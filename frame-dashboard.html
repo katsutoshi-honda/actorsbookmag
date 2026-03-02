@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRAME — Article Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --panel: #0f0f0f;
+  --surface: #141414;
+  --surface2: #1c1c1c;
+  --border: #222;
+  --border2: #2c2c2c;
+  --white: #f0ede8;
+  --off: #a09c94;
+  --dim: #4a4642;
+  --accent: #d4f000;
+  --red: #ff3300;
+  --green: #00e676;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  min-height: 100vh;
+}
+
+.topbar {
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 4px; flex-shrink: 0; }
+.logo em { color: var(--accent); font-style: normal; }
+.topbar-tag { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--dim); letter-spacing: 2px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); margin-left: auto; animation: blink 2s ease-in-out infinite; }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.workspace {
+  display: grid;
+  grid-template-columns: 300px 1fr 310px;
+  min-height: calc(100vh - 46px);
+}
+
+.left-panel  { background: var(--panel); border-right: 1px solid var(--border); overflow-y: auto; }
+.center-panel { background: var(--bg); overflow-y: auto; }
+.right-panel  { background: var(--panel); border-left: 1px solid var(--border); overflow-y: auto; }
+
+.section { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+
+.section-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--dim);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.step {
+  width: 16px; height: 16px;
+  background: var(--accent);
+  color: #000;
+  font-size: 8px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.step.g { background: var(--border2); color: var(--dim); }
+.step.r { background: #FF0000; color: #fff; }
+
+input[type=text], input[type=password], textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--white);
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color .15s;
+}
+input:focus, textarea:focus { border-color: var(--accent); }
+input::placeholder, textarea::placeholder { color: var(--dim); }
+textarea { resize: vertical; min-height: 70px; font-family: 'Noto Sans JP', sans-serif; font-size: 11px; line-height: 1.7; }
+
+.input-row { display: flex; gap: 5px; }
+.input-row input { flex: 1; }
+
+.eye-btn {
+  width: 34px; height: 34px;
+  background: var(--surface); border: 1px solid var(--border2);
+  color: var(--dim); cursor: pointer; font-size: 12px; flex-shrink: 0;
+  transition: color .15s;
+}
+.eye-btn:hover { color: var(--white); }
+
+.hint { font-family: 'Space Mono', monospace; font-size: 8px; color: var(--dim); line-height: 1.6; margin-top: 5px; }
+
+.tone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.tone-btn {
+  background: var(--surface); border: 1px solid var(--border2);
+  color: var(--off); font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 1px;
+  padding: 7px 8px; cursor: pointer; text-align: left; transition: all .15s;
+}
+.tone-btn:hover { background: var(--surface2); color: var(--white); }
+.tone-btn.on { border-color: var(--accent); color: var(--accent); background: rgba(212,240,0,.04); }
+.tone-btn .icon { display: block; font-size: 12px; margin-bottom: 3px; }
+
+.len-row { display: flex; gap: 5px; }
+.len-btn {
+  flex: 1; background: var(--surface); border: 1px solid var(--border2);
+  color: var(--off); font-family: 'Space Mono', monospace; font-size: 8px;
+  padding: 7px 0; cursor: pointer; text-align: center; transition: all .15s;
+}
+.len-btn:hover { background: var(--surface2); color: var(--white); }
+.len-btn.on { border-color: var(--accent); color: var(--accent); }
+.len-btn .num { display: block; font-family: 'Bebas Neue', sans-serif; font-size: 18px; }
+
+.slider-block { margin-bottom: 13px; }
+.slider-block:last-child { margin-bottom: 0; }
+.slider-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.slider-label { font-family: 'Space Mono', monospace; font-size: 7px; color: var(--dim); }
+.slider-name  { font-family: 'Space Mono', monospace; font-size: 7px; color: var(--accent); letter-spacing: 1px; }
+
+input[type=range] {
+  width: 100%; -webkit-appearance: none; height: 2px;
+  background: var(--border2); outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 11px; height: 11px;
+  background: var(--accent); border: none; transition: transform .15s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+.gen-wrap { padding: 14px; }
+.gen-btn {
+  width: 100%; height: 46px; background: var(--accent); border: none;
+  color: #000; font-family: 'Bebas Neue', sans-serif; font-size: 19px; letter-spacing: 4px;
+  cursor: pointer; transition: background .15s;
+}
+.gen-btn:hover { background: #c8e800; }
+.gen-btn:disabled { background: var(--surface2); color: var(--accent); border: 1px solid var(--accent); cursor: not-allowed; }
+
+.load-bar { height: 2px; background: var(--border); display: none; }
+.load-bar.on { display: block; }
+.load-bar-inner { height: 100%; background: var(--accent); animation: slide 1.2s ease-in-out infinite; width: 40%; }
+@keyframes slide { from{margin-left:-40%} to{margin-left:110%} }
+
+.toolbar {
+  height: 40px; background: var(--panel); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 20px; gap: 14px;
+  position: sticky; top: 46px; z-index: 90;
+}
+.tab {
+  font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 2px;
+  color: var(--dim); cursor: pointer; padding: 4px 0; border-bottom: 1px solid transparent; transition: all .15s;
+}
+.tab:hover, .tab.on { color: var(--white); border-color: var(--accent); }
+.divider { width: 1px; height: 14px; background: var(--border2); }
+.stat-lbl { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--dim); }
+.toolbar-right { margin-left: auto; display: flex; gap: 8px; }
+.copy-btn {
+  font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 1px;
+  padding: 5px 12px; background: none; border: 1px solid var(--border2); color: var(--dim); cursor: pointer; transition: all .15s;
+}
+.copy-btn:hover { color: var(--white); }
+.pub-btn {
+  font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 1px;
+  padding: 5px 12px; background: var(--red); border: 1px solid var(--red); color: #fff; cursor: pointer;
+}
+.pub-btn:hover { background: #cc2800; }
+
+.empty {
+  padding: 80px 44px; display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
+.empty-icon { font-family: 'Bebas Neue', sans-serif; font-size: 80px; color: var(--border2); line-height: 1; }
+.empty-msg { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--dim); letter-spacing: 2px; text-align: center; line-height: 2; }
+
+.article-wrap { padding: 36px 44px; }
+
+.art-kicker { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 3px; color: var(--accent); margin-bottom: 14px; }
+.art-headline { font-family: 'Bebas Neue', sans-serif; font-size: clamp(30px, 3vw, 52px); line-height: 1; letter-spacing: 1px; margin-bottom: 10px; }
+.art-deck {
+  font-size: 15px; color: var(--off); line-height: 1.8; font-weight: 300;
+  max-width: 600px; margin-bottom: 26px;
+  border-left: 3px solid var(--accent); padding-left: 16px;
+}
+.art-meta {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 28px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+}
+.art-tag { font-family: 'Space Mono', monospace; font-size: 8px; padding: 3px 8px; background: var(--accent); color: #000; font-weight: 700; letter-spacing: 1px; }
+.art-date { font-family: 'Space Mono', monospace; font-size: 8px; color: var(--dim); letter-spacing: 2px; }
+.art-body { font-size: 13px; line-height: 2; color: var(--off); font-weight: 300; max-width: 620px; }
+.art-body p { margin-bottom: 18px; }
+.art-body h2 {
+  font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--white); letter-spacing: 1px;
+  margin: 32px 0 12px; padding-left: 10px; border-left: 3px solid var(--red);
+}
+.art-body h3 { font-size: 14px; font-weight: 700; color: var(--white); margin: 24px 0 8px; }
+.art-body strong { color: var(--white); font-weight: 700; }
+.art-body em { font-style: normal; color: var(--accent); }
+
+.yt-zone { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--border); max-width: 620px; }
+.yt-zone-title { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--accent); letter-spacing: 3px; margin-bottom: 14px; }
+.yt-embed-wrap iframe { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
+.yt-embed-cap { font-family: 'Space Mono', monospace; font-size: 8px; color: var(--dim); margin-top: 6px; }
+.yt-remove {
+  font-family: 'Space Mono', monospace; font-size: 8px; color: var(--red);
+  background: none; border: 1px solid var(--red); padding: 3px 10px; cursor: pointer; margin-top: 6px; transition: all .15s;
+}
+.yt-remove:hover { background: var(--red); color: #fff; }
+
+.yt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
+.yt-card {
+  border: 1px solid var(--border2); background: var(--surface); cursor: pointer;
+  overflow: hidden; transition: border-color .15s;
+}
+.yt-card:hover { border-color: var(--accent); }
+.yt-card.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.yt-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; filter: brightness(.85); transition: filter .15s; }
+.yt-card:hover img { filter: brightness(1); }
+.yt-card-body { padding: 5px 7px 7px; }
+.yt-card-title { font-size: 9px; color: var(--white); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 2px; }
+.yt-card-meta { font-family: 'Space Mono', monospace; font-size: 7px; color: var(--dim); }
+.yt-search-btn {
+  width: 100%; padding: 8px; background: none; border: 1px solid var(--border2);
+  color: var(--dim); font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 1px; cursor: pointer; transition: all .15s;
+}
+.yt-search-btn:hover { border-color: #FF0000; color: #FF0000; }
+.yt-loading { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--dim); letter-spacing: 2px; padding: 10px 0; animation: fade 1.2s ease-in-out infinite; }
+@keyframes fade { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.plain-view {
+  display: none; font-family: 'Space Mono', monospace; font-size: 10px;
+  line-height: 1.9; color: var(--off); white-space: pre-wrap; word-break: break-word;
+  padding: 36px 44px;
+}
+
+.r-section { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.r-title { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 2px; color: var(--dim); margin-bottom: 11px; }
+
+.prog-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 0; border-bottom: 1px solid var(--border);
+  opacity: .2; transition: opacity .3s;
+}
+.prog-item:last-child { border-bottom: none; }
+.prog-item.done, .prog-item.active { opacity: 1; }
+.prog-dot {
+  width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--dim);
+  flex-shrink: 0; transition: all .3s;
+}
+.prog-item.done .prog-dot { background: var(--green); border-color: var(--green); box-shadow: 0 0 5px var(--green); }
+.prog-item.active .prog-dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 5px var(--accent); animation: blink .8s ease-in-out infinite; }
+.prog-text { font-family: 'Space Mono', monospace; font-size: 8px; color: var(--off); letter-spacing: 1px; }
+.prog-item.active .prog-text { color: var(--accent); }
+.prog-item.done  .prog-text { color: var(--white); }
+
+.thumb { aspect-ratio: 16/9; background: var(--surface2); position: relative; overflow: hidden; border: 1px solid var(--border2); }
+.thumb-bg { position: absolute; inset: 0; }
+.thumb-overlay {
+  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 12px; background: linear-gradient(to top, rgba(0,0,0,.9) 0%, transparent 60%);
+}
+.thumb-tag { font-family: 'Space Mono', monospace; font-size: 7px; background: var(--accent); color: #000; padding: 2px 6px; font-weight: 700; letter-spacing: 1px; align-self: flex-start; margin-bottom: 5px; }
+.thumb-title { font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: var(--white); line-height: 1.1; }
+.thumb-site { font-family: 'Space Mono', monospace; font-size: 7px; color: var(--dim); margin-top: 4px; }
+
+.stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+.stat-cell { background: var(--surface); padding: 9px 6px; text-align: center; }
+.stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--accent); line-height: 1; }
+.stat-lbl2 { font-family: 'Space Mono', monospace; font-size: 7px; color: var(--dim); letter-spacing: 1px; margin-top: 2px; }
+
+.sns-item { background: var(--surface); border: 1px solid var(--border2); padding: 9px; margin-bottom: 5px; }
+.sns-item:last-child { margin-bottom: 0; }
+.sns-row { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+.sns-icon { width: 17px; height: 17px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.sns-name { font-family: 'Space Mono', monospace; font-size: 8px; color: var(--off); letter-spacing: 1px; }
+.sns-text { font-size: 10px; color: var(--dim); line-height: 1.5; }
+.post-btn {
+  width: 100%; padding: 9px; background: none; border: 1px solid var(--border2);
+  color: var(--off); font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 2px;
+  cursor: pointer; transition: all .15s; margin-top: 9px;
+}
+.post-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.notif {
+  position: fixed; top: 56px; right: 16px; background: var(--surface2); border: 1px solid var(--accent);
+  font-family: 'Space Mono', monospace; font-size: 9px; color: var(--accent); letter-spacing: 2px;
+  padding: 9px 14px; z-index: 999; transform: translateY(-8px); opacity: 0; transition: all .25s; pointer-events: none;
+}
+.notif.on { transform: translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">FR<em>A</em>ME <span style="color:var(--dim);font-size:12px;letter-spacing:3px;">STUDIO</span></div>
+  <div class="topbar-tag">ARTICLE GENERATION SYSTEM</div>
+  <div class="dot"></div>
+</div>
+
+<div class="load-bar" id="load-bar"><div class="load-bar-inner"></div></div>
+
+<div class="workspace">
+
+  <!-- LEFT -->
+  <div class="left-panel">
+
+    <div class="section">
+      <div class="section-title"><span class="step">1</span>SOURCE URL</div>
+      <input type="text" id="input-url" placeholder="https://filmfreeway.com/...">
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="step">2</span>ARTICLE TITLE</div>
+      <input type="text" id="input-title" placeholder="例：『Anora』── ショーン・ベイカーが描く...">
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="step">3</span>DIRECTION（編集方針）</div>
+      <textarea id="input-direction" rows="4" placeholder="例：監督のビジョンと助成金の背景にフォーカス。カンヌでの反応も語る。読者は映画好き20-35歳。批評的で熱量ある文体で。"></textarea>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="step">4</span>ARTICLE TYPE</div>
+      <div class="tone-grid">
+        <button class="tone-btn on" data-tone="hypebeast" onclick="selectTone(this)"><span class="icon">🔥</span>HYPEBEAST</button>
+        <button class="tone-btn" data-tone="critical"   onclick="selectTone(this)"><span class="icon">🎬</span>CRITICAL</button>
+        <button class="tone-btn" data-tone="interview"  onclick="selectTone(this)"><span class="icon">🎙️</span>INTERVIEW</button>
+        <button class="tone-btn" data-tone="news"       onclick="selectTone(this)"><span class="icon">⚡</span>BREAKING</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="step">5</span>WRITING STYLE</div>
+      <div class="slider-block">
+        <div class="slider-row"><span class="slider-label">ライト</span><span class="slider-name">文体の重さ</span><span class="slider-label">ヘビー</span></div>
+        <input type="range" id="sl-weight" min="1" max="5" value="3">
+      </div>
+      <div class="slider-block">
+        <div class="slider-row"><span class="slider-label">客観</span><span class="slider-name">批評温度</span><span class="slider-label">主観</span></div>
+        <input type="range" id="sl-subj" min="1" max="5" value="3">
+      </div>
+      <div class="slider-block">
+        <div class="slider-row"><span class="slider-label">平易</span><span class="slider-name">語彙レベル</span><span class="slider-label">専門</span></div>
+        <input type="range" id="sl-vocab" min="1" max="5" value="2">
+      </div>
+      <div class="slider-block">
+        <div class="slider-row"><span class="slider-label">短文</span><span class="slider-name">文の長さ</span><span class="slider-label">長文</span></div>
+        <input type="range" id="sl-sent" min="1" max="5" value="2">
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="step">6</span>LENGTH</div>
+      <div class="len-row">
+        <button class="len-btn" data-len="short"  onclick="selectLen(this)"><span class="num">400</span>SHORT</button>
+        <button class="len-btn on" data-len="medium" onclick="selectLen(this)"><span class="num">800</span>MEDIUM</button>
+        <button class="len-btn" data-len="long"   onclick="selectLen(this)"><span class="num">1500</span>LONG</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="step g">⚙</span>CLAUDE API KEY</div>
+      <div class="input-row">
+        <input type="password" id="input-apikey" placeholder="sk-ant-...">
+        <button class="eye-btn" onclick="togglePw('input-apikey')">👁</button>
+      </div>
+      <p class="hint">ブラウザ内のみ。サーバーには送信されません。</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="step r">▶</span>YOUTUBE API KEY <span style="color:var(--dim)">(任意)</span></div>
+      <div class="input-row">
+        <input type="password" id="input-ytkey" placeholder="AIza...">
+        <button class="eye-btn" onclick="togglePw('input-ytkey')">👁</button>
+      </div>
+      <p class="hint">Google Cloud → YouTube Data API v3<br>なくても記事生成は動作します。</p>
+    </div>
+
+    <div class="gen-wrap">
+      <button class="gen-btn" id="gen-btn" onclick="generateArticle()">GENERATE ARTICLE</button>
+    </div>
+
+  </div>
+
+  <!-- CENTER -->
+  <div class="center-panel">
+    <div class="toolbar">
+      <span class="tab on" onclick="switchTab('preview',this)">PREVIEW</span>
+      <span class="tab"    onclick="switchTab('body',this)">BODY TEXT</span>
+      <div class="divider"></div>
+      <span class="stat-lbl" id="stat-chars">— CHARS</span>
+      <span class="stat-lbl" id="stat-words">— WORDS</span>
+      <div class="toolbar-right">
+        <button class="copy-btn" onclick="copyText()">COPY</button>
+        <button class="pub-btn">PUBLISH →</button>
+      </div>
+    </div>
+
+    <div class="empty" id="empty-state">
+      <div class="empty-icon">✦</div>
+      <div class="empty-msg">左パネルに情報を入力して<br>GENERATE ARTICLE を押してください</div>
+    </div>
+
+    <div class="article-wrap" id="article-wrap" style="display:none;">
+      <div class="art-kicker" id="art-kicker">REVIEW — 2026.03.02</div>
+      <h1 class="art-headline" id="art-headline"></h1>
+      <p class="art-deck" id="art-deck"></p>
+      <div class="art-meta">
+        <span class="art-tag" id="art-tag">REVIEW</span>
+        <span class="art-date" id="art-date">2026.03.02</span>
+        <span class="art-date" style="margin-left:auto;">FRAME EDITORIAL</span>
+      </div>
+      <div class="art-body" id="art-body"></div>
+
+      <div class="yt-zone" id="yt-zone" style="display:none;">
+        <div class="yt-zone-title">// RELATED VIDEOS</div>
+        <div class="yt-embed-wrap" id="yt-embed-wrap"></div>
+        <div id="yt-picker"></div>
+      </div>
+    </div>
+
+    <div class="plain-view" id="plain-view"></div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+
+    <div class="r-section">
+      <div class="r-title">// PIPELINE STATUS</div>
+      <div id="prog-list">
+        <div class="prog-item" id="p0"><div class="prog-dot"></div><div class="prog-text">WEB RESEARCH</div></div>
+        <div class="prog-item" id="p1"><div class="prog-dot"></div><div class="prog-text">FACT EXTRACT</div></div>
+        <div class="prog-item" id="p2"><div class="prog-dot"></div><div class="prog-text">BUILD PROMPT</div></div>
+        <div class="prog-item" id="p3"><div class="prog-dot"></div><div class="prog-text">WRITE ARTICLE</div></div>
+        <div class="prog-item" id="p4"><div class="prog-dot"></div><div class="prog-text">RENDER</div></div>
+        <div class="prog-item" id="p5"><div class="prog-dot"></div><div class="prog-text">YOUTUBE SEARCH</div></div>
+        <div class="prog-item" id="p6"><div class="prog-dot"></div><div class="prog-text">READY</div></div>
+      </div>
+    </div>
+
+    <div class="r-section">
+      <div class="r-title">// THUMBNAIL PREVIEW</div>
+      <div class="thumb">
+        <div class="thumb-bg" id="thumb-bg" style="background:linear-gradient(135deg,#1a0500,#0a0a0a)"></div>
+        <div class="thumb-overlay">
+          <span class="thumb-tag" id="thumb-tag">REVIEW</span>
+          <div class="thumb-title" id="thumb-title">タイトルがここに表示されます</div>
+          <div class="thumb-site">FRAME — INDEPENDENT FILM MEDIA</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="r-section">
+      <div class="r-title">// ARTICLE STATS</div>
+      <div class="stat-row">
+        <div class="stat-cell"><div class="stat-num" id="s-chars">0</div><div class="stat-lbl2">CHARS</div></div>
+        <div class="stat-cell"><div class="stat-num" id="s-words">0</div><div class="stat-lbl2">WORDS</div></div>
+        <div class="stat-cell"><div class="stat-num" id="s-read">0</div><div class="stat-lbl2">MIN READ</div></div>
+      </div>
+    </div>
+
+    <div class="r-section">
+      <div class="r-title">// SNS AUTO-CAPTION</div>
+      <div class="sns-item">
+        <div class="sns-row"><div class="sns-icon" style="background:#E1306C;">IG</div><div class="sns-name">INSTAGRAM</div></div>
+        <div class="sns-text" id="sns-ig">記事が生成されるとキャプションが自動作成されます。</div>
+      </div>
+      <div class="sns-item">
+        <div class="sns-row"><div class="sns-icon" style="background:#000;border:1px solid #333;">𝕏</div><div class="sns-name">X / TWITTER</div></div>
+        <div class="sns-text" id="sns-x">—</div>
+      </div>
+      <div class="sns-item">
+        <div class="sns-row"><div class="sns-icon" style="background:#FF0050;">TK</div><div class="sns-name">TIKTOK</div></div>
+        <div class="sns-text" id="sns-tk">—</div>
+      </div>
+      <button class="post-btn">POST TO ALL PLATFORMS →</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+'use strict';
+
+let tone    = 'hypebeast';
+let len     = 'medium';
+let busy    = false;
+let embedId = null;
+
+const G = ['linear-gradient(135deg,#1a0500,#0a0a0a)','linear-gradient(135deg,#000a1a,#080808)','linear-gradient(135deg,#0a0a1a,#080808)','linear-gradient(135deg,#1a1500,#080808)'];
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ── APIキー永続化（window.storage） ──
+async function loadKeys() {
+  try {
+    const ck = await window.storage.get('frame:claude_key');
+    if (ck && ck.value) {
+      $('input-apikey').value = ck.value;
+      showKeySaved('input-apikey', true);
+    }
+    const yk = await window.storage.get('frame:yt_key');
+    if (yk && yk.value) {
+      $('input-ytkey').value = yk.value;
+      showKeySaved('input-ytkey', true);
+    }
+  } catch(_) {}
+}
+
+async function saveKey(storageKey, inputId) {
+  const val = $(inputId).value.trim();
+  try {
+    if (val) {
+      await window.storage.set(storageKey, val);
+      showKeySaved(inputId, true);
+      notify('✦ APIキーを保存しました');
+    } else {
+      await window.storage.delete(storageKey);
+      showKeySaved(inputId, false);
+    }
+  } catch(_) { notify('⚠ キーの保存に失敗しました'); }
+}
+
+function showKeySaved(inputId, saved) {
+  const wrap = $(inputId).closest('.section');
+  let badge = wrap.querySelector('.key-saved');
+  if (!badge) {
+    badge = document.createElement('span');
+    badge.className = 'key-saved';
+    badge.style.cssText = 'font-family:"Space Mono",monospace;font-size:8px;letter-spacing:1px;padding:2px 7px;margin-left:8px;';
+    wrap.querySelector('.section-title').appendChild(badge);
+  }
+  if (saved) {
+    badge.textContent = '✓ SAVED';
+    badge.style.color = 'var(--green)';
+  } else {
+    badge.textContent = '';
+  }
+}
+
+// 入力フィールドのsaveボタン追加は不要 → blur時に自動保存
+$('input-apikey').addEventListener('blur', () => saveKey('frame:claude_key', 'input-apikey'));
+$('input-ytkey').addEventListener('blur',  () => saveKey('frame:yt_key',    'input-ytkey'));
+
+// ページ読み込み時にキーを復元
+loadKeys();
+
+function notify(msg) {
+  n.textContent = msg;
+  n.classList.add('on');
+  setTimeout(() => n.classList.remove('on'), 2500);
+}
+
+function togglePw(id) {
+  const e = $(id);
+  e.type = e.type === 'password' ? 'text' : 'password';
+}
+
+function selectTone(el) {
+  document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  tone = el.dataset.tone;
+}
+
+function selectLen(el) {
+  document.querySelectorAll('.len-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  len = el.dataset.len;
+}
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  const preview = $('article-wrap');
+  const plain   = $('plain-view');
+  if (tab === 'preview') {
+    if (preview) preview.style.display = 'block';
+    plain.style.display = 'none';
+  } else {
+    if (preview) preview.style.display = 'none';
+    buildPlainView();
+    plain.style.display = 'block';
+  }
+}
+
+function buildPlainView() {
+  const h = $('art-headline').textContent;
+  const d = $('art-deck').textContent;
+  const b = $('art-body').innerText;
+  const yt = embedId ? `\n\n【YouTube埋め込み】\n<iframe width="100%" src="https://www.youtube.com/embed/${embedId}" frameborder="0" allowfullscreen></iframe>` : '';
+  $('plain-view').textContent = h ? `【見出し】\n${h}\n\n【リード文】\n${d}\n\n【本文】\n${b}${yt}` : '記事がまだ生成されていません。';
+}
+
+function updateStats(text) {
+  const clean = text.replace(/<[^>]+>/g,'').trim();
+  const chars = clean.length;
+  const words = clean ? clean.split(/\s+/).length : 0;
+  const mins  = Math.max(1, Math.round(chars/400));
+  $('s-chars').textContent = chars.toLocaleString();
+  $('s-words').textContent = words.toLocaleString();
+  $('s-read').textContent  = mins;
+  $('stat-chars').textContent = chars.toLocaleString() + ' CHARS';
+  $('stat-words').textContent = words.toLocaleString() + ' WORDS';
+}
+
+function resetProg() { for(let i=0;i<=6;i++){const e=$(`p${i}`);e.classList.remove('done','active');} }
+function setProg(i,s) { const e=$(`p${i}`);e.classList.remove('done','active');e.classList.add(s); }
+function doneProg(i)  { const e=$(`p${i}`);e.classList.remove('active');e.classList.add('done'); }
+
+function getSliders() {
+  return {
+    weight: parseInt($('sl-weight').value),
+    subj:   parseInt($('sl-subj').value),
+    vocab:  parseInt($('sl-vocab').value),
+    sent:   parseInt($('sl-sent').value),
+  };
+}
+
+function researchPrompt(url, title, dir) {
+  return `あなたはFRAMEのリサーチャーです。web_searchツールで以下を調査してください。
+
+調査対象: ${title||'（URLから特定）'}
+URL: ${url||'（なし）'}
+方針: ${dir||'（なし）'}
+
+必ず調査すること:
+1. 基本情報（制作年・監督・製作国）
+2. 資金調達・助成金（財団名・ファンド名を正確に）
+3. 映画祭歴（映画祭名・年度・賞名を正確に）
+4. 配給・公開情報
+5. 監督プロフィール・経歴
+6. 制作背景・テーマ
+7. 批評・評価
+
+出力:
+FACTS:
+[事実を箇条書き。不明は「不明」と記載。推測・創作は絶対にしない]`;
+}
+
+function articlePrompt(facts, title, dir) {
+  const lenMap  = {short:'400字前後',medium:'800字前後',long:'1500字前後'};
+  const toneMap = {
+    hypebeast:'Hypebeast・NiEW風。断言的で熱量と知性を融合。',
+    critical: '映画評論家スタイル。技術・芸術面を深く論理的に分析。',
+    interview:'インタビュー記事風。人物の言葉中心。内面に迫る。',
+    news:     'ニュース報道スタイル。事実簡潔・業界への影響解説。',
+  };
+  const s = getSliders();
+  const w = s.weight<=2?'短文中心・軽快。':s.weight>=4?'重厚・読み応え重視。':'バランス型。';
+  const b = s.subj<=2?'ニュートラル・客観的。':s.subj>=4?'断言的・熱量重視。':'やや主観交え展開。';
+  const v = s.vocab<=2?'平易な語彙・一般読者向け。':s.vocab>=4?'映画批評用語を積極使用。':'映画ファン向け語彙。';
+  const e = s.sent<=2?'一文を短く刻む。':s.sent>=4?'一文を長く描写・展開を積む。':'短文と長文を交互に。';
+
+  return `あなたはFRAMEの編集者です。以下の【確認済み事実】のみを使い記事を執筆してください。事実にない情報は絶対に加えないでください。
+
+【確認済み事実】
+${facts}
+
+編集方針: ${dir||'映画の魅力と制作背景を伝える。'}
+記事タイプ: ${toneMap[tone]}
+文体: ${w}${b}${v}${e}
+文字数: ${lenMap[len]}
+
+出力フォーマット（厳守）:
+HEADLINE: [見出し]
+DECK: [リード文2〜3文]
+BODY:
+[本文。見出し##・段落は空行区切り]
+IG_CAPTION: [Instagram用。絵文字+ハッシュタグ]
+X_CAPTION: [X用。280字以内]
+TK_CAPTION: [TikTok用。一言]
+
+HEADLINE:から始めて出力。`;
+}
+
+function parseResponse(text) {
+  const get = key => {
+    const m = text.match(new RegExp(`${key}:([\\s\\S]*?)(?=\\n[A-Z_]+:|$)`,'i'));
+    return m ? m[1].trim() : '';
+  };
+  const headline = get('HEADLINE');
+  const deck     = get('DECK');
+  const body     = get('BODY');
+  const ig       = get('IG_CAPTION');
+  const x        = get('X_CAPTION');
+  const tk       = get('TK_CAPTION');
+  const bodyHtml = body
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/『(.+?)』/g,'『<em>$1</em>』')
+    .split(/\n\n+/)
+    .map(p=>p.startsWith('<h')?p:`<p>${p.replace(/\n/g,'<br>')}</p>`)
+    .join('\n');
+  return {headline,deck,bodyHtml,ig,x,tk};
+}
+
+async function callClaude(body) {
+  const key = $('input-apikey').value.trim();
+  if (!key) throw new Error('Claude APIキーを入力してください');
+  const res = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':key,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true',
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    let msg=`API Error ${res.status}`;
+    try{const j=await res.json();msg=j.error?.message||msg;}catch(_){}
+    throw new Error(msg);
+  }
+  return res.json();
+}
+
+async function generateArticle() {
+  if (busy) return;
+  const url = $('input-url').value.trim();
+  const title = $('input-title').value.trim();
+  const dir   = $('input-direction').value.trim();
+
+  if (!url && !title && !dir) { notify('❌ URL・タイトル・ディレクションのいずれかを入力してください'); return; }
+  if (!$('input-apikey').value.trim()) { notify('❌ Claude APIキーを入力してください'); return; }
+
+  busy = true;
+  embedId = null;
+
+  const btn = $('gen-btn');
+  btn.disabled = true;
+  btn.textContent = 'RESEARCHING...';
+  $('load-bar').classList.add('on');
+
+  $('empty-state').style.display  = 'none';
+  $('article-wrap').style.display = 'block';
+  $('plain-view').style.display   = 'none';
+  $('yt-zone').style.display      = 'none';
+
+  $('thumb-title').textContent = title || '調査中...';
+  $('thumb-bg').style.background = G[Math.floor(Math.random()*G.length)];
+
+  resetProg();
+
+  $('art-headline').textContent = title || '調査中...';
+  $('art-deck').textContent     = '';
+  $('art-body').innerHTML = '<p style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--dim);">ウェブ検索でリサーチ中...</p>';
+
+  try {
+    // Phase 1: Research
+    setProg(0,'active');
+    const rd = await callClaude({
+      model:'claude-sonnet-4-6', max_tokens:3000,
+      tools:[{type:'web_search_20250305',name:'web_search'}],
+      messages:[{role:'user',content:researchPrompt(url,title,dir)}],
+    });
+    const factsRaw = rd.content.filter(b=>b.type==='text').map(b=>b.text).join('\n').trim();
+    const fm = factsRaw.match(/FACTS:\s*([\s\S]+)/i);
+    const facts = (fm?fm[1]:factsRaw).trim();
+
+    doneProg(0); setProg(1,'active');
+    $('art-body').innerHTML = '<p style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--dim);">リサーチ完了。記事執筆中...</p>';
+    await sleep(150); doneProg(1); setProg(2,'active'); await sleep(100); doneProg(2);
+
+    // Phase 2: Write
+    btn.textContent = 'WRITING...';
+    setProg(3,'active');
+    const ad = await callClaude({
+      model:'claude-sonnet-4-6', max_tokens:2500,
+      messages:[{role:'user',content:articlePrompt(facts,title,dir)}],
+    });
+    const rawText = ad.content?.[0]?.text||'';
+    if (!rawText) throw new Error('記事生成レスポンスが空でした');
+    doneProg(3); setProg(4,'active');
+
+    // Phase 3: Render
+    const p = parseResponse(rawText);
+    $('art-headline').textContent = p.headline||title;
+    $('art-deck').textContent     = p.deck;
+    $('art-body').innerHTML       = p.bodyHtml;
+
+    const today = new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'.');
+    $('art-kicker').textContent = `${tone.toUpperCase()} — ${today}`;
+    $('art-date').textContent   = today;
+    $('art-tag').textContent    = tone.toUpperCase();
+    $('sns-ig').textContent     = p.ig||'—';
+    $('sns-x').textContent      = p.x||'—';
+    $('sns-tk').textContent     = p.tk||'—';
+    $('thumb-title').textContent = p.headline||title;
+    $('thumb-tag').textContent   = tone.toUpperCase();
+    updateStats([$('art-headline').textContent, p.deck, $('art-body').innerText].join(' '));
+    doneProg(4);
+
+    // Phase 4: YouTube
+    const ytKey = $('input-ytkey').value.trim();
+    if (ytKey) {
+      setProg(5,'active');
+      $('yt-zone').style.display = 'block';
+      await searchYouTube(p.headline||title, ytKey);
+      doneProg(5);
+    } else {
+      // Show manual search option
+      $('yt-zone').style.display = 'block';
+      $('yt-picker').innerHTML = `<p style="font-family:'Space Mono',monospace;font-size:8px;color:var(--dim);margin-bottom:8px;">YouTube APIキーを設定すると動画を自動検索できます</p>`;
+    }
+
+    doneProg(6);
+    notify('✦ 生成完了！');
+
+  } catch(err) {
+    notify('❌ ' + err.message);
+    resetProg();
+    $('art-body').innerHTML = `<p style="color:var(--red)">${err.message}</p>`;
+  } finally {
+    busy = false;
+    btn.disabled = false;
+    btn.textContent = 'GENERATE ARTICLE';
+    $('load-bar').classList.remove('on');
+  }
+}
+
+async function searchYouTube(query, ytKey) {
+  if (!ytKey) ytKey = $('input-ytkey').value.trim();
+  if (!ytKey) { notify('❌ YouTube APIキーを入力してください'); return; }
+  const picker = $('yt-picker');
+  picker.innerHTML = '<div class="yt-loading">▶ SEARCHING YOUTUBE...</div>';
+  $('yt-zone').style.display = 'block';
+  try {
+    const params = new URLSearchParams({part:'snippet',q:query+' trailer',type:'video',maxResults:6,key:ytKey});
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/search?${params}`);
+    if (!res.ok) { const e=await res.json(); throw new Error(e.error?.message||`YouTube API Error ${res.status}`); }
+    const data = await res.json();
+    renderPicker(data.items||[], query);
+  } catch(e) {
+    picker.innerHTML = `<p style="font-family:'Space Mono',monospace;font-size:9px;color:var(--red);">❌ ${e.message}</p>`;
+  }
+}
+
+function renderPicker(videos, origQuery) {
+  const picker = $('yt-picker');
+  picker.innerHTML = '';
+  if (!videos.length) { picker.innerHTML='<div class="yt-loading">動画が見つかりませんでした</div>'; return; }
+
+  const lbl = document.createElement('p');
+  lbl.style.cssText = 'font-family:"Space Mono",monospace;font-size:8px;color:var(--dim);letter-spacing:1px;margin-bottom:8px;';
+  lbl.textContent = 'クリックして記事に埋め込む';
+  picker.appendChild(lbl);
+
+  const grid = document.createElement('div');
+  grid.className = 'yt-grid';
+  videos.forEach(v => {
+    const vid = v.id.videoId;
+    const ttl = v.snippet.title;
+    const thr = v.snippet.thumbnails?.medium?.url||'';
+    const ch  = v.snippet.channelTitle;
+    const card = document.createElement('div');
+    card.className='yt-card'; card.id='yc-'+vid;
+    card.innerHTML=`<img src="${thr}" alt="" loading="lazy"><div class="yt-card-body"><div class="yt-card-title">${ttl}</div><div class="yt-card-meta">${ch}</div></div>`;
+    card.onclick=()=>embedVideo(vid,ttl);
+    grid.appendChild(card);
+  });
+  picker.appendChild(grid);
+
+  const re = document.createElement('button');
+  re.className='yt-search-btn'; re.textContent='▶ 別のキーワードで再検索';
+  re.onclick=()=>{ const q=prompt('検索キーワード:',origQuery); if(q) searchYouTube(q); };
+  picker.appendChild(re);
+}
+
+function embedVideo(videoId, title) {
+  document.querySelectorAll('.yt-card').forEach(c=>c.classList.remove('on'));
+  const card=document.getElementById('yc-'+videoId);
+  if (card) card.classList.add('on');
+  embedId = videoId;
+  $('yt-embed-wrap').innerHTML=`
+    <iframe src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen loading="lazy"></iframe>
+    <div class="yt-embed-cap">▶ ${title}</div>
+    <button class="yt-remove" onclick="removeEmbed()">✕ REMOVE</button>`;
+  notify('✦ 動画を埋め込みました');
+}
+
+function removeEmbed() {
+  $('yt-embed-wrap').innerHTML='';
+  document.querySelectorAll('.yt-card').forEach(c=>c.classList.remove('on'));
+  embedId=null;
+}
+
+function copyText() {
+  const h=$('art-headline').textContent;
+  const d=$('art-deck').textContent;
+  const b=$('art-body').innerText;
+  if (!h) { notify('記事がまだありません'); return; }
+  navigator.clipboard.writeText(`${h}\n\n${d}\n\n${b}`);
+  notify('✦ コピーしました');
+}
+
+$('input-title').addEventListener('input', function() {
+  $('thumb-title').textContent = this.value || 'タイトルがここに表示されます';
+});
+</script>
+</body>
+</html>

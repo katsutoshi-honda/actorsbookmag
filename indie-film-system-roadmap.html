@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INDIE FRAME — System Architecture</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;700&display=swap');
+
+  :root {
+    --bg: #080808;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --accent: #E8FF00;
+    --accent2: #FF3B00;
+    --white: #f0f0f0;
+    --gray: #555;
+    --border: #222;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Noto Sans JP', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--accent);
+  }
+
+  .logo span { color: var(--white); }
+
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--gray);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    letter-spacing: 2px;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 80px 40px 60px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: 'SYSTEM';
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 200px;
+    color: #ffffff04;
+    position: absolute;
+    top: 0;
+    right: -20px;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 96px);
+    line-height: 0.95;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+  }
+
+  .hero h1 .highlight {
+    color: var(--accent);
+    display: block;
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    color: #aaa;
+    max-width: 600px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* PIPELINE SECTION */
+  .section {
+    padding: 60px 40px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 4px;
+    margin-bottom: 40px;
+  }
+
+  /* PIPELINE FLOW */
+  .pipeline {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 20px;
+  }
+
+  .pipe-step {
+    flex: 0 0 220px;
+    border: 1px solid var(--border);
+    border-right: none;
+    padding: 28px 24px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--surface);
+  }
+
+  .pipe-step:last-child { border-right: 1px solid var(--border); }
+
+  .pipe-step:hover, .pipe-step.active {
+    background: var(--surface2);
+    border-color: var(--accent);
+    z-index: 2;
+  }
+
+  .pipe-step.active .pipe-num { color: var(--accent); }
+
+  .pipe-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: #2a2a2a;
+    line-height: 1;
+    margin-bottom: 12px;
+    transition: color 0.2s;
+  }
+
+  .pipe-icon {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .pipe-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--white);
+  }
+
+  .pipe-sub {
+    font-size: 11px;
+    color: var(--gray);
+    line-height: 1.5;
+  }
+
+  .pipe-arrow {
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background: var(--accent);
+    clip-path: polygon(0 0, 60% 50%, 0 100%, 30% 50%);
+    z-index: 3;
+    display: none;
+  }
+
+  /* DETAIL PANEL */
+  .detail-panel {
+    margin-top: 30px;
+    border: 1px solid var(--accent);
+    padding: 30px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .detail-panel.show { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .detail-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .detail-desc {
+    font-size: 13px;
+    color: #aaa;
+    line-height: 1.8;
+    margin-bottom: 20px;
+  }
+
+  .tech-list {
+    list-style: none;
+  }
+
+  .tech-list li {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--white);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .tech-list li span {
+    color: var(--accent);
+  }
+
+  /* ARCHITECTURE */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-top: 20px;
+  }
+
+  .arch-cell {
+    background: var(--surface);
+    padding: 24px;
+    position: relative;
+  }
+
+  .arch-cell.featured {
+    background: var(--surface2);
+    grid-column: span 2;
+  }
+
+  .arch-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+  }
+
+  .arch-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .arch-desc {
+    font-size: 11px;
+    color: var(--gray);
+    line-height: 1.6;
+  }
+
+  .arch-tech {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    padding: 3px 8px;
+    border: 1px solid var(--border);
+    color: var(--gray);
+  }
+
+  .tag.hot {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ROADMAP */
+  .roadmap {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .phase {
+    background: var(--surface);
+    padding: 28px 24px;
+  }
+
+  .phase-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    color: #1e1e1e;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .phase-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--white);
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+
+  .phase-weeks {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .phase-tasks {
+    list-style: none;
+  }
+
+  .phase-tasks li {
+    font-size: 11px;
+    color: var(--gray);
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .phase-tasks li::before {
+    content: '—';
+    color: var(--accent2);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* SNS TARGETS */
+  .sns-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .sns-card {
+    background: var(--surface);
+    padding: 28px 24px;
+  }
+
+  .sns-platform {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .sns-card:nth-child(1) .sns-platform { color: #E1306C; }
+  .sns-card:nth-child(2) .sns-platform { color: var(--white); }
+  .sns-card:nth-child(3) .sns-platform { color: #FF0050; }
+
+  .sns-format {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+
+  .sns-desc {
+    font-size: 11px;
+    color: var(--gray);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  /* FOOTER NOTE */
+  .footer-note {
+    padding: 40px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--gray);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+
+  @media (max-width: 768px) {
+    header { padding: 16px 20px; }
+    .hero { padding: 40px 20px; }
+    .section { padding: 40px 20px; }
+    .arch-grid { grid-template-columns: 1fr; }
+    .arch-cell.featured { grid-column: span 1; }
+    .roadmap { grid-template-columns: 1fr 1fr; }
+    .sns-grid { grid-template-columns: 1fr; }
+    .detail-panel.show { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">INDIE<span>FRAME</span></div>
+  <div class="badge">SYSTEM ARCHITECTURE v1.0</div>
+</header>
+
+<section class="hero">
+  <div class="hero-tag">// PROJECT OVERVIEW</div>
+  <h1>
+    AUTOMATED
+    <span class="highlight">CONTENT</span>
+    PIPELINE
+  </h1>
+  <p class="hero-desc">
+    URLを投げるだけで、記事生成・サムネイル作成・SNS投稿まで全自動。
+    インディペンデント映画に特化したHypebeast風メディアプラットフォーム。
+  </p>
+</section>
+
+<!-- PIPELINE -->
+<section class="section">
+  <div class="section-title">// 01 — CONTENT PIPELINE</div>
+
+  <div class="pipeline">
+    <div class="pipe-step active" onclick="showDetail(0)">
+      <div class="pipe-num">01</div>
+      <div class="pipe-icon">🔗</div>
+      <div class="pipe-title">URL INPUT</div>
+      <div class="pipe-sub">映画URL・プレスリリースを投入</div>
+    </div>
+    <div class="pipe-step" onclick="showDetail(1)">
+      <div class="pipe-num">02</div>
+      <div class="pipe-icon">🧠</div>
+      <div class="pipe-title">AI SCRAPE & ANALYZE</div>
+      <div class="pipe-sub">情報抽出・分析・方向性提示</div>
+    </div>
+    <div class="pipe-step" onclick="showDetail(2)">
+      <div class="pipe-num">03</div>
+      <div class="pipe-icon">✍️</div>
+      <div class="pipe-title">ARTICLE DIRECTION</div>
+      <div class="pipe-sub">編集方針・トーンを指定</div>
+    </div>
+    <div class="pipe-step" onclick="showDetail(3)">
+      <div class="pipe-num">04</div>
+      <div class="pipe-icon">📝</div>
+      <div class="pipe-title">ARTICLE GENERATE</div>
+      <div class="pipe-sub">Claude APIで本文生成</div>
+    </div>
+    <div class="pipe-step" onclick="showDetail(4)">
+      <div class="pipe-num">05</div>
+      <div class="pipe-icon">🖼️</div>
+      <div class="pipe-title">THUMBNAIL CREATE</div>
+      <div class="pipe-sub">DALL-E / Stable Diffusionで生成</div>
+    </div>
+    <div class="pipe-step" onclick="showDetail(5)">
+      <div class="pipe-num">06</div>
+      <div class="pipe-icon">🚀</div>
+      <div class="pipe-title">PUBLISH & POST</div>
+      <div class="pipe-sub">サイト公開 + SNS同時投稿</div>
+    </div>
+  </div>
+
+  <div class="detail-panel show" id="detail-panel">
+    <div>
+      <div class="detail-title" id="detail-title">URL INPUT</div>
+      <div class="detail-desc" id="detail-desc">映画の公式サイト、IMDb、プレスリリースのURLを入力するだけでパイプラインが起動。スクレイピングツールが自動でテキスト・メタデータ・画像を取得します。複数URLの一括処理にも対応。</div>
+      <ul class="tech-list" id="detail-tech">
+        <li>入力形式 <span>URL / テキスト / RSS</span></li>
+        <li>対応サイト <span>IMDb, Letterboxd, 公式サイト</span></li>
+        <li>処理方式 <span>非同期キュー処理</span></li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:3px;margin-bottom:16px;">FLOW DIAGRAM</div>
+      <div style="background:var(--bg);border:1px solid var(--border);padding:20px;font-family:'Space Mono',monospace;font-size:11px;color:#555;line-height:2;">
+        <span style="color:var(--accent)">USER</span> → input URL<br>
+        &nbsp;&nbsp;↓<br>
+        <span style="color:var(--white)">QUEUE</span> → job created<br>
+        &nbsp;&nbsp;↓<br>
+        <span style="color:var(--accent2)">SCRAPER</span> → fetch data<br>
+        &nbsp;&nbsp;↓<br>
+        <span style="color:var(--white)">PARSER</span> → structure JSON<br>
+        &nbsp;&nbsp;↓<br>
+        <span style="color:var(--accent)">→ NEXT STEP</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="section">
+  <div class="section-title">// 02 — TECH ARCHITECTURE</div>
+  <div class="arch-grid">
+    <div class="arch-cell featured">
+      <div class="arch-label">FRONTEND</div>
+      <div class="arch-name">Next.js 14 + App Router</div>
+      <div class="arch-desc">Hypebeast風のエディトリアルデザイン。ISR (Incremental Static Regeneration) で高速表示。記事ページ・管理ダッシュボードを含む。</div>
+      <div class="arch-tech">
+        <span class="tag hot">Next.js 14</span>
+        <span class="tag hot">Tailwind CSS</span>
+        <span class="tag">TypeScript</span>
+        <span class="tag">Framer Motion</span>
+        <span class="tag">Vercel Deploy</span>
+      </div>
+    </div>
+    <div class="arch-cell">
+      <div class="arch-label">BACKEND / API</div>
+      <div class="arch-name">FastAPI</div>
+      <div class="arch-desc">Python製。AI処理との相性が抜群。非同期処理・キュー管理。</div>
+      <div class="arch-tech">
+        <span class="tag hot">FastAPI</span>
+        <span class="tag">Celery</span>
+        <span class="tag">Redis</span>
+      </div>
+    </div>
+    <div class="arch-cell">
+      <div class="arch-label">AI ARTICLE</div>
+      <div class="arch-name">Claude API</div>
+      <div class="arch-desc">Anthropic Claude Sonnetで高品質な映画記事を生成。</div>
+      <div class="arch-tech">
+        <span class="tag hot">Claude API</span>
+        <span class="tag">Prompt Templates</span>
+      </div>
+    </div>
+    <div class="arch-cell">
+      <div class="arch-label">AI IMAGE</div>
+      <div class="arch-name">DALL-E 3</div>
+      <div class="arch-desc">サムネイル自動生成。映画スチール+タイポグラフィ合成。</div>
+      <div class="arch-tech">
+        <span class="tag hot">DALL-E 3</span>
+        <span class="tag">Pillow</span>
+      </div>
+    </div>
+    <div class="arch-cell">
+      <div class="arch-label">DATABASE</div>
+      <div class="arch-name">Supabase</div>
+      <div class="arch-desc">PostgreSQL + Storage + Auth。記事・メディア・ユーザー管理。</div>
+      <div class="arch-tech">
+        <span class="tag hot">Supabase</span>
+        <span class="tag">S3 Storage</span>
+      </div>
+    </div>
+    <div class="arch-cell">
+      <div class="arch-label">SNS POSTING</div>
+      <div class="arch-name">Multi-Platform</div>
+      <div class="arch-desc">Instagram Graph API、X API v2、TikTok API。各フォーマットに自動最適化。</div>
+      <div class="arch-tech">
+        <span class="tag hot">Instagram API</span>
+        <span class="tag hot">X API v2</span>
+        <span class="tag hot">TikTok API</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SNS STRATEGY -->
+<section class="section">
+  <div class="section-title">// 03 — SNS STRATEGY</div>
+  <div class="sns-grid">
+    <div class="sns-card">
+      <div class="sns-platform">INSTAGRAM</div>
+      <div class="sns-format">FEED + REELS + STORIES</div>
+      <div class="sns-desc">映画スチールを使ったビジュアル重視の投稿。縦長サムネイル(9:16)を自動生成。キャプションは映画の見どころを短くまとめる。</div>
+      <ul class="tech-list">
+        <li>画像サイズ <span>1080×1350px</span></li>
+        <li>Caption <span>最大2200字</span></li>
+        <li>API <span>Graph API v20</span></li>
+      </ul>
+    </div>
+    <div class="sns-card">
+      <div class="sns-platform">X / TWITTER</div>
+      <div class="sns-format">TWEET + THREAD</div>
+      <div class="sns-desc">記事のハイライトをスレッド形式で投稿。OGP画像付きURL。映画関連ハッシュタグを自動付与。エンゲージメント分析も実装。</div>
+      <ul class="tech-list">
+        <li>文字数 <span>280字×スレッド</span></li>
+        <li>画像 <span>OGP + カスタム</span></li>
+        <li>API <span>X API v2</span></li>
+      </ul>
+    </div>
+    <div class="sns-card">
+      <div class="sns-platform">TIKTOK</div>
+      <div class="sns-format">SHORT VIDEO</div>
+      <div class="sns-desc">映画トレーラーのクリップ+テキストオーバーレイで自動ショート動画生成。トレンド音楽との組み合わせ提案も。</div>
+      <ul class="tech-list">
+        <li>動画長 <span>15〜60秒</span></li>
+        <li>形式 <span>9:16 縦動画</span></li>
+        <li>API <span>TikTok API v2</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="section">
+  <div class="section-title">// 04 — DEVELOPMENT ROADMAP</div>
+  <div class="roadmap">
+    <div class="phase">
+      <div class="phase-num">01</div>
+      <div class="phase-title">FOUNDATION</div>
+      <div class="phase-weeks">Week 1–2</div>
+      <ul class="phase-tasks">
+        <li>Next.jsサイト基盤</li>
+        <li>Supabase DB設計</li>
+        <li>記事CRUDシステム</li>
+        <li>Hypebeastデザイン実装</li>
+      </ul>
+    </div>
+    <div class="phase">
+      <div class="phase-num">02</div>
+      <div class="phase-title">AI PIPELINE</div>
+      <div class="phase-weeks">Week 3–4</div>
+      <ul class="phase-tasks">
+        <li>URLスクレイパー構築</li>
+        <li>Claude API連携</li>
+        <li>記事生成プロンプト設計</li>
+        <li>管理ダッシュボード</li>
+      </ul>
+    </div>
+    <div class="phase">
+      <div class="phase-num">03</div>
+      <div class="phase-title">IMAGE GEN</div>
+      <div class="phase-weeks">Week 5–6</div>
+      <ul class="phase-tasks">
+        <li>DALL-E 3連携</li>
+        <li>サムネイルテンプレ</li>
+        <li>画像最適化</li>
+        <li>各SNSサイズ自動変換</li>
+      </ul>
+    </div>
+    <div class="phase">
+      <div class="phase-num">04</div>
+      <div class="phase-title">SNS AUTO</div>
+      <div class="phase-weeks">Week 7–8</div>
+      <ul class="phase-tasks">
+        <li>Instagram API連携</li>
+        <li>X API v2連携</li>
+        <li>TikTok API連携</li>
+        <li>スケジュール投稿機能</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="footer-note">
+  <span>INDIE FRAME — SYSTEM ARCHITECTURE v1.0 — 2026</span>
+  <span>NEXT: Click pipeline steps to explore each component →</span>
+</div>
+
+<script>
+const details = [
+  {
+    title: "URL INPUT",
+    desc: "映画の公式サイト、IMDb、プレスリリースのURLを入力するだけでパイプラインが起動。スクレイピングツールが自動でテキスト・メタデータ・画像を取得します。複数URLの一括処理にも対応。",
+    tech: [
+      ["入力形式", "URL / テキスト / RSS"],
+      ["対応サイト", "IMDb, Letterboxd, 公式サイト"],
+      ["処理方式", "非同期キュー処理"]
+    ],
+    flow: `<span style="color:var(--accent)">USER</span> → input URL<br>&nbsp;&nbsp;↓<br><span style="color:var(--white)">QUEUE</span> → job created<br>&nbsp;&nbsp;↓<br><span style="color:var(--accent2)">SCRAPER</span> → fetch data<br>&nbsp;&nbsp;↓<br><span style="color:var(--white)">PARSER</span> → structure JSON`
+  },
+  {
+    title: "AI SCRAPE & ANALYZE",
+    desc: "Playwright/Cheerioで対象ページをスクレイピング。Claude APIで映画タイトル・監督・キャスト・あらすじ・リリース情報を構造化。関連する批評や文脈情報もウェブ検索で補完。",
+    tech: [
+      ["スクレイパー", "Playwright + Cheerio"],
+      ["構造化AI", "Claude API"],
+      ["データ形式", "JSON Schema"]
+    ],
+    flow: `<span style="color:var(--accent)">SCRAPER</span> → HTML取得<br>&nbsp;&nbsp;↓<br><span style="color:var(--white)">PARSER</span> → テキスト抽出<br>&nbsp;&nbsp;↓<br><span style="color:var(--accent2)">CLAUDE</span> → 情報構造化<br>&nbsp;&nbsp;↓<br><span style="color:var(--white)">JSON</span> → DB保存`
+  },
+  {
+    title: "ARTICLE DIRECTION",
+    desc: "管理UIから編集方針を指定。トーン（批評的/熱量高め/中立）、文字数、フォーカスポイント（監督/技術/社会的メッセージ）を選択。AIが複数の方向性案を提示し、選んで生成。",
+    tech: [
+      ["UI", "管理ダッシュボード"],
+      ["指定項目", "トーン/文字数/フォーカス"],
+      ["プレビュー", "生成前アウトライン表示"]
+    ],
+    flow: `<span style="color:var(--accent)">EDITOR</span> → 方針設定<br>&nbsp;&nbsp;↓<br><span style="color:var(--white)">TEMPLATE</span> → プロンプト構築<br>&nbsp;&nbsp;↓<br><span style="color:var(--accent2)">OUTLINE</span> → 案3種提示<br>&nbsp;&nbsp;↓<br><span style="color:var(--white)">SELECT</span> → 確定`
+  },
+  {
+    title: "ARTICLE GENERATE",
+    desc: "指定した方針とスクレイピングデータをもとにClaude APIが本文を生成。Hypebeast風のエディトリアルトーン（断言型・映画的語彙・煽り気味の見出し）に特化したプロンプトテンプレートを使用。",
+    tech: [
+      ["AI", "Claude Sonnet 3.7"],
+      ["文字数", "800〜2000字"],
+      ["出力形式", "Markdown → HTML変換"]
+    ],
+    flow: `<span style="color:var(--accent)">PROMPT</span> → 方針 + データ<br>&nbsp;&nbsp;↓<br><span style="color:var(--white)">CLAUDE</span> → 本文生成<br>&nbsp;&nbsp;↓<br><span style="color:var(--accent2)">REVIEW</span> → 編集確認<br>&nbsp;&nbsp;↓<br><span style="color:var(--white)">APPROVE</span> → 公開待ち`
+  },
+  {
+    title: "THUMBNAIL CREATE",
+    desc: "DALL-E 3とPillowを組み合わせてサムネイルを自動生成。映画のビジュアルスタイルを分析してプロンプトを自動生成。Hypebeastスタイルの太めタイポグラフィをオーバーレイ合成。各SNS用サイズに自動変換。",
+    tech: [
+      ["画像AI", "DALL-E 3 / Stable Diffusion"],
+      ["合成", "Pillow + Canvas API"],
+      ["出力", "3サイズ自動生成(OGP/IG/TikTok)"]
+    ],
+    flow: `<span style="color:var(--accent)">MOVIE DATA</span> → スタイル分析<br>&nbsp;&nbsp;↓<br><span style="color:var(--white)">DALL-E</span> → ベース画像生成<br>&nbsp;&nbsp;↓<br><span style="color:var(--accent2)">PILLOW</span> → テキスト合成<br>&nbsp;&nbsp;↓<br><span style="color:var(--white)">RESIZE</span> → 各SNS用出力`
+  },
+  {
+    title: "PUBLISH & POST",
+    desc: "ワンクリックで全プラットフォームに同時投稿。Next.jsサイトに記事公開（ISRで即時反映）、Instagram・X・TikTokに最適化されたキャプションと画像で自動投稿。投稿スケジューリングも対応。",
+    tech: [
+      ["サイト公開", "Supabase + Vercel ISR"],
+      ["Instagram", "Graph API v20"],
+      ["X / TikTok", "X API v2 / TikTok API v2"]
+    ],
+    flow: `<span style="color:var(--accent)">APPROVE</span> → 公開承認<br>&nbsp;&nbsp;↓<br><span style="color:var(--white)">SITE</span> → ISR即時反映<br>&nbsp;&nbsp;↓<br><span style="color:var(--accent2)">SNS x3</span> → 同時投稿<br>&nbsp;&nbsp;↓<br><span style="color:var(--white)">ANALYTICS</span> → 計測開始`
+  }
+];
+
+function showDetail(idx) {
+  const steps = document.querySelectorAll('.pipe-step');
+  steps.forEach((s, i) => s.classList.toggle('active', i === idx));
+
+  const d = details[idx];
+  document.getElementById('detail-title').textContent = d.title;
+  document.getElementById('detail-desc').textContent = d.desc;
+
+  const techEl = document.getElementById('detail-tech');
+  techEl.innerHTML = d.tech.map(([k,v]) => `<li>${k} <span>${v}</span></li>`).join('');
+
+  const panel = document.getElementById('detail-panel');
+  panel.classList.remove('show');
+  setTimeout(() => {
+    // update flow diagram
+    const flow = panel.querySelector('.detail-panel > div:last-child > div:last-child');
+    if (flow) flow.innerHTML = d.flow;
+    panel.classList.add('show');
+  }, 50);
+}
+</script>
+</body>
+</html>

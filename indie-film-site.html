@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRAME — Independent Film Media</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;700;800&family=Noto+Sans+JP:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #0a0a0a;
+  --surface: #121212;
+  --surface2: #181818;
+  --border: #1f1f1f;
+  --border2: #2a2a2a;
+  --white: #f2f0ec;
+  --offwhite: #c8c4bc;
+  --gray: #666;
+  --accent: #e2ff00;
+  --accent2: #ff3300;
+  --accent3: #00aaff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Noto Sans JP', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a { text-decoration: none; color: inherit; }
+
+img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ===================== HEADER ===================== */
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 32px;
+  height: 56px;
+}
+
+.header-nav {
+  display: flex;
+  gap: 28px;
+}
+
+.header-nav a {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--gray);
+  transition: color 0.2s;
+}
+
+.header-nav a:hover, .header-nav a.active {
+  color: var(--white);
+}
+
+.site-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 30px;
+  letter-spacing: 6px;
+  text-align: center;
+  color: var(--white);
+}
+
+.site-logo span {
+  color: var(--accent);
+}
+
+.header-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-right a {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--gray);
+  transition: color 0.2s;
+}
+
+.header-right a:hover { color: var(--white); }
+
+.search-btn {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border2);
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-btn svg { stroke: var(--gray); }
+
+/* ticker */
+.ticker-wrap {
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 8px 0;
+}
+
+.ticker {
+  display: inline-block;
+  animation: ticker 30s linear infinite;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--gray);
+}
+
+.ticker span.sep {
+  color: var(--accent);
+  margin: 0 20px;
+}
+
+@keyframes ticker {
+  from { transform: translateX(100vw); }
+  to   { transform: translateX(-100%); }
+}
+
+/* ===================== LAYOUT ===================== */
+main {
+  margin-top: 56px;
+}
+
+/* ===================== HERO FEATURED ===================== */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  border-bottom: 1px solid var(--border);
+  min-height: calc(100vh - 90px);
+}
+
+.hero-main {
+  position: relative;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+}
+
+.hero-img {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.8s ease;
+}
+
+.hero-main:hover .hero-img { transform: scale(1.03); }
+
+.hero-img img { 
+  width: 100%; height: 100%; 
+  object-fit: cover;
+  filter: brightness(0.55);
+}
+
+.hero-content {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 48px 48px 48px;
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+}
+
+.hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.cat-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  padding: 4px 10px;
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+}
+
+.cat-tag.review { background: var(--accent2); color: var(--white); }
+.cat-tag.interview { background: var(--accent3); color: #000; }
+.cat-tag.news { background: var(--accent); color: #000; }
+
+.date-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.5);
+}
+
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(40px, 5.5vw, 80px);
+  line-height: 0.95;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+.hero-title em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.hero-sub {
+  font-size: 13px;
+  color: var(--offwhite);
+  line-height: 1.7;
+  max-width: 560px;
+  font-weight: 300;
+}
+
+/* Hero sidebar */
+.hero-side {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-side-item {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.hero-side-item:hover { background: var(--surface); }
+.hero-side-item:last-child { border-bottom: none; }
+
+.hero-side-img {
+  height: 100%;
+  overflow: hidden;
+}
+
+.hero-side-img img { height: 100%; object-fit: cover; }
+
+.hero-side-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+
+.hero-side-title {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ===================== SECTION HEADER ===================== */
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 28px 32px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-title-main {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+
+.section-title-main span {
+  color: var(--accent);
+}
+
+.section-more {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--gray);
+  border-bottom: 1px solid var(--gray);
+  padding-bottom: 2px;
+  transition: all 0.2s;
+}
+
+.section-more:hover { color: var(--white); border-color: var(--white); }
+
+/* ===================== FILM GRID ===================== */
+/* 大判ヒーロー + サイド2列 */
+.grid-featured {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-hero {
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+}
+
+.card-hero-img {
+  height: 480px;
+  overflow: hidden;
+}
+
+.card-hero-img img {
+  transition: transform 0.7s ease;
+}
+
+.card-hero:hover .card-hero-img img {
+  transform: scale(1.04);
+}
+
+.card-hero-body {
+  padding: 28px 32px;
+  border-top: 1px solid var(--border);
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.film-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  line-height: 1;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.film-title-en {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  color: var(--gray);
+  letter-spacing: 2px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.card-excerpt {
+  font-size: 12px;
+  color: var(--offwhite);
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* Right column stack */
+.card-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-compact {
+  flex: 1;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.card-compact:hover { background: var(--surface); }
+.card-compact:last-child { border-bottom: none; }
+
+.card-compact-img {
+  height: 180px;
+  overflow: hidden;
+}
+
+.card-compact-img img { transition: transform 0.6s ease; }
+.card-compact:hover .card-compact-img img { transform: scale(1.05); }
+
+.card-compact-body {
+  padding: 16px 20px 20px;
+}
+
+.card-compact-title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.card-compact-excerpt {
+  font-size: 11px;
+  color: var(--gray);
+  line-height: 1.6;
+  font-weight: 300;
+}
+
+/* ===================== HORIZONTAL SCROLL STRIP ===================== */
+.strip-section {
+  border-bottom: 1px solid var(--border);
+}
+
+.strip-scroll {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.strip-scroll::-webkit-scrollbar { display: none; }
+
+.strip-card {
+  flex: 0 0 280px;
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.strip-card:hover { background: var(--surface); }
+
+.strip-img {
+  height: 180px;
+  overflow: hidden;
+}
+
+.strip-img img { transition: transform 0.6s ease; }
+.strip-card:hover .strip-img img { transform: scale(1.04); }
+
+.strip-body {
+  padding: 16px;
+}
+
+.strip-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 40px;
+  color: var(--border2);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.strip-title {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* ===================== MASONRY / EDITORIAL GRID ===================== */
+.editorial-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: 60px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ed-card {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.ed-card:hover .ed-img img { transform: scale(1.04); }
+
+.ed-img {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.ed-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: brightness(0.5);
+  transition: transform 0.7s ease;
+}
+
+.ed-body {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 20px;
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+}
+
+.ed-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  line-height: 1.1;
+  letter-spacing: 1px;
+}
+
+/* grid areas */
+.ed-a { grid-column: 1 / 5; grid-row: 1 / 7; }
+.ed-b { grid-column: 5 / 9; grid-row: 1 / 5; }
+.ed-c { grid-column: 9 / 13; grid-row: 1 / 7; }
+.ed-d { grid-column: 5 / 9; grid-row: 5 / 7; }
+.ed-d .ed-img img { filter: brightness(0.7); }
+.ed-d .ed-body { background: none; padding: 12px 16px; }
+.ed-d .ed-title { font-size: 13px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; }
+
+/* ===================== TEXT LIST ===================== */
+.list-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+}
+
+.list-col {
+  border-right: 1px solid var(--border);
+}
+
+.list-col:last-child { border-right: none; }
+
+.list-item {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.list-item:hover { background: var(--surface); }
+.list-item:last-child { border-bottom: none; }
+
+.list-num {
+  padding: 20px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  color: var(--border2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.list-body {
+  padding: 16px 20px;
+}
+
+.list-title {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.list-sub {
+  font-size: 11px;
+  color: var(--gray);
+  font-family: 'Space Mono', monospace;
+}
+
+/* ===================== DIRECTOR SPOTLIGHT ===================== */
+.spotlight {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  border-bottom: 1px solid var(--border);
+}
+
+.spotlight-img {
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+  height: 420px;
+}
+
+.spotlight-img img { height: 100%; object-fit: cover; filter: grayscale(30%); }
+
+.spotlight-body {
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.spotlight-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+.spotlight-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 72px;
+  line-height: 0.9;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+
+.spotlight-name span {
+  display: block;
+  font-size: 24px;
+  color: var(--gray);
+  letter-spacing: 4px;
+}
+
+.spotlight-desc {
+  font-size: 14px;
+  color: var(--offwhite);
+  line-height: 1.8;
+  font-weight: 300;
+  max-width: 480px;
+  margin-bottom: 32px;
+}
+
+.spotlight-films {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.film-chip {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  padding: 6px 14px;
+  border: 1px solid var(--border2);
+  color: var(--gray);
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+
+.film-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ===================== FOOTER ===================== */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 60px 32px 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+
+.footer-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  letter-spacing: 6px;
+  margin-bottom: 12px;
+}
+
+.footer-tagline {
+  font-size: 11px;
+  color: var(--gray);
+  line-height: 1.6;
+  max-width: 200px;
+  font-weight: 300;
+}
+
+.footer-heading {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--gray);
+  margin-bottom: 16px;
+}
+
+.footer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-links a {
+  font-size: 13px;
+  color: var(--offwhite);
+  transition: color 0.2s;
+}
+
+.footer-links a:hover { color: var(--accent); }
+
+.footer-bottom {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-copy {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: var(--gray);
+  letter-spacing: 2px;
+}
+
+/* ===================== MISC ===================== */
+.divider-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 32px;
+  height: 40px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.divider-label span {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--gray);
+}
+
+.divider-label .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* placeholders via CSS */
+.placeholder-img {
+  background: var(--surface2);
+  position: relative;
+  overflow: hidden;
+}
+
+.placeholder-img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+  background-size: 400% 400%;
+  animation: shimmer 2s ease infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+/* Film poster colors */
+.film-1 { background: linear-gradient(135deg, #1a0a00 0%, #2d1500 50%, #0a0a0a 100%); }
+.film-2 { background: linear-gradient(135deg, #000a1a 0%, #001a2d 50%, #0a0a0a 100%); }
+.film-3 { background: linear-gradient(135deg, #0a1a0a 0%, #0d2b0d 50%, #0a0a0a 100%); }
+.film-4 { background: linear-gradient(135deg, #1a001a 0%, #2b0a2b 50%, #0a0a0a 100%); }
+.film-5 { background: linear-gradient(135deg, #1a1a00 0%, #2b2b00 50%, #0a0a0a 100%); }
+.film-6 { background: linear-gradient(135deg, #1a0000 0%, #2b0000 50%, #0a0a0a 100%); }
+
+.film-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.film-overlay-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  color: rgba(255,255,255,0.15);
+  letter-spacing: 4px;
+  text-align: center;
+}
+
+.film-overlay-dir {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: rgba(255,255,255,0.08);
+  letter-spacing: 3px;
+}
+
+.mock-img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* score badge */
+.score-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  background: var(--accent);
+  color: #000;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+/* reading time */
+.read-time {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: var(--gray);
+  letter-spacing: 1px;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header class="header">
+  <div class="header-inner">
+    <nav class="header-nav">
+      <a href="#" class="active">NEWS</a>
+      <a href="#">REVIEW</a>
+      <a href="#">INTERVIEW</a>
+      <a href="#">DIRECTOR</a>
+      <a href="#">FESTIVAL</a>
+    </nav>
+    <a href="#" class="site-logo">FR<span>A</span>ME</a>
+    <div class="header-right">
+      <a href="#">ABOUT</a>
+      <a href="#">JP / EN</a>
+      <button class="search-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <div class="ticker-wrap">
+    <div class="ticker">
+      LATEST<span class="sep">✦</span>
+      サンダンス映画祭2026グランプリ受賞作『VOID』が今夏日本公開決定
+      <span class="sep">✦</span>
+      インタビュー：濱口竜介、次回作について語る「沈黙そのものを撮りたい」
+      <span class="sep">✦</span>
+      レビュー：『ANORA』──ショーン・ベイカーが描く、壊れかけた夢の輝き
+      <span class="sep">✦</span>
+      第78回カンヌ映画祭コンペ部門セレクション発表
+      <span class="sep">✦</span>
+      ニューヨーク・インディー映画シーンの今：低予算で世界を驚かせた5作品
+      <span class="sep">✦</span>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<main>
+<section class="hero">
+  <!-- Main feature -->
+  <div class="hero-main">
+    <div class="hero-img">
+      <div class="mock-img film-1" style="height:100%;">
+        <div class="film-overlay">
+          <div class="film-overlay-title">ALL WE<br>IMAGINE</div>
+          <div class="film-overlay-dir">DIR. PAYAL KAPADIA</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-meta">
+        <span class="cat-tag review">REVIEW</span>
+        <span class="date-tag">2026.03.02</span>
+        <span class="read-time">8 MIN READ</span>
+      </div>
+      <h1 class="hero-title">
+        『ALL WE IMAGINE<br>AS LIGHT』<br>
+        <em>光が溶ける場所で、</em><br>
+        女たちは夢を見る
+      </h1>
+      <p class="hero-sub">パヤル・カパーディア監督が描く、ムンバイに生きる女性たちの孤独と連帯。カンヌ審査員大賞受賞作が問いかける「どこにも属せない感覚」の普遍性。</p>
+    </div>
+  </div>
+
+  <!-- Side list -->
+  <div class="hero-side">
+    <a class="hero-side-item" href="#">
+      <div class="hero-side-img">
+        <div class="mock-img film-2" style="height:100%;">
+          <div class="film-overlay"><div class="film-overlay-title" style="font-size:14px;">ANORA</div></div>
+        </div>
+      </div>
+      <div class="hero-side-body">
+        <span class="cat-tag review" style="align-self:flex-start">REVIEW</span>
+        <div class="hero-side-title">『ANORA』レビュー ── ショーン・ベイカーが解き放つ、階級と愛の臨界点</div>
+        <span class="date-tag">2026.03.01</span>
+      </div>
+    </a>
+    <a class="hero-side-item" href="#">
+      <div class="hero-side-img">
+        <div class="mock-img film-3" style="height:100%;">
+          <div class="film-overlay"><div class="film-overlay-title" style="font-size:14px;">CONCLAVE</div></div>
+        </div>
+      </div>
+      <div class="hero-side-body">
+        <span class="cat-tag interview" style="align-self:flex-start">INTERVIEW</span>
+        <div class="hero-side-title">エドワード・バーガー ロングインタビュー「映画は常に権力への問いであるべきだ」</div>
+        <span class="date-tag">2026.02.28</span>
+      </div>
+    </a>
+    <a class="hero-side-item" href="#">
+      <div class="hero-side-img">
+        <div class="mock-img film-4" style="height:100%;">
+          <div class="film-overlay"><div class="film-overlay-title" style="font-size:14px;">APRIL</div></div>
+        </div>
+      </div>
+      <div class="hero-side-body">
+        <span class="cat-tag news" style="align-self:flex-start">NEWS</span>
+        <div class="hero-side-title">デア・クルドヴァニゼ監督作『APRIL』、ベルリン国際映画祭で銀熊賞受賞</div>
+        <span class="date-tag">2026.02.26</span>
+      </div>
+    </a>
+    <a class="hero-side-item" href="#">
+      <div class="hero-side-img">
+        <div class="mock-img film-5" style="height:100%;">
+          <div class="film-overlay"><div class="film-overlay-title" style="font-size:14px;">THE ROOM<br>NEXT DOOR</div></div>
+        </div>
+      </div>
+      <div class="hero-side-body">
+        <span class="cat-tag review" style="align-self:flex-start">REVIEW</span>
+        <div class="hero-side-title">アルモドバル最新作『The Room Next Door』── 老いと死を、愛のかたちで撮る</div>
+        <span class="date-tag">2026.02.24</span>
+      </div>
+    </a>
+    <a class="hero-side-item" href="#">
+      <div class="hero-side-img">
+        <div class="mock-img film-6" style="height:100%;">
+          <div class="film-overlay"><div class="film-overlay-title" style="font-size:14px;">WAVE<br>BREAKERS</div></div>
+        </div>
+      </div>
+      <div class="hero-side-body">
+        <span class="cat-tag news" style="align-self:flex-start">NEWS</span>
+        <div class="hero-side-title">サンダンス2026：今年押さえておくべきインディー映画 厳選7作品</div>
+        <span class="date-tag">2026.02.22</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ===================== FEATURED REVIEWS ===================== -->
+<div class="section-header">
+  <div class="section-title-main">FEATURED <span>REVIEWS</span></div>
+  <a href="#" class="section-more">ALL REVIEWS →</a>
+</div>
+
+<div class="grid-featured">
+  <article class="card-hero">
+    <div class="card-hero-img">
+      <div class="mock-img film-3" style="height:480px;position:relative;">
+        <div class="film-overlay">
+          <div class="film-overlay-title">BABYGIRL</div>
+          <div class="film-overlay-dir">DIR. HALINA REIJN</div>
+        </div>
+        <div class="score-badge">9.1</div>
+      </div>
+    </div>
+    <div class="card-hero-body">
+      <div class="card-meta">
+        <span class="cat-tag review">REVIEW</span>
+        <span class="date-tag">2026.02.28</span>
+        <span class="read-time">12 MIN READ</span>
+      </div>
+      <div class="film-title-en">BABYGIRL / 2025</div>
+      <h2 class="film-title">ニコール・キッドマンが<br>自ら解体する「権力と欲望」の構造</h2>
+      <p class="card-excerpt">ハリナ・レイン監督が描く、CEOと若いインターンの禁断の関係。キッドマンがここまで自分自身を晒け出した作品はかつてなかった。支配と服従、強さと脆さが複雑に絡み合うこの物語は、2025年最も議論を呼んだ映画として記憶されるだろう。</p>
+    </div>
+  </article>
+
+  <div class="card-stack">
+    <article class="card-compact">
+      <div class="card-compact-img">
+        <div class="mock-img film-4" style="height:180px;position:relative;">
+          <div class="film-overlay">
+            <div class="film-overlay-title" style="font-size:18px;">HARD TRUTHS</div>
+          </div>
+          <div class="score-badge" style="width:36px;height:36px;font-size:16px;top:10px;right:10px;">8.7</div>
+        </div>
+      </div>
+      <div class="card-compact-body">
+        <div class="card-meta">
+          <span class="cat-tag review">REVIEW</span>
+          <span class="date-tag">2026.02.25</span>
+        </div>
+        <h3 class="card-compact-title">マイク・リー『Hard Truths』── マリアン・ジャン=バプティストの怒りは、誰の怒りか</h3>
+        <p class="card-compact-excerpt">17年ぶりのコラボが生んだ奇跡的なキャラクター研究。怒れる中年女性の内面を、これほど誠実に描いた映画があったか。</p>
+      </div>
+    </article>
+
+    <article class="card-compact">
+      <div class="card-compact-img">
+        <div class="mock-img film-5" style="height:180px;position:relative;">
+          <div class="film-overlay">
+            <div class="film-overlay-title" style="font-size:18px;">THE BRUTALIST</div>
+          </div>
+          <div class="score-badge" style="width:36px;height:36px;font-size:16px;top:10px;right:10px;">9.4</div>
+        </div>
+      </div>
+      <div class="card-compact-body">
+        <div class="card-meta">
+          <span class="cat-tag review">REVIEW</span>
+          <span class="date-tag">2026.02.20</span>
+        </div>
+        <h3 class="card-compact-title">『The Brutalist』── 3時間半、アメリカン・ドリームの廃墟に立つ</h3>
+        <p class="card-compact-excerpt">ブレイディ・コーベット監督の野心作。アドリアン・ブロディが演じるホロコースト生存者の建築家が見た「理想と現実」。</p>
+      </div>
+    </article>
+  </div>
+</div>
+
+<!-- ===================== TRENDING ===================== -->
+<div class="divider-label">
+  <div class="dot"></div>
+  <span>NOW TRENDING</span>
+</div>
+
+<div class="strip-section">
+  <div class="strip-scroll">
+    <a class="strip-card" href="#">
+      <div class="strip-img">
+        <div class="mock-img film-1" style="height:180px;">
+          <div class="film-overlay"><div class="film-overlay-title" style="font-size:16px;">SING SING</div></div>
+        </div>
+      </div>
+      <div class="strip-body">
+        <div class="strip-num">01</div>
+        <div class="card-meta" style="margin-bottom:6px;"><span class="cat-tag review">REVIEW</span></div>
+        <div class="strip-title">『Sing Sing』コルマン・ドミンゴの圧巻。刑務所演劇が問う「更生とは何か」</div>
+      </div>
+    </a>
+    <a class="strip-card" href="#">
+      <div class="strip-img">
+        <div class="mock-img film-2" style="height:180px;">
+          <div class="film-overlay"><div class="film-overlay-title" style="font-size:16px;">I SAW<br>THE TV GLOW</div></div>
+        </div>
+      </div>
+      <div class="strip-body">
+        <div class="strip-num">02</div>
+        <div class="card-meta" style="margin-bottom:6px;"><span class="cat-tag news">NEWS</span></div>
+        <div class="strip-title">ジェーン・シェンブリ監督『I Saw the TV Glow』── クィアホラーの新地平</div>
+      </div>
+    </a>
+    <a class="strip-card" href="#">
+      <div class="strip-img">
+        <div class="mock-img film-6" style="height:180px;">
+          <div class="film-overlay"><div class="film-overlay-title" style="font-size:16px;">FLOW</div></div>
+        </div>
+      </div>
+      <div class="strip-body">
+        <div class="strip-num">03</div>
+        <div class="card-meta" style="margin-bottom:6px;"><span class="cat-tag review">REVIEW</span></div>
+        <div class="strip-title">ラトビア発アニメーション『Flow』── セリフなし、猫だけで語る世界の終わりと再生</div>
+      </div>
+    </a>
+    <a class="strip-card" href="#">
+      <div class="strip-img">
+        <div class="mock-img film-3" style="height:180px;">
+          <div class="film-overlay"><div class="film-overlay-title" style="font-size:16px;">NICKEL<br>BOYS</div></div>
+        </div>
+      </div>
+      <div class="strip-body">
+        <div class="strip-num">04</div>
+        <div class="card-meta" style="margin-bottom:6px;"><span class="cat-tag interview">INTERVIEW</span></div>
+        <div class="strip-title">RaMell Ross監督インタビュー「主観ショットだけで撮ることで、見えてくるものがある」</div>
+      </div>
+    </a>
+    <a class="strip-card" href="#">
+      <div class="strip-img">
+        <div class="mock-img film-5" style="height:180px;">
+          <div class="film-overlay"><div class="film-overlay-title" style="font-size:16px;">QUEER</div></div>
+        </div>
+      </div>
+      <div class="strip-body">
+        <div class="strip-num">05</div>
+        <div class="card-meta" style="margin-bottom:6px;"><span class="cat-tag review">REVIEW</span></div>
+        <div class="strip-title">リュカ・グァダニーノ×ダニエル・クレイグ『Queer』── バロウズの亡霊が現代に憑く</div>
+      </div>
+    </a>
+    <a class="strip-card" href="#">
+      <div class="strip-img">
+        <div class="mock-img film-4" style="height:180px;">
+          <div class="film-overlay"><div class="film-overlay-title" style="font-size:16px;">KNEECAP</div></div>
+        </div>
+      </div>
+      <div class="strip-body">
+        <div class="strip-num">06</div>
+        <div class="card-meta" style="margin-bottom:6px;"><span class="cat-tag news">NEWS</span></div>
+        <div class="strip-title">『Kneecap』── アイルランド語ラップで闘う、最もパンクな自伝映画</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- ===================== EDITORIAL GRID ===================== -->
+<div class="section-header">
+  <div class="section-title-main">FILM <span>CULTURE</span></div>
+  <a href="#" class="section-more">EXPLORE →</a>
+</div>
+
+<div class="editorial-grid">
+  <article class="ed-card ed-a">
+    <div class="ed-img">
+      <div class="mock-img film-2" style="height:100%;"></div>
+    </div>
+    <div class="ed-body">
+      <div class="card-meta" style="margin-bottom:8px;"><span class="cat-tag interview">INTERVIEW</span></div>
+      <div class="ed-title">濱口竜介<br>「映画は<br>偶然を<br>制御する<br>技術だ」</div>
+    </div>
+  </article>
+  <article class="ed-card ed-b">
+    <div class="ed-img">
+      <div class="mock-img film-5" style="height:100%;"></div>
+    </div>
+    <div class="ed-body">
+      <div class="card-meta" style="margin-bottom:6px;"><span class="cat-tag news">NEWS</span></div>
+      <div class="ed-title">カンヌ2026 最注目コンペ10作品を徹底解説</div>
+    </div>
+  </article>
+  <article class="ed-card ed-c">
+    <div class="ed-img">
+      <div class="mock-img film-6" style="height:100%;"></div>
+    </div>
+    <div class="ed-body">
+      <div class="card-meta" style="margin-bottom:8px;"><span class="cat-tag review">DEEP DIVE</span></div>
+      <div class="ed-title">ホン・サンス全作品を<br>観直して<br>わかったこと</div>
+    </div>
+  </article>
+  <article class="ed-card ed-d">
+    <div class="ed-img">
+      <div class="mock-img film-1" style="height:100%;"></div>
+    </div>
+    <div class="ed-body">
+      <div class="card-meta" style="margin-bottom:4px;"><span class="cat-tag news">NEWS</span></div>
+      <div class="ed-title">インディー映画のストリーミング革命：Mubi vs Criterion Channel</div>
+    </div>
+  </article>
+</div>
+
+<!-- ===================== LATEST NEWS ===================== -->
+<div class="section-header">
+  <div class="section-title-main">LATEST <span>NEWS</span></div>
+  <a href="#" class="section-more">ALL NEWS →</a>
+</div>
+
+<div class="list-section">
+  <div class="list-col">
+    <a class="list-item" href="#">
+      <div class="list-num">01</div>
+      <div class="list-body">
+        <div class="card-meta" style="margin-bottom:6px;"><span class="cat-tag news">NEWS</span><span class="date-tag">2026.03.02</span></div>
+        <div class="list-title">ベルリン映画祭2026受賞結果速報 ── 金熊賞はブラジル映画『Manas』に</div>
+        <div class="list-sub">3 MIN READ</div>
+      </div>
+    </a>
+    <a class="list-item" href="#">
+      <div class="list-num">02</div>
+      <div class="list-body">
+        <div class="card-meta" style="margin-bottom:6px;"><span class="cat-tag interview">INTERVIEW</span><span class="date-tag">2026.03.01</span></div>
+        <div class="list-title">セリーヌ・ソン監督「次回作はドキュメンタリー。現実を直視したい」</div>
+        <div class="list-sub">6 MIN READ</div>
+      </div>
+    </a>
+    <a class="list-item" href="#">
+      <div class="list-num">03</div>
+      <div class="list-body">
+        <div class="card-meta" style="margin-bottom:6px;"><span class="cat-tag news">NEWS</span><span class="date-tag">2026.02.28</span></div>
+        <div class="list-title">Mubi、日本でオリジナル映画製作へ ── 若手監督3名と契約締結</div>
+        <div class="list-sub">4 MIN READ</div>
+      </div>
+    </a>
+    <a class="list-item" href="#">
+      <div class="list-num">04</div>
+      <div class="list-body">
+        <div class="card-meta" style="margin-bottom:6px;"><span class="cat-tag review">REVIEW</span><span class="date-tag">2026.02.27</span></div>
+        <div class="list-title">『ヘビー・トリップ』続編、北欧メタルの神話はまだ終わらない</div>
+        <div class="list-sub">5 MIN READ</div>
+      </div>
+    </a>
+  </div>
+  <div class="list-col">
+    <a class="list-item" href="#">
+      <div class="list-num">05</div>
+      <div class="list-body">
+        <div class="card-meta" style="margin-bottom:6px;"><span class="cat-tag news">NEWS</span><span class="date-tag">2026.02.26</span></div>
+        <div class="list-title">東京国際映画祭2026ラインナップ発表 ── アジア映画の台頭が鮮明に</div>
+        <div class="list-sub">4 MIN READ</div>
+      </div>
+    </a>
+    <a class="list-item" href="#">
+      <div class="list-num">06</div>
+      <div class="list-body">
+        <div class="card-meta" style="margin-bottom:6px;"><span class="cat-tag interview">INTERVIEW</span><span class="date-tag">2026.02.25</span></div>
+        <div class="list-title">キャリー・クーンに聞く「ポール・トーマス・アンダーソンと仕事をして変わったこと」</div>
+        <div class="list-sub">8 MIN READ</div>
+      </div>
+    </a>
+    <a class="list-item" href="#">
+      <div class="list-num">07</div>
+      <div class="list-body">
+        <div class="card-meta" style="margin-bottom:6px;"><span class="cat-tag news">NEWS</span><span class="date-tag">2026.02.24</span></div>
+        <div class="list-title">Netflix、世界各国のインディー映画ファンド100億円拠出を発表</div>
+        <div class="list-sub">3 MIN READ</div>
+      </div>
+    </a>
+    <a class="list-item" href="#">
+      <div class="list-num">08</div>
+      <div class="list-body">
+        <div class="card-meta" style="margin-bottom:6px;"><span class="cat-tag review">COLUMN</span><span class="date-tag">2026.02.23</span></div>
+        <div class="list-title">「映画を見る」から「映画と生きる」へ ── フィルムジンが変えた鑑賞体験</div>
+        <div class="list-sub">7 MIN READ</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- ===================== DIRECTOR SPOTLIGHT ===================== -->
+<div class="divider-label">
+  <div class="dot"></div>
+  <span>DIRECTOR SPOTLIGHT</span>
+</div>
+
+<div class="spotlight">
+  <div class="spotlight-img">
+    <div class="mock-img film-1" style="height:420px;">
+      <div class="film-overlay">
+        <div class="film-overlay-title" style="font-size:48px;">RW</div>
+        <div class="film-overlay-dir" style="font-size:10px;color:rgba(255,255,255,0.15);">RYUSUKE HAMAGUCHI</div>
+      </div>
+    </div>
+  </div>
+  <div class="spotlight-body">
+    <div>
+      <div class="spotlight-tag">// THIS MONTH'S DIRECTOR</div>
+      <div class="spotlight-name">
+        濱口竜介
+        <span>RYÛSUKE HAMAGUCHI</span>
+      </div>
+      <p class="spotlight-desc">
+        『偶然と想像』『ドライブ・マイ・カー』で世界の映画シーンを震撼させた濱口竜介。アカデミー賞受賞後も独自のペースを守り、言語・沈黙・偶然性をテーマに撮り続ける日本映画の最前線。その映画哲学と次回作への展望に迫る。
+      </p>
+      <div class="spotlight-films">
+        <span class="film-chip">WHEEL OF FORTUNE AND FANTASY</span>
+        <span class="film-chip">DRIVE MY CAR</span>
+        <span class="film-chip">EVIL DOES NOT EXIST</span>
+        <span class="film-chip">GIFT</span>
+      </div>
+    </div>
+    <a href="#" class="section-more" style="align-self:flex-start;margin-top:32px;">READ FULL PROFILE →</a>
+  </div>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="footer">
+  <div>
+    <div class="footer-logo">FRAME</div>
+    <p class="footer-tagline">インディペンデント映画専門メディア。世界の映画祭、批評、インタビューを届ける。</p>
+  </div>
+  <div>
+    <div class="footer-heading">// CATEGORY</div>
+    <ul class="footer-links">
+      <li><a href="#">NEWS</a></li>
+      <li><a href="#">REVIEW</a></li>
+      <li><a href="#">INTERVIEW</a></li>
+      <li><a href="#">DIRECTOR</a></li>
+      <li><a href="#">FESTIVAL</a></li>
+    </ul>
+  </div>
+  <div>
+    <div class="footer-heading">// CONTENT</div>
+    <ul class="footer-links">
+      <li><a href="#">FEATURE</a></li>
+      <li><a href="#">COLUMN</a></li>
+      <li><a href="#">DEEP DIVE</a></li>
+      <li><a href="#">BEST OF</a></li>
+    </ul>
+  </div>
+  <div>
+    <div class="footer-heading">// FOLLOW</div>
+    <ul class="footer-links">
+      <li><a href="#">INSTAGRAM</a></li>
+      <li><a href="#">X / TWITTER</a></li>
+      <li><a href="#">TIKTOK</a></li>
+      <li><a href="#">NEWSLETTER</a></li>
+    </ul>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2026 FRAME — INDEPENDENT FILM MEDIA. ALL RIGHTS RESERVED.</span>
+    <span class="footer-copy">BUILT WITH CLAUDE</span>
+  </div>
+</footer>
+</main>
+
+</body>
+</html>

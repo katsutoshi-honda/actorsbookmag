@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRAME — Project HQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #060606;
+  --panel: #0c0c0c;
+  --surface: #111;
+  --surface2: #181818;
+  --border: #1e1e1e;
+  --border2: #2a2a2a;
+  --white: #f2efe9;
+  --off: #8a8680;
+  --dim: #3e3c38;
+  --accent: #d4f000;
+  --red: #ff3300;
+  --blue: #00aaff;
+  --purple: #b060ff;
+  --orange: #ff8800;
+  --green: #00e676;
+  --pink: #ff4488;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  min-height: 100vh;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+.logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 5px; }
+.logo em { color: var(--accent); font-style: normal; }
+.logo-sub { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--dim); letter-spacing: 3px; }
+
+.topbar-nav { margin-left: auto; display: flex; gap: 4px; }
+.nav-btn {
+  font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 2px;
+  padding: 6px 14px; background: none; border: 1px solid transparent;
+  color: var(--off); cursor: pointer; transition: all .15s;
+}
+.nav-btn:hover { color: var(--white); border-color: var(--border2); }
+.nav-btn.on { color: var(--accent); border-color: var(--accent); }
+
+.live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 8px var(--green);
+  animation: pulse 2s ease-in-out infinite;
+  margin-left: 8px;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+
+/* ── VIEWS ── */
+.view { display: none; }
+.view.on { display: block; }
+
+/* ── OVERVIEW ── */
+.overview-header {
+  padding: 32px 28px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.overview-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px; letter-spacing: 2px; line-height: 1;
+  margin-bottom: 6px;
+}
+.overview-title span { color: var(--accent); }
+.overview-sub {
+  font-family: 'Space Mono', monospace; font-size: 10px;
+  color: var(--off); letter-spacing: 2px;
+}
+
+/* Summary stats */
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.summary-cell {
+  background: var(--panel);
+  padding: 20px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.summary-cell::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+}
+.summary-cell.c-accent::before { background: var(--accent); }
+.summary-cell.c-blue::before   { background: var(--blue); }
+.summary-cell.c-red::before    { background: var(--red); }
+.summary-cell.c-purple::before { background: var(--purple); }
+.summary-cell.c-green::before  { background: var(--green); }
+
+.summary-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 42px; line-height: 1; margin-bottom: 4px;
+}
+.summary-cell.c-accent .summary-num { color: var(--accent); }
+.summary-cell.c-blue   .summary-num { color: var(--blue); }
+.summary-cell.c-red    .summary-num { color: var(--red); }
+.summary-cell.c-purple .summary-num { color: var(--purple); }
+.summary-cell.c-green  .summary-num { color: var(--green); }
+
+.summary-label {
+  font-family: 'Space Mono', monospace; font-size: 8px;
+  color: var(--dim); letter-spacing: 2px;
+}
+
+/* ── PROJECT GRID ── */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  padding: 0;
+}
+
+.project-card {
+  background: var(--panel);
+  padding: 24px;
+  cursor: pointer;
+  transition: background .15s;
+  position: relative;
+  overflow: hidden;
+}
+.project-card:hover { background: var(--surface); }
+
+.project-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.project-card:hover::after { opacity: 1; }
+
+.pc-1::after { background: var(--blue); }
+.pc-2::after { background: var(--purple); }
+.pc-3::after { background: var(--accent); }
+.pc-4::after { background: var(--orange); }
+.pc-5::after { background: var(--green); }
+.pc-6::after { background: var(--pink); }
+
+.project-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 64px; line-height: 1;
+  opacity: .06; position: absolute;
+  top: 10px; right: 16px;
+  color: var(--white);
+}
+
+.project-badge {
+  display: inline-block;
+  font-family: 'Space Mono', monospace; font-size: 7px;
+  letter-spacing: 2px; padding: 3px 8px; margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.project-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px; letter-spacing: 1px; line-height: 1.1;
+  margin-bottom: 10px;
+}
+
+.project-desc {
+  font-size: 11px; color: var(--off); line-height: 1.7;
+  font-weight: 300; margin-bottom: 16px;
+}
+
+.project-tags {
+  display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 16px;
+}
+.project-tag {
+  font-family: 'Space Mono', monospace; font-size: 7px; letter-spacing: 1px;
+  padding: 2px 7px; border: 1px solid var(--border2); color: var(--dim);
+}
+
+.project-footer {
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.project-status {
+  font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 1px;
+  display: flex; align-items: center; gap: 6px;
+}
+.status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.s-plan    .status-dot { background: var(--dim); }
+.s-active  .status-dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+.s-build   .status-dot { background: var(--blue); box-shadow: 0 0 6px var(--blue); }
+.s-done    .status-dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
+
+.project-progress-wrap { width: 80px; }
+.project-progress-bar {
+  height: 2px; background: var(--border2); position: relative; overflow: hidden;
+}
+.project-progress-fill { height: 100%; transition: width .5s; }
+
+.detail-btn {
+  font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 1px;
+  padding: 5px 12px; background: none; border: 1px solid var(--border2);
+  color: var(--dim); cursor: pointer; transition: all .15s; margin-top: 12px;
+  display: block; width: 100%; text-align: center;
+}
+.detail-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── KANBAN ── */
+.kanban-header {
+  padding: 24px 28px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 16px;
+}
+
+.kanban-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px; letter-spacing: 2px;
+}
+
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  min-height: calc(100vh - 120px);
+  align-items: start;
+}
+
+.kanban-col {
+  background: var(--panel);
+  padding: 16px;
+  min-height: 400px;
+}
+
+.kanban-col-header {
+  font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 2px;
+  color: var(--dim); margin-bottom: 14px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.kanban-col-title { display: flex; align-items: center; gap: 8px; }
+.col-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+.k-task {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  cursor: grab;
+  transition: border-color .15s, transform .15s;
+  position: relative;
+}
+.k-task:hover { border-color: var(--border2); transform: translateY(-1px); background: var(--surface2); }
+.k-task:active { cursor: grabbing; }
+
+.k-task-proj {
+  font-family: 'Space Mono', monospace; font-size: 7px; letter-spacing: 1px;
+  margin-bottom: 6px; display: flex; align-items: center; gap: 5px;
+}
+
+.k-task-name {
+  font-size: 11px; color: var(--white); line-height: 1.5; margin-bottom: 8px; font-weight: 500;
+}
+
+.k-task-footer {
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.k-task-prio {
+  font-family: 'Space Mono', monospace; font-size: 7px; letter-spacing: 1px;
+  padding: 2px 6px;
+}
+
+.prio-high { border: 1px solid var(--red); color: var(--red); }
+.prio-mid  { border: 1px solid var(--orange); color: var(--orange); }
+.prio-low  { border: 1px solid var(--dim); color: var(--dim); }
+
+.k-task-date {
+  font-family: 'Space Mono', monospace; font-size: 7px; color: var(--dim);
+}
+
+.k-add-btn {
+  width: 100%; padding: 8px; background: none; border: 1px dashed var(--border2);
+  color: var(--dim); font-family: 'Space Mono', monospace; font-size: 8px;
+  letter-spacing: 1px; cursor: pointer; transition: all .15s; margin-top: 4px;
+}
+.k-add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── ROADMAP / GANTT ── */
+.roadmap-header {
+  padding: 24px 28px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.roadmap-title {
+  font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 2px;
+}
+
+.gantt-wrap { padding: 24px 28px; overflow-x: auto; }
+
+.gantt-row {
+  display: flex; align-items: center; gap: 0;
+  border-bottom: 1px solid var(--border);
+  min-width: 900px;
+}
+.gantt-row:last-child { border-bottom: none; }
+
+.gantt-label {
+  width: 220px; flex-shrink: 0;
+  padding: 12px 16px 12px 0;
+  font-family: 'Space Mono', monospace; font-size: 9px; color: var(--off);
+  letter-spacing: 1px;
+}
+
+.gantt-label strong {
+  display: block; color: var(--white); font-size: 10px; margin-bottom: 2px;
+}
+
+.gantt-timeline {
+  flex: 1; position: relative; height: 44px;
+}
+
+.gantt-bar {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  height: 14px; border-radius: 0;
+  display: flex; align-items: center; padding: 0 8px;
+  font-family: 'Space Mono', monospace; font-size: 7px; letter-spacing: 1px;
+  white-space: nowrap; overflow: hidden;
+}
+
+.gantt-months {
+  display: flex; gap: 0; min-width: 680px;
+}
+.gantt-month {
+  flex: 1; text-align: center;
+  font-family: 'Space Mono', monospace; font-size: 8px; color: var(--dim);
+  letter-spacing: 1px; padding: 8px 0;
+  border-right: 1px solid var(--border);
+}
+.gantt-month:last-child { border-right: none; }
+.gantt-month.now { color: var(--accent); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.85); z-index: 500;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.on { display: flex; }
+
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  width: 680px; max-width: 95vw; max-height: 90vh;
+  overflow-y: auto; position: relative;
+}
+
+.modal-header {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--panel); z-index: 10;
+}
+
+.modal-close {
+  position: absolute; top: 20px; right: 20px;
+  background: none; border: 1px solid var(--border2); color: var(--dim);
+  width: 28px; height: 28px; cursor: pointer; font-size: 14px;
+  transition: all .15s;
+}
+.modal-close:hover { border-color: var(--red); color: var(--red); }
+
+.modal-body { padding: 24px 28px; }
+
+.modal-section { margin-bottom: 24px; }
+.modal-section-title {
+  font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 3px;
+  color: var(--dim); margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.task-list { display: flex; flex-direction: column; gap: 6px; }
+.task-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; background: var(--surface); border: 1px solid var(--border2);
+  font-size: 12px; color: var(--off);
+}
+.task-item input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
+.task-item.done { text-decoration: line-through; opacity: .5; }
+
+.tech-stack { display: flex; flex-wrap: wrap; gap: 6px; }
+.tech-pill {
+  font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: 1px;
+  padding: 4px 10px; background: var(--surface); border: 1px solid var(--border2); color: var(--off);
+}
+
+/* ── NOTIF ── */
+.notif {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--surface2); border: 1px solid var(--accent);
+  font-family: 'Space Mono', monospace; font-size: 9px; color: var(--accent);
+  letter-spacing: 2px; padding: 10px 16px; z-index: 999;
+  transform: translateY(8px); opacity: 0; transition: all .25s; pointer-events: none;
+}
+.notif.on { transform: translateY(0); opacity: 1; }
+
+/* ── TASK FORM ── */
+.task-form {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  padding: 14px;
+  margin-top: 8px;
+  display: none;
+}
+.task-form.on { display: block; }
+.task-form input, .task-form select {
+  width: 100%; background: var(--panel); border: 1px solid var(--border2);
+  color: var(--white); font-family: 'Space Mono', monospace; font-size: 10px;
+  padding: 7px 10px; outline: none; margin-bottom: 6px;
+}
+.task-form input:focus, .task-form select:focus { border-color: var(--accent); }
+.task-form-row { display: flex; gap: 6px; }
+.task-form-row input, .task-form-row select { margin-bottom: 0; }
+.task-form-btns { display: flex; gap: 6px; margin-top: 8px; }
+.tf-save {
+  flex: 1; padding: 7px; background: var(--accent); border: none;
+  color: #000; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 1px; cursor: pointer;
+}
+.tf-cancel {
+  padding: 7px 14px; background: none; border: 1px solid var(--border2);
+  color: var(--dim); font-family: 'Space Mono', monospace; font-size: 9px; cursor: pointer; transition: all .15s;
+}
+.tf-cancel:hover { border-color: var(--red); color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">FR<em>A</em>ME</div>
+  <div class="logo-sub">PROJECT HQ</div>
+  <div class="topbar-nav">
+    <button class="nav-btn on" onclick="showView('overview')">OVERVIEW</button>
+    <button class="nav-btn" onclick="showView('kanban')">KANBAN</button>
+    <button class="nav-btn" onclick="showView('roadmap')">ROADMAP</button>
+  </div>
+  <div class="live-dot"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     VIEW: OVERVIEW
+══════════════════════════════════ -->
+<div class="view on" id="view-overview">
+
+  <div class="overview-header">
+    <div class="overview-title">FRAME <span>PROJECTS</span></div>
+    <div class="overview-sub">6 ACTIVE PROJECTS — INDIE FILM MEDIA SYSTEM BUILD</div>
+  </div>
+
+  <div class="summary-row">
+    <div class="summary-cell c-accent">
+      <div class="summary-num">6</div>
+      <div class="summary-label">TOTAL PROJECTS</div>
+    </div>
+    <div class="summary-cell c-blue">
+      <div class="summary-num" id="sum-active">2</div>
+      <div class="summary-label">IN PROGRESS</div>
+    </div>
+    <div class="summary-cell c-red">
+      <div class="summary-num" id="sum-plan">4</div>
+      <div class="summary-label">PLANNING</div>
+    </div>
+    <div class="summary-cell c-purple">
+      <div class="summary-num" id="sum-tasks">32</div>
+      <div class="summary-label">TOTAL TASKS</div>
+    </div>
+    <div class="summary-cell c-green">
+      <div class="summary-num" id="sum-done">4</div>
+      <div class="summary-label">COMPLETED</div>
+    </div>
+  </div>
+
+  <div class="project-grid" id="project-grid">
+    <!-- JS生成 -->
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════
+     VIEW: KANBAN
+══════════════════════════════════ -->
+<div class="view" id="view-kanban">
+
+  <div class="kanban-header">
+    <div class="kanban-title">KANBAN BOARD</div>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <select id="kanban-filter" onchange="renderKanban()" style="background:var(--surface);border:1px solid var(--border2);color:var(--white);font-family:'Space Mono',monospace;font-size:9px;padding:5px 10px;outline:none;">
+        <option value="all">ALL PROJECTS</option>
+        <option value="0">P1: 配信ニュース</option>
+        <option value="1">P2: 名画座ニュース</option>
+        <option value="2">P3: TOP配信一覧</option>
+        <option value="3">P4: トレンドウォッチ</option>
+        <option value="4">P5: 新人監督ニュース</option>
+        <option value="5">P6: サムネイル+IG投稿</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="kanban-board">
+    <div class="kanban-col" id="col-backlog">
+      <div class="kanban-col-header">
+        <div class="kanban-col-title"><div class="col-dot" style="background:var(--dim)"></div>BACKLOG</div>
+        <span id="cnt-backlog">0</span>
+      </div>
+      <div id="tasks-backlog"></div>
+      <button class="k-add-btn" onclick="showAddForm('backlog')">+ TASK</button>
+      <div class="task-form" id="form-backlog">
+        <input type="text" id="new-task-backlog" placeholder="タスク名...">
+        <div class="task-form-row">
+          <select id="new-proj-backlog">
+            <option value="0">P1: 配信ニュース</option>
+            <option value="1">P2: 名画座</option>
+            <option value="2">P3: TOP配信</option>
+            <option value="3">P4: トレンド</option>
+            <option value="4">P5: 新人監督</option>
+            <option value="5">P6: サムネイル</option>
+          </select>
+          <select id="new-prio-backlog">
+            <option value="high">HIGH</option>
+            <option value="mid" selected>MID</option>
+            <option value="low">LOW</option>
+          </select>
+        </div>
+        <div class="task-form-btns">
+          <button class="tf-save" onclick="addTask('backlog')">SAVE</button>
+          <button class="tf-cancel" onclick="hideAddForm('backlog')">CANCEL</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="kanban-col" id="col-todo">
+      <div class="kanban-col-header">
+        <div class="kanban-col-title"><div class="col-dot" style="background:var(--blue)"></div>TO DO</div>
+        <span id="cnt-todo">0</span>
+      </div>
+      <div id="tasks-todo"></div>
+      <button class="k-add-btn" onclick="showAddForm('todo')">+ TASK</button>
+      <div class="task-form" id="form-todo">
+        <input type="text" id="new-task-todo" placeholder="タスク名...">
+        <div class="task-form-row">
+          <select id="new-proj-todo">
+            <option value="0">P1: 配信ニュース</option>
+            <option value="1">P2: 名画座</option>
+            <option value="2">P3: TOP配信</option>
+            <option value="3">P4: トレンド</option>
+            <option value="4">P5: 新人監督</option>
+            <option value="5">P6: サムネイル</option>
+          </select>
+          <select id="new-prio-todo">
+            <option value="high">HIGH</option>
+            <option value="mid" selected>MID</option>
+            <option value="low">LOW</option>
+          </select>
+        </div>
+        <div class="task-form-btns">
+          <button class="tf-save" onclick="addTask('todo')">SAVE</button>
+          <button class="tf-cancel" onclick="hideAddForm('todo')">CANCEL</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="kanban-col" id="col-doing">
+      <div class="kanban-col-header">
+        <div class="kanban-col-title"><div class="col-dot" style="background:var(--accent)"></div>IN PROGRESS</div>
+        <span id="cnt-doing">0</span>
+      </div>
+      <div id="tasks-doing"></div>
+      <button class="k-add-btn" onclick="showAddForm('doing')">+ TASK</button>
+      <div class="task-form" id="form-doing">
+        <input type="text" id="new-task-doing" placeholder="タスク名...">
+        <div class="task-form-row">
+          <select id="new-proj-doing">
+            <option value="0">P1: 配信ニュース</option>
+            <option value="1">P2: 名画座</option>
+            <option value="2">P3: TOP配信</option>
+            <option value="3">P4: トレンド</option>
+            <option value="4">P5: 新人監督</option>
+            <option value="5">P6: サムネイル</option>
+          </select>
+          <select id="new-prio-doing">
+            <option value="high">HIGH</option>
+            <option value="mid" selected>MID</option>
+            <option value="low">LOW</option>
+          </select>
+        </div>
+        <div class="task-form-btns">
+          <button class="tf-save" onclick="addTask('doing')">SAVE</button>
+          <button class="tf-cancel" onclick="hideAddForm('doing')">CANCEL</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="kanban-col" id="col-done">
+      <div class="kanban-col-header">
+        <div class="kanban-col-title"><div class="col-dot" style="background:var(--green)"></div>DONE</div>
+        <span id="cnt-done">0</span>
+      </div>
+      <div id="tasks-done"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════
+     VIEW: ROADMAP
+══════════════════════════════════ -->
+<div class="view" id="view-roadmap">
+  <div class="roadmap-header">
+    <div class="roadmap-title">ROADMAP — 2026</div>
+    <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);margin-top:4px;letter-spacing:2px;">6ヶ月並行開発スケジュール</div>
+  </div>
+  <div class="gantt-wrap">
+    <div class="gantt-row">
+      <div class="gantt-label"></div>
+      <div class="gantt-months">
+        <div class="gantt-month now">MAR</div>
+        <div class="gantt-month">APR</div>
+        <div class="gantt-month">MAY</div>
+        <div class="gantt-month">JUN</div>
+        <div class="gantt-month">JUL</div>
+        <div class="gantt-month">AUG</div>
+      </div>
+    </div>
+    <div id="gantt-rows"></div>
+  </div>
+</div>
+
+<!-- PROJECT DETAIL MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content">
+    <div class="modal-header">
+      <div id="modal-badge" class="project-badge" style="margin-bottom:8px;"></div>
+      <div id="modal-title" style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;"></div>
+      <div id="modal-sub" style="font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);margin-top:4px;letter-spacing:2px;"></div>
+      <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('on')">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+'use strict';
+
+// ══════════════════════════════════
+// DATA
+// ══════════════════════════════════
+
+const PROJECTS = [
+  {
+    id: 0,
+    num: '01',
+    name: '配信サイト\n自動ニュース化',
+    shortName: '配信ニュース',
+    color: '#00aaff',
+    badgeColor: 'rgba(0,170,255,.15)',
+    status: 'planning',
+    progress: 10,
+    desc: 'MUBI・MUBI GO・DAZNなど配信サイトで新たに配信開始されたシネフィルライクな作品を自動検知し、ニュース記事を生成。確認後に投稿。',
+    tags: ['MUBI','Claude API','Web Scraping','自動投稿'],
+    techStack: ['Python/Node.js スクレイパー','Claude API（記事生成）','配信サービスRSS/API','CMS連携'],
+    tasks: [
+      { name: 'MUBI 新着作品スクレイパー設計', status: 'todo', prio: 'high' },
+      { name: 'シネフィル度スコアリングロジック定義', status: 'todo', prio: 'high' },
+      { name: 'Claude API 記事生成プロンプト設計', status: 'doing', prio: 'high' },
+      { name: '確認→投稿フロー UI設計', status: 'backlog', prio: 'mid' },
+      { name: '配信終了日の自動取得ロジック', status: 'backlog', prio: 'mid' },
+    ],
+    phase: [0, 3], // 開始月オフセット, 期間（月）
+  },
+  {
+    id: 1,
+    num: '02',
+    name: '名画座・特集上映\n自動ニュース化',
+    shortName: '名画座ニュース',
+    color: '#b060ff',
+    badgeColor: 'rgba(176,96,255,.15)',
+    status: 'planning',
+    progress: 5,
+    desc: '全国の名画座・ミニシアターの特集上映情報を自動収集。シネフィルライクな作品のみをフィルタリングしてニュース化・確認後投稿。',
+    tags: ['名画座','特集上映','スクレイピング','フィルタリング'],
+    techStack: ['各劇場サイトスクレイパー','シネフィル判定AI','Claude API（記事生成）','スケジュール管理DB'],
+    tasks: [
+      { name: '対象名画座リスト作成（50館）', status: 'todo', prio: 'high' },
+      { name: '上映スケジュール取得スクレイパー', status: 'backlog', prio: 'high' },
+      { name: 'シネフィル作品フィルタリング基準定義', status: 'todo', prio: 'high' },
+      { name: '記事生成プロンプト（上映特化）', status: 'backlog', prio: 'mid' },
+      { name: 'カレンダー表示UI', status: 'backlog', prio: 'low' },
+    ],
+    phase: [1, 3],
+  },
+  {
+    id: 2,
+    num: '03',
+    name: 'TOP配信作品\n一覧コーナー',
+    shortName: 'TOP配信一覧',
+    color: '#d4f000',
+    badgeColor: 'rgba(212,240,0,.1)',
+    status: 'active',
+    progress: 30,
+    desc: 'FRAMEトップページに配信中の注目作品一覧を表示。配信終了日を明記し、期限切れ前に読者へ通知。複数サービスを横断的に表示。',
+    tags: ['TOPページ','配信終了日','UI/UX','リアルタイム'],
+    techStack: ['フロントエンド（Next.js）','配信情報API','配信終了日スクレイパー','Cron更新'],
+    tasks: [
+      { name: 'TOP配信コーナー ワイヤーフレーム', status: 'done', prio: 'high' },
+      { name: '配信サービス横断データ構造設計', status: 'doing', prio: 'high' },
+      { name: '配信終了日 自動取得', status: 'todo', prio: 'high' },
+      { name: 'カード型UI実装', status: 'backlog', prio: 'mid' },
+      { name: '「もうすぐ終了」バッジ実装', status: 'backlog', prio: 'mid' },
+    ],
+    phase: [0, 2],
+  },
+  {
+    id: 3,
+    num: '04',
+    name: 'トレンド\nウォッチコーナー',
+    shortName: 'トレンドウォッチ',
+    color: '#ff8800',
+    badgeColor: 'rgba(255,136,0,.12)',
+    status: 'active',
+    progress: 20,
+    desc: 'SNS（X/Instagram）のミニシアター界隈トレンドワードを自動収集してTOPページに表示。編集部がトピックをコントロールできる管理UI付き。',
+    tags: ['X API','トレンド','管理UI','SNSモニタリング'],
+    techStack: ['X API v2','Instagram API','Claude API（分析）','管理ダッシュボード'],
+    tasks: [
+      { name: 'X API トレンドワード取得実装', status: 'doing', prio: 'high' },
+      { name: 'ミニシアター関連ワードフィルタリング', status: 'todo', prio: 'high' },
+      { name: 'トピック管理UI（編集部用）', status: 'backlog', prio: 'high' },
+      { name: 'TOP表示コンポーネント設計', status: 'todo', prio: 'mid' },
+      { name: 'トレンド履歴・分析ビュー', status: 'backlog', prio: 'low' },
+    ],
+    phase: [1, 2],
+  },
+  {
+    id: 4,
+    num: '05',
+    name: '新人監督・映画祭・\n助成金ニュース化',
+    shortName: '新人監督ニュース',
+    color: '#00e676',
+    badgeColor: 'rgba(0,230,118,.1)',
+    status: 'planning',
+    progress: 5,
+    desc: '新人監督の短編・長編情報、映画祭の入選情報、助成金・グラントの採択情報を自動収集・記事化。FRAMEの核心コンテンツ。',
+    tags: ['映画祭','助成金','新人監督','リサーチAPI'],
+    techStack: ['FilmFreeway API','各映画祭RSS','助成機関ウェブスクレイパー','Claude API（記事生成）'],
+    tasks: [
+      { name: '主要映画祭リスト作成（国内外）', status: 'todo', prio: 'high' },
+      { name: '助成機関リスト作成・スクレイパー設計', status: 'todo', prio: 'high' },
+      { name: '新人監督データベース設計', status: 'backlog', prio: 'high' },
+      { name: '記事生成プロンプト（祭/助成特化）', status: 'backlog', prio: 'mid' },
+      { name: 'FilmFreeway連携検討', status: 'backlog', prio: 'low' },
+    ],
+    phase: [2, 4],
+  },
+  {
+    id: 5,
+    num: '06',
+    name: 'サムネイル自動生成\n+ Instagram自動投稿',
+    shortName: 'サムネイル+IG投稿',
+    color: '#ff4488',
+    badgeColor: 'rgba(255,68,136,.12)',
+    status: 'planning',
+    progress: 15,
+    desc: '関連画像に50%透過の座布団を敷き記事名を配置したシンプルなサムネイルを自動生成。Instagram Graph APIで自動投稿まで一気通貫。',
+    tags: ['Canvas API','サムネイル生成','Instagram API','自動投稿'],
+    techStack: ['Canvas API / Sharp','Instagram Graph API','画像ストレージ','投稿スケジューラー'],
+    tasks: [
+      { name: 'サムネイルデザインテンプレート確定', status: 'done', prio: 'high' },
+      { name: 'Canvas APIで画像合成ロジック実装', status: 'doing', prio: 'high' },
+      { name: 'Instagram Graph API接続設定', status: 'todo', prio: 'high' },
+      { name: '投稿前プレビュー確認UI', status: 'todo', prio: 'mid' },
+      { name: '投稿スケジューラー実装', status: 'backlog', prio: 'mid' },
+    ],
+    phase: [0, 4],
+  },
+];
+
+// タスクをカンバン用フラットリストに変換
+let kanbanTasks = [];
+PROJECTS.forEach(p => {
+  p.tasks.forEach((t, i) => {
+    kanbanTasks.push({
+      id: `${p.id}-${i}`,
+      projId: p.id,
+      projName: p.shortName,
+      projColor: p.color,
+      name: t.name,
+      status: t.status,
+      prio: t.prio,
+      date: '2026.Q2',
+    });
+  });
+});
+
+// ══════════════════════════════════
+// HELPERS
+// ══════════════════════════════════
+
+const $ = id => document.getElementById(id);
+function notify(msg) {
+  const n = $('notif');
+  n.textContent = msg;
+  n.classList.add('on');
+  setTimeout(() => n.classList.remove('on'), 2200);
+}
+
+// ══════════════════════════════════
+// VIEW SWITCHING
+// ══════════════════════════════════
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('on'));
+  $(`view-${name}`).classList.add('on');
+  event.target.classList.add('on');
+  if (name === 'kanban') renderKanban();
+  if (name === 'roadmap') renderRoadmap();
+}
+
+// ══════════════════════════════════
+// OVERVIEW
+// ══════════════════════════════════
+
+function renderOverview() {
+  const grid = $('project-grid');
+  grid.innerHTML = '';
+
+  PROJECTS.forEach((p, i) => {
+    const statusMap = { planning: { label: 'PLANNING', cls: 's-plan' }, active: { label: 'IN PROGRESS', cls: 's-active' }, done: { label: 'DONE', cls: 's-done' } };
+    const st = statusMap[p.status];
+    const doneTasks = p.tasks.filter(t => t.status === 'done').length;
+
+    const card = document.createElement('div');
+    card.className = `project-card pc-${i+1}`;
+    card.onclick = () => openModal(p);
+    card.innerHTML = `
+      <div class="project-num">${p.num}</div>
+      <div class="project-badge" style="background:${p.badgeColor};color:${p.color};border:1px solid ${p.color}40;">PROJECT ${p.num}</div>
+      <div class="project-name">${p.name}</div>
+      <div class="project-desc">${p.desc}</div>
+      <div class="project-tags">${p.tags.map(t => `<span class="project-tag">${t}</span>`).join('')}</div>
+      <div class="project-footer">
+        <div class="project-status ${st.cls}"><div class="status-dot"></div>${st.label}</div>
+        <div class="project-progress-wrap">
+          <div style="font-family:'Space Mono',monospace;font-size:7px;color:var(--dim);text-align:right;margin-bottom:4px;">${doneTasks}/${p.tasks.length} TASKS</div>
+          <div class="project-progress-bar"><div class="project-progress-fill" style="width:${p.progress}%;background:${p.color};"></div></div>
+        </div>
+      </div>
+      <button class="detail-btn" onclick="event.stopPropagation();openModal(PROJECTS[${i}])">OPEN DETAIL →</button>`;
+    grid.appendChild(card);
+  });
+
+  // Update summary
+  $('sum-active').textContent = PROJECTS.filter(p => p.status === 'active').length;
+  $('sum-plan').textContent   = PROJECTS.filter(p => p.status === 'planning').length;
+  $('sum-tasks').textContent  = kanbanTasks.length;
+  $('sum-done').textContent   = kanbanTasks.filter(t => t.status === 'done').length;
+}
+
+// ══════════════════════════════════
+// MODAL
+// ══════════════════════════════════
+
+function openModal(p) {
+  $('modal-badge').textContent = `PROJECT ${p.num}`;
+  $('modal-badge').style.cssText = `background:${p.badgeColor};color:${p.color};border:1px solid ${p.color}40;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;padding:3px 10px;margin-bottom:8px;display:inline-block;`;
+  $('modal-title').textContent = p.name.replace('\n', ' ');
+  $('modal-sub').textContent = p.desc;
+
+  const tasks = p.tasks;
+  const doneCnt = tasks.filter(t => t.status === 'done').length;
+
+  $('modal-body').innerHTML = `
+    <div class="modal-section">
+      <div class="modal-section-title">TECH STACK</div>
+      <div class="tech-stack">${p.techStack.map(t => `<span class="tech-pill">${t}</span>`).join('')}</div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">TASK LIST (${doneCnt}/${tasks.length} DONE)</div>
+      <div class="task-list">
+        ${tasks.map((t, i) => `
+          <label class="task-item ${t.status === 'done' ? 'done' : ''}" id="modal-task-${p.id}-${i}">
+            <input type="checkbox" ${t.status === 'done' ? 'checked' : ''} onchange="toggleModalTask(${p.id},${i},this)">
+            <span>${t.name}</span>
+            <span class="k-task-prio prio-${t.prio}" style="margin-left:auto;">${t.prio.toUpperCase()}</span>
+          </label>`).join('')}
+      </div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">PROGRESS</div>
+      <div style="background:var(--border2);height:4px;position:relative;overflow:hidden;">
+        <div style="width:${p.progress}%;height:100%;background:${p.color};transition:width .5s;"></div>
+      </div>
+      <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--dim);margin-top:6px;letter-spacing:1px;">${p.progress}% COMPLETE</div>
+    </div>`;
+
+  $('modal-overlay').classList.add('on');
+}
+
+function toggleModalTask(projId, taskIdx, cb) {
+  PROJECTS[projId].tasks[taskIdx].status = cb.checked ? 'done' : 'todo';
+  const label = $(`modal-task-${projId}-${taskIdx}`);
+  if (cb.checked) label.classList.add('done');
+  else label.classList.remove('done');
+  // sync kanban
+  const kt = kanbanTasks.find(t => t.id === `${projId}-${taskIdx}`);
+  if (kt) kt.status = cb.checked ? 'done' : 'todo';
+  renderOverview();
+  notify(cb.checked ? '✦ タスク完了' : '✦ タスク未完了に戻しました');
+}
+
+function closeModal(e) {
+  if (e.target === $('modal-overlay')) $('modal-overlay').classList.remove('on');
+}
+
+// ══════════════════════════════════
+// KANBAN
+// ══════════════════════════════════
+
+const COLS = ['backlog','todo','doing','done'];
+
+function renderKanban() {
+  const filter = $('kanban-filter').value;
+
+  COLS.forEach(col => {
+    const container = $(`tasks-${col}`);
+    container.innerHTML = '';
+
+    const tasks = kanbanTasks.filter(t => {
+      if (t.status !== col) return false;
+      if (filter !== 'all' && t.projId !== parseInt(filter)) return false;
+      return true;
+    });
+
+    $(`cnt-${col}`).textContent = tasks.length;
+
+    tasks.forEach(t => {
+      const card = document.createElement('div');
+      card.className = 'k-task';
+      card.draggable = true;
+      card.id = 'kt-' + t.id;
+      card.ondragstart = e => e.dataTransfer.setData('text/plain', t.id);
+      card.innerHTML = `
+        <div class="k-task-proj">
+          <span style="width:7px;height:7px;border-radius:50%;background:${t.projColor};display:inline-block;flex-shrink:0;"></span>
+          ${t.projName}
+        </div>
+        <div class="k-task-name">${t.name}</div>
+        <div class="k-task-footer">
+          <span class="k-task-prio prio-${t.prio}">${t.prio.toUpperCase()}</span>
+          <div style="display:flex;gap:6px;align-items:center;">
+            ${COLS.filter(c=>c!==col).map(c => `<span onclick="moveTask('${t.id}','${c}')" style="font-family:'Space Mono',monospace;font-size:7px;color:var(--dim);cursor:pointer;padding:2px 5px;border:1px solid var(--border2);" title="${c}">${c === 'done' ? '✓' : c === 'doing' ? '▶' : c === 'todo' ? '→' : '←'}</span>`).join('')}
+          </div>
+        </div>`;
+      container.appendChild(card);
+    });
+
+    // Drop zone
+    container.ondragover = e => e.preventDefault();
+    container.ondrop = e => {
+      e.preventDefault();
+      const id = e.dataTransfer.getData('text/plain');
+      moveTask(id, col);
+    };
+  });
+}
+
+function moveTask(taskId, newStatus) {
+  const task = kanbanTasks.find(t => t.id === taskId);
+  if (task) {
+    task.status = newStatus;
+    // sync to project
+    const [projId, tIdx] = taskId.split('-').map(Number);
+    PROJECTS[projId].tasks[tIdx].status = newStatus;
+    renderKanban();
+    renderOverview();
+    notify(`✦ タスクを ${newStatus.toUpperCase()} へ移動`);
+  }
+}
+
+function showAddForm(col) {
+  document.querySelectorAll('.task-form').forEach(f => f.classList.remove('on'));
+  $(`form-${col}`).classList.add('on');
+  $(`new-task-${col}`).focus();
+}
+
+function hideAddForm(col) { $(`form-${col}`).classList.remove('on'); }
+
+function addTask(col) {
+  const name = $(`new-task-${col}`).value.trim();
+  const projId = parseInt($(`new-proj-${col}`).value);
+  const prio   = $(`new-prio-${col}`).value;
+  if (!name) return;
+
+  const newTask = { name, status: col, prio };
+  PROJECTS[projId].tasks.push(newTask);
+  const idx = PROJECTS[projId].tasks.length - 1;
+  kanbanTasks.push({
+    id: `${projId}-${idx}`,
+    projId, projName: PROJECTS[projId].shortName, projColor: PROJECTS[projId].color,
+    name, status: col, prio, date: '2026.Q2',
+  });
+
+  $(`new-task-${col}`).value = '';
+  hideAddForm(col);
+  renderKanban();
+  renderOverview();
+  notify('✦ タスクを追加しました');
+}
+
+// ══════════════════════════════════
+// ROADMAP / GANTT
+// ══════════════════════════════════
+
+function renderRoadmap() {
+  const container = $('gantt-rows');
+  container.innerHTML = '';
+
+  const MONTHS = 6;
+  const MONTH_W = 100 / MONTHS;
+
+  PROJECTS.forEach(p => {
+    const [start, dur] = p.phase;
+    const row = document.createElement('div');
+    row.className = 'gantt-row';
+
+    const label = document.createElement('div');
+    label.className = 'gantt-label';
+    label.innerHTML = `<strong>P${p.num} ${p.shortName}</strong>${p.status === 'active' ? '<span style="color:var(--accent);font-size:8px;"> ● ACTIVE</span>' : ''}`;
+
+    const timeline = document.createElement('div');
+    timeline.className = 'gantt-timeline';
+    timeline.style.minWidth = '680px';
+
+    // Grid lines
+    for (let i = 0; i < MONTHS; i++) {
+      const line = document.createElement('div');
+      line.style.cssText = `position:absolute;top:0;bottom:0;left:${i*MONTH_W}%;width:1px;background:var(--border);`;
+      timeline.appendChild(line);
+    }
+
+    const bar = document.createElement('div');
+    bar.className = 'gantt-bar';
+    bar.style.cssText = `left:${start*MONTH_W}%;width:${dur*MONTH_W}%;background:${p.color}22;border:1px solid ${p.color}66;color:${p.color};`;
+    bar.textContent = p.shortName;
+
+    // Progress fill
+    const fill = document.createElement('div');
+    fill.style.cssText = `position:absolute;top:50%;transform:translateY(-50%);left:${start*MONTH_W}%;width:${dur*MONTH_W*p.progress/100}%;height:14px;background:${p.color}44;`;
+    timeline.appendChild(fill);
+    timeline.appendChild(bar);
+
+    // Current month marker
+    const nowLine = document.createElement('div');
+    nowLine.style.cssText = 'position:absolute;top:0;bottom:0;left:0%;width:2px;background:var(--accent);opacity:.6;';
+    timeline.appendChild(nowLine);
+
+    row.appendChild(label);
+    row.appendChild(timeline);
+    container.appendChild(row);
+  });
+}
+
+// ══════════════════════════════════
+// INIT
+// ══════════════════════════════════
+renderOverview();
+</script>
+</body>
+</html>
