@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRAME — Streaming New Arrivals</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;700;800&family=Noto+Sans+JP:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #0a0a0a;
+  --surface: #121212;
+  --surface2: #181818;
+  --border: #1f1f1f;
+  --border2: #2a2a2a;
+  --white: #f2f0ec;
+  --offwhite: #c8c4bc;
+  --gray: #666;
+  --accent: #e2ff00;
+  --accent2: #ff3300;
+  --accent3: #00aaff;
+  --mubi-color: #E8F037;
+  --unext-color: #00c3e3;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Noto Sans JP', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a { text-decoration: none; color: inherit; }
+img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* ── HEADER ── */
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.header-inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 32px;
+  height: 56px;
+}
+.header-nav {
+  display: flex;
+  gap: 28px;
+}
+.header-nav a {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--gray);
+  transition: color 0.2s;
+}
+.header-nav a:hover, .header-nav a.active { color: var(--white); }
+.site-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 30px;
+  letter-spacing: 6px;
+  text-align: center;
+}
+.site-logo span { color: var(--accent); }
+.header-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 20px;
+}
+.header-right a {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--gray);
+  transition: color 0.2s;
+}
+.header-right a:hover { color: var(--white); }
+
+/* ── PAGE HERO ── */
+.page-hero {
+  margin-top: 56px;
+  padding: 64px 40px 48px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+.page-hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px, 7vw, 96px);
+  letter-spacing: 4px;
+  line-height: 0.9;
+}
+.page-hero-title em {
+  color: var(--accent);
+  font-style: normal;
+}
+.page-hero-meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--gray);
+  text-align: right;
+  line-height: 2;
+}
+.page-hero-meta strong { color: var(--white); }
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 40px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.filter-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--gray);
+  margin-right: 4px;
+}
+.filter-btn {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  padding: 6px 14px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--gray);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.filter-btn:hover { border-color: var(--white); color: var(--white); }
+.filter-btn.active { background: var(--white); color: var(--bg); border-color: var(--white); }
+.filter-btn.mubi.active { background: var(--mubi-color); color: #000; border-color: var(--mubi-color); }
+.filter-btn.unext.active { background: var(--unext-color); color: #000; border-color: var(--unext-color); }
+.filter-count {
+  margin-left: auto;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--gray);
+}
+
+/* ── FILM GRID ── */
+.film-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  padding: 0;
+}
+
+.film-card {
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.film-card:hover { background: var(--surface); }
+
+.film-thumb {
+  aspect-ratio: 16/9;
+  background: var(--surface2);
+  overflow: hidden;
+  position: relative;
+}
+.film-thumb img {
+  transition: transform 0.4s ease;
+}
+.film-card:hover .film-thumb img { transform: scale(1.03); }
+.film-thumb-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  letter-spacing: 4px;
+  color: var(--border2);
+}
+.film-source-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  padding: 3px 8px;
+  font-weight: 700;
+}
+.badge-mubi { background: var(--mubi-color); color: #000; }
+.badge-unext { background: var(--unext-color); color: #000; }
+
+.film-info {
+  padding: 16px 16px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.film-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--white);
+}
+.film-title-locale {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: var(--gray);
+  letter-spacing: 0.5px;
+}
+.film-meta {
+  margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.film-meta-item {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--gray);
+}
+.film-meta-item strong { color: var(--offwhite); }
+.film-synopsis {
+  font-size: 11px;
+  color: var(--gray);
+  line-height: 1.6;
+  margin-top: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.film-link {
+  margin-top: auto;
+  padding-top: 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  color: var(--gray);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+.film-card:hover .film-link { color: var(--accent); }
+.film-link::after { content: '→'; }
+
+/* ── STATUS STATES ── */
+.state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 16px;
+  padding: 60px 40px;
+}
+.state-icon {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 80px;
+  letter-spacing: 4px;
+  color: var(--border2);
+}
+.state-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--gray);
+}
+.state-sub {
+  font-size: 12px;
+  color: var(--gray);
+  text-align: center;
+  max-width: 400px;
+  line-height: 1.8;
+}
+
+/* ── FOOTER ── */
+.footer {
+  padding: 40px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.footer-note {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--gray);
+  line-height: 2;
+}
+
+@media (max-width: 640px) {
+  .header-inner { grid-template-columns: auto 1fr; padding: 0 16px; }
+  .header-nav { display: none; }
+  .header-right { display: none; }
+  .page-hero { flex-direction: column; align-items: flex-start; padding: 40px 20px 32px; }
+  .page-hero-meta { text-align: left; }
+  .filter-bar { padding: 16px 20px; }
+  .film-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .footer { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <nav class="header-nav">
+      <a href="index.html">NEWS</a>
+      <a href="#">REVIEW</a>
+      <a href="#">INTERVIEW</a>
+      <a href="#">DIRECTOR</a>
+      <a href="#">FESTIVAL</a>
+    </nav>
+    <a href="index.html" class="site-logo">FR<span>A</span>ME</a>
+    <div class="header-right">
+      <a href="streaming.html" class="active">STREAMING</a>
+      <a href="#">JP / EN</a>
+    </div>
+  </div>
+</header>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div>
+    <div class="page-hero-title">NEW<br><em>ARRIVALS</em></div>
+  </div>
+  <div class="page-hero-meta">
+    <div>SOURCE — MUBI &amp; U-NEXT</div>
+    <div>更新: <strong id="last-updated">—</strong></div>
+    <div>全 <strong id="total-count">—</strong> 作品</div>
+  </div>
+</section>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <span class="filter-label">FILTER</span>
+  <button class="filter-btn active" data-filter="all">ALL</button>
+  <button class="filter-btn mubi" data-filter="MUBI">MUBI</button>
+  <button class="filter-btn unext" data-filter="U-NEXT">U-NEXT</button>
+  <span class="filter-count" id="visible-count"></span>
+</div>
+
+<!-- FILM GRID -->
+<main id="film-grid" class="film-grid"></main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-note">
+    FRAME — INDEPENDENT FILM MEDIA<br>
+    DATA AUTO-UPDATED DAILY VIA GITHUB ACTIONS
+  </div>
+  <div class="footer-note" style="text-align:right;">
+    © 2026 FRAME
+  </div>
+</footer>
+
+<script>
+(function () {
+  const grid = document.getElementById('film-grid');
+  const lastUpdatedEl = document.getElementById('last-updated');
+  const totalCountEl = document.getElementById('total-count');
+  const visibleCountEl = document.getElementById('visible-count');
+  const filterBtns = document.querySelectorAll('.filter-btn');
+
+  let allFilms = [];
+  let currentFilter = 'all';
+
+  // ── Render ──────────────────────────────────────────────────────────────────
+  function renderFilms(films) {
+    grid.innerHTML = '';
+
+    if (films.length === 0) {
+      grid.innerHTML = `
+        <div class="state-container" style="grid-column:1/-1">
+          <div class="state-icon">0</div>
+          <div class="state-label">NO FILMS FOUND</div>
+          <p class="state-sub">このフィルターに該当する作品はありません。</p>
+        </div>`;
+      visibleCountEl.textContent = '0 FILMS';
+      return;
+    }
+
+    films.forEach(film => {
+      const card = document.createElement('article');
+      card.className = 'film-card';
+
+      const source = film.source || 'MUBI';
+      const badgeClass = source === 'U-NEXT' ? 'badge-unext' : 'badge-mubi';
+
+      const thumbHtml = film.thumbnail
+        ? `<img src="${escHtml(film.thumbnail)}" alt="${escHtml(film.title)}" loading="lazy">`
+        : `<div class="film-thumb-placeholder">▶</div>`;
+
+      const metaItems = [
+        film.year ? `<span class="film-meta-item"><strong>${film.year}</strong></span>` : '',
+        film.director ? `<span class="film-meta-item">DIR <strong>${escHtml(film.director)}</strong></span>` : '',
+        film.country ? `<span class="film-meta-item">${escHtml(film.country)}</span>` : '',
+        film.duration ? `<span class="film-meta-item">${film.duration}<small>min</small></span>` : '',
+      ].filter(Boolean).join('');
+
+      card.innerHTML = `
+        <a href="${escHtml(film.url)}" target="_blank" rel="noopener noreferrer">
+          <div class="film-thumb">
+            ${thumbHtml}
+            <span class="film-source-badge ${badgeClass}">${escHtml(source)}</span>
+          </div>
+          <div class="film-info">
+            <div class="film-title">${escHtml(film.title)}</div>
+            ${film.title_locale && film.title_locale !== film.title
+              ? `<div class="film-title-locale">${escHtml(film.title_locale)}</div>` : ''}
+            ${metaItems ? `<div class="film-meta">${metaItems}</div>` : ''}
+            ${film.synopsis ? `<p class="film-synopsis">${escHtml(film.synopsis)}</p>` : ''}
+            <div class="film-link">VIEW ON ${escHtml(source)}</div>
+          </div>
+        </a>`;
+
+      grid.appendChild(card);
+    });
+
+    visibleCountEl.textContent = `${films.length} FILMS`;
+  }
+
+  function applyFilter() {
+    const filtered = currentFilter === 'all'
+      ? allFilms
+      : allFilms.filter(f => f.source === currentFilter);
+    renderFilms(filtered);
+  }
+
+  // ── Filter buttons ───────────────────────────────────────────────────────────
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      applyFilter();
+    });
+  });
+
+  // ── Fetch data ───────────────────────────────────────────────────────────────
+  function showLoading() {
+    grid.innerHTML = `
+      <div class="state-container" style="grid-column:1/-1">
+        <div class="state-icon">▶</div>
+        <div class="state-label">LOADING</div>
+        <p class="state-sub">作品データを取得しています...</p>
+      </div>`;
+  }
+
+  function showError() {
+    grid.innerHTML = `
+      <div class="state-container" style="grid-column:1/-1">
+        <div class="state-icon">!</div>
+        <div class="state-label">DATA NOT FOUND</div>
+        <p class="state-sub">
+          まだデータが取得されていません。<br>
+          GitHub Actions を手動実行して<br>
+          <code>data/films.json</code> を生成してください。
+        </p>
+      </div>`;
+  }
+
+  showLoading();
+
+  fetch('./data/films.json')
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      allFilms = Array.isArray(data) ? data : [];
+      totalCountEl.textContent = allFilms.length;
+
+      if (allFilms.length === 0) {
+        showError();
+        return;
+      }
+
+      // 最終更新日時
+      const dates = allFilms.map(f => f.fetched_at).filter(Boolean).sort();
+      if (dates.length) {
+        const d = new Date(dates[dates.length - 1]);
+        lastUpdatedEl.textContent = d.toLocaleString('ja-JP', {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit',
+        });
+      }
+
+      applyFilter();
+    })
+    .catch(err => {
+      console.error('Failed to load films.json:', err);
+      showError();
+    });
+
+  // ── Utility ─────────────────────────────────────────────────────────────────
+  function escHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+})();
+</script>
+</body>
+</html>
