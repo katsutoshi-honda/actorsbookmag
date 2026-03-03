@@ -1,5 +1,1775 @@
 [
   {
+    "id": "mubi_my-undesirable-friends-part-ii-exile",
+    "title": "My Undesirable Friends: Part II - Exile",
+    "year": null,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/my-undesirable-friends-part-ii-exile/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002752+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_last-days-1",
+    "title": "Last Days",
+    "year": null,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/last-days-1/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002742+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_self-portrait-as-a-coffee-pot-2024",
+    "title": "Self-Portrait as a Coffee Pot",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/self-portrait-as-a-coffee-pot-2024/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002735+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_the-sacrifice",
+    "title": "The Sacrifice",
+    "year": 1986,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-sacrifice/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002729+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_first-cow",
+    "title": "First Cow",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/first-cow/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002722+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_the-son-of-joseph",
+    "title": "The Son of Joseph",
+    "year": 2016,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-son-of-joseph/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002716+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_i-olga-hepnarova",
+    "title": "I, Olga Hepnarova",
+    "year": 2016,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/i-olga-hepnarova/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002709+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_songs-my-brothers-taught-me",
+    "title": "Songs My Brothers Taught Me",
+    "year": 2015,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/songs-my-brothers-taught-me/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002702+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_baden-baden",
+    "title": "Baden Baden",
+    "year": 2016,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/baden-baden/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002692+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_the-blue-room-2014",
+    "title": "The Blue Room",
+    "year": 2014,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-blue-room-2014/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002686+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_arabian-nights-volume-3-the-enchanted-one",
+    "title": "Arabian Nights: Volume 3, The Enchanted One",
+    "year": 2015,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/arabian-nights-volume-3-the-enchanted-one/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002679+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_arabian-nights-volume-2-the-desolate-one",
+    "title": "Arabian Nights: Volume 2, The Desolate One",
+    "year": 2015,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/arabian-nights-volume-2-the-desolate-one/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002672+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_arabian-nights-volume-1-the-restless-one",
+    "title": "Arabian Nights: Volume 1, The Restless One",
+    "year": 2015,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/arabian-nights-volume-1-the-restless-one/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002664+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_antiporno",
+    "title": "Antiporno",
+    "year": 2016,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/antiporno/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002657+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_wet-woman-in-the-wind",
+    "title": "Wet Woman in the Wind",
+    "year": 2016,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/wet-woman-in-the-wind/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002651+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_felicite-2017",
+    "title": "Félicité",
+    "year": 2017,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/felicite-2017/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002643+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_on-body-and-soul",
+    "title": "On Body and Soul",
+    "year": 2017,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/on-body-and-soul/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002633+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_mimosas",
+    "title": "Mimosas",
+    "year": 2016,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/mimosas/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002626+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_slack-bay",
+    "title": "Slack Bay",
+    "year": 2016,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/slack-bay/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002620+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_the-happiest-day-in-the-life-of-olli-maki",
+    "title": "The Happiest Day in the Life of Olli Mäki",
+    "year": 2016,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-happiest-day-in-the-life-of-olli-maki/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002613+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_weirdos",
+    "title": "Weirdos",
+    "year": 2016,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/weirdos/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002604+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_the-park-2016",
+    "title": "The Park",
+    "year": 2016,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-park-2016/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002598+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_the-image-book",
+    "title": "The Image Book",
+    "year": 2018,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-image-book/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002591+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_suspiria-2018",
+    "title": "Suspiria",
+    "year": 2018,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/suspiria-2018/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002584+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_dont-worry-he-wont-get-far-on-foot",
+    "title": "Don't Worry, He Won't Get Far on Foot",
+    "year": 2018,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/dont-worry-he-wont-get-far-on-foot/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002573+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_ryuichi-sakamoto-async-at-the-park-avenue-armory",
+    "title": "Ryuichi Sakamoto: async at the Park Avenue Armory",
+    "year": 2018,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/ryuichi-sakamoto-async-at-the-park-avenue-armory/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002566+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_touch-me-not-2018",
+    "title": "Touch Me Not",
+    "year": 2018,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/touch-me-not-2018/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002559+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_the-apparition-2018",
+    "title": "The Apparition",
+    "year": 2018,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-apparition-2018/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002552+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_ryuichi-sakamoto-coda",
+    "title": "Ryuichi Sakamoto: Coda",
+    "year": 2017,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/ryuichi-sakamoto-coda/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002546+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_have-a-nice-day-2017",
+    "title": "Have a Nice Day",
+    "year": 2017,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/have-a-nice-day-2017/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002539+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_lover-for-a-day",
+    "title": "Lover for a Day",
+    "year": 2017,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/lover-for-a-day/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002532+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_a-dog-called-money",
+    "title": "A Dog Called Money",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/a-dog-called-money/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002525+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_celebration-2007",
+    "title": "Celebration",
+    "year": 2007,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/celebration-2007/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002519+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_zombi-child",
+    "title": "Zombi Child",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/zombi-child/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002512+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_beanpole",
+    "title": "Beanpole",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/beanpole/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002505+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_leto",
+    "title": "Leto",
+    "year": 2018,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/leto/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002499+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_knife-heart",
+    "title": "Knife+Heart",
+    "year": 2018,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/knife-heart/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002492+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_madelines-madeline",
+    "title": "Madeline's Madeline",
+    "year": 2018,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/madelines-madeline/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002485+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_under-the-silver-lake",
+    "title": "Under the Silver Lake",
+    "year": 2018,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/under-the-silver-lake/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002479+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_border-2018",
+    "title": "Border",
+    "year": 2018,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/border-2018/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002471+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_farewell-amor",
+    "title": "Farewell Amor",
+    "year": 2020,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/farewell-amor/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002465+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_cold-meridian",
+    "title": "Cold Meridian",
+    "year": 2020,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/cold-meridian/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002458+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_tripping-with-nils-frahm",
+    "title": "Tripping with Nils Frahm",
+    "year": 2020,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/tripping-with-nils-frahm/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002451+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_nimic",
+    "title": "Nimic",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/nimic/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002445+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_swallow-2019",
+    "title": "Swallow",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/swallow-2019/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002438+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_the-other-lamb",
+    "title": "The Other Lamb",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-other-lamb/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002431+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_two-one",
+    "title": "Two/One",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/two-one/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002425+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_film:284798",
+    "title": "End of Summer",
+    "year": 2014,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/film:284798/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002412+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_strasbourg-1518",
+    "title": "Strasbourg 1518",
+    "year": 2020,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/strasbourg-1518/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002405+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_matthias-maxime",
+    "title": "Matthias & Maxime",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/matthias-maxime/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002399+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_dogs-dont-wear-pants",
+    "title": "Dogs Don't Wear Pants",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/dogs-dont-wear-pants/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002392+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_family-romance-llc",
+    "title": "Family Romance, LLC",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/family-romance-llc/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002386+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_the-fall-2019",
+    "title": "The Fall",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-fall-2019/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002379+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_ema",
+    "title": "Ema",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/ema/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002372+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_bacurau",
+    "title": "Bacurau",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/bacurau/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002365+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_the-wild-goose-lake",
+    "title": "The Wild Goose Lake",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-wild-goose-lake/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002359+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_the-staggering-girl",
+    "title": "The Staggering Girl",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-staggering-girl/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002352+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_voyage-of-time-the-imax-experience",
+    "title": "Voyage of Time: The IMAX Experience",
+    "year": 2016,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/voyage-of-time-the-imax-experience/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002344+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_cryptozoo",
+    "title": "Cryptozoo",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/cryptozoo/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002337+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_azor",
+    "title": "Azor",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/azor/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002328+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_annette",
+    "title": "Annette",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/annette/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002321+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_new-order-2020",
+    "title": "New Order",
+    "year": 2020,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/new-order-2020/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002314+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_limbo-2020-1",
+    "title": "Limbo",
+    "year": 2020,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/limbo-2020-1/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002307+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_the-human-voice-2020",
+    "title": "The Human Voice",
+    "year": 2020,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-human-voice-2020/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002300+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_sweat-2020",
+    "title": "Sweat",
+    "year": 2020,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/sweat-2020/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002292+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_shiva-baby-2020",
+    "title": "Shiva Baby",
+    "year": 2020,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/shiva-baby-2020/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002285+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_state-funeral",
+    "title": "State Funeral",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/state-funeral/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002278+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_max-richters-sleep",
+    "title": "Max Richter's Sleep",
+    "year": 2019,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/max-richters-sleep/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002270+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_hey-there-2021",
+    "title": "Hey There!",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/hey-there-2021/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002262+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_notturno-2020",
+    "title": "Notturno",
+    "year": 2020,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/notturno-2020/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002254+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_dead-pigs",
+    "title": "Dead Pigs",
+    "year": 2018,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/dead-pigs/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002246+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_beginning-2020",
+    "title": "Beginning",
+    "year": 2020,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/beginning-2020/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002238+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_invisible-demons",
+    "title": "Invisible Demons",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/invisible-demons/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.002218+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_inshallah-a-boy",
+    "title": "Inshallah a Boy",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/inshallah-a-boy/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.001741+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_unclenching-the-fists",
+    "title": "Unclenching the Fists",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/unclenching-the-fists/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.001733+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_butterfly-vision",
+    "title": "Butterfly Vision",
+    "year": 2022,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/butterfly-vision/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.001723+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_what-do-we-see-when-we-look-at-the-sky",
+    "title": "What Do We See When We Look at the Sky?",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/what-do-we-see-when-we-look-at-the-sky/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:31.001673+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_titane",
+    "title": "Titane",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/titane/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447227+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_cow-2021",
+    "title": "Cow",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/cow-2021/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447223+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_petite-maman",
+    "title": "Petite Maman",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/petite-maman/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447220+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_lamb-2021",
+    "title": "Lamb",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/lamb-2021/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447216+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_lingui-the-sacred-bonds-2021",
+    "title": "Lingui: The Sacred Bonds",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/lingui-the-sacred-bonds-2021/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447213+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_prayers-for-the-stolen",
+    "title": "Prayers for the Stolen",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/prayers-for-the-stolen/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447210+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_the-humans",
+    "title": "The Humans",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-humans/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447206+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_paris-13th-district",
+    "title": "Paris, 13th District",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/paris-13th-district/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447203+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_pleasure-2021",
+    "title": "Pleasure",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/pleasure-2021/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447199+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_benedetta",
+    "title": "Benedetta",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/benedetta/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447196+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_this-much-i-know-to-be-true",
+    "title": "This Much I Know to Be True",
+    "year": 2022,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/this-much-i-know-to-be-true/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447192+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_great-freedom",
+    "title": "Great Freedom",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/great-freedom/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447189+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_bergman-island-2021",
+    "title": "Bergman Island",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/bergman-island-2021/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447186+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_faya-dayi",
+    "title": "Faya Dayi",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/faya-dayi/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447182+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_to-chiara",
+    "title": "To Chiara",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/to-chiara/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447179+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_the-cathedral-2021",
+    "title": "The Cathedral",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-cathedral-2021/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447175+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_the-worst-person-in-the-world",
+    "title": "The Worst Person in the World",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-worst-person-in-the-world/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447172+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_one-second-2020",
+    "title": "One Second",
+    "year": 2020,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/one-second-2020/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447166+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_medusa-deluxe",
+    "title": "Medusa Deluxe",
+    "year": 2022,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/medusa-deluxe/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447163+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_the-african-desperate",
+    "title": "The African Desperate",
+    "year": 2022,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-african-desperate/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447160+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_free-chol-soo-lee",
+    "title": "Free Chol Soo Lee",
+    "year": 2022,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/free-chol-soo-lee/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447156+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_film:544079",
+    "title": "The Box",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/film:544079/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447151+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_the-kingdom-ii",
+    "title": "The Kingdom II",
+    "year": 1997,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-kingdom-ii/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447147+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_the-kingdom",
+    "title": "The Kingdom",
+    "year": 1994,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-kingdom/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447144+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_the-idiots",
+    "title": "The Idiots",
+    "year": 1998,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-idiots/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447138+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_drive-my-car",
+    "title": "Drive My Car",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/drive-my-car/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447135+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_memoria-2021",
+    "title": "Memoria",
+    "year": 2021,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/memoria-2021/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447131+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_the-kingdom-exodus",
+    "title": "The Kingdom: Exodus",
+    "year": 2022,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-kingdom-exodus/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447128+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_decision-to-leave",
+    "title": "Decision to Leave",
+    "year": 2022,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/decision-to-leave/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447125+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_alcarras",
+    "title": "Alcarràs",
+    "year": 2022,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/alcarras/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447121+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_holy-spider",
+    "title": "Holy Spider",
+    "year": 2022,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/holy-spider/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447118+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_close-2022",
+    "title": "Close",
+    "year": 2022,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/close-2022/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447114+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_the-five-devils",
+    "title": "The Five Devils",
+    "year": 2022,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-five-devils/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447111+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_crimes-of-the-future-2022",
+    "title": "Crimes of the Future",
+    "year": 2022,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/crimes-of-the-future-2022/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447108+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_one-fine-morning-2022",
+    "title": "One Fine Morning",
+    "year": 2022,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/one-fine-morning-2022/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447104+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_return-to-seoul",
+    "title": "Return to Seoul",
+    "year": 2022,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/return-to-seoul/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447100+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_aftersun",
+    "title": "Aftersun",
+    "year": 2022,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/aftersun/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447097+00:00",
+    "score": 1.0
+  },
+  {
+    "id": "mubi_crossing-the-bridge-the-sound-of-istanbul",
+    "title": "Crossing the Bridge: The Sound of Istanbul",
+    "year": 2005,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/crossing-the-bridge-the-sound-of-istanbul/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447094+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_memory-2023",
+    "title": "Memory",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/memory-2023/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447090+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_dead-girls-dancing",
+    "title": "Dead Girls Dancing",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/dead-girls-dancing/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447087+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_rotting-in-the-sun",
+    "title": "Rotting in the Sun",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/rotting-in-the-sun/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447083+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_strange-way-of-life",
+    "title": "Strange Way of Life",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/strange-way-of-life/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447080+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_the-settlers-2023",
+    "title": "The Settlers",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-settlers-2023/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447077+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_the-delinquents-2023",
+    "title": "The Delinquents",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-delinquents-2023/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447073+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_high-low-john-galliano",
+    "title": "High & Low – John Galliano",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/high-low-john-galliano/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447070+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_how-to-have-sex",
+    "title": "How to Have Sex",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/how-to-have-sex/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447066+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_passages-2023",
+    "title": "Passages",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/passages-2023/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447062+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_perfect-days-2023",
+    "title": "Perfect Days",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/perfect-days-2023/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447058+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_fallen-leaves-2023",
+    "title": "Fallen Leaves",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/fallen-leaves-2023/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447053+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_made-in-england-the-films-of-powell-and-pressburger",
+    "title": "Made in England: The Films of Powell and Pressburger",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/made-in-england-the-films-of-powell-and-pressburger/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447049+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_do-not-expect-too-much-from-the-end-of-the-world",
+    "title": "Do Not Expect Too Much from the End of the World",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/do-not-expect-too-much-from-the-end-of-the-world/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447045+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_gasoline-rainbow",
+    "title": "Gasoline Rainbow",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/gasoline-rainbow/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447042+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_crossing-2024",
+    "title": "Crossing",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/crossing-2024/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447038+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_my-first-film-2024",
+    "title": "My First Film",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/my-first-film-2024/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447035+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_motel-destino",
+    "title": "Motel Destino",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/motel-destino/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447031+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_the-fall",
+    "title": "The Fall",
+    "year": 2006,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-fall/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447028+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_emilia-perez",
+    "title": "Emilia Pérez",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/emilia-perez/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447024+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_maria-2024",
+    "title": "Maria",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/maria-2024/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447020+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_bird-2024",
+    "title": "Bird",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/bird-2024/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447016+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_agon-2025",
+    "title": "Agon",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/agon-2025/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447013+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_grand-theft-hamlet",
+    "title": "Grand Theft Hamlet",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/grand-theft-hamlet/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447009+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_september-says",
+    "title": "September Says",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/september-says/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447006+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_dahomey",
+    "title": "Dahomey",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/dahomey/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.447002+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_priscilla",
+    "title": "Priscilla",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/priscilla/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446999+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_the-end-2024",
+    "title": "The End",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-end-2024/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446995+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_grand-tour-2024",
+    "title": "Grand Tour",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/grand-tour-2024/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446992+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_the-girl-with-the-needle",
+    "title": "The Girl with the Needle",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-girl-with-the-needle/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446989+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_bring-them-down",
+    "title": "Bring Them Down",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/bring-them-down/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446985+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_pavements",
+    "title": "Pavements",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/pavements/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446982+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_queer-2024",
+    "title": "Queer",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/queer-2024/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446978+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_magic-farm",
+    "title": "Magic Farm",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/magic-farm/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446975+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_hot-milk-2025",
+    "title": "Hot Milk",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/hot-milk-2025/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446971+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_harvest-2024",
+    "title": "Harvest",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/harvest-2024/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446968+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_a-long-winter-1",
+    "title": "A Long Winter",
+    "year": null,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/a-long-winter-1/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446965+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_rosebush-pruning",
+    "title": "Rosebush Pruning",
+    "year": 2026,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/rosebush-pruning/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446962+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_amores-perros",
+    "title": "Amores Perros",
+    "year": 2000,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/amores-perros/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446958+00:00",
+    "score": 0.5
+  },
+  {
+    "id": "mubi_arco",
+    "title": "Arco",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/arco/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446955+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_alpha-2025",
+    "title": "Alpha",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/alpha-2025/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446951+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_orphan-2025",
+    "title": "Orphan",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/orphan-2025/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446948+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_mussolini-son-of-the-century",
+    "title": "Mussolini: Son of the Century",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/mussolini-son-of-the-century/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446944+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_hal-harper",
+    "title": "Hal & Harper",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/hal-harper/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446941+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_the-new-years",
+    "title": "The New Years",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-new-years/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446937+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_blossoms-shanghai",
+    "title": "Blossoms Shanghai",
+    "year": 2023,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/blossoms-shanghai/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446933+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_lurker-2025",
+    "title": "Lurker",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/lurker-2025/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446929+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_the-history-of-sound",
+    "title": "The History of Sound",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-history-of-sound/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446925+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_the-mastermind-2025",
+    "title": "The Mastermind",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-mastermind-2025/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446921+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_la-grazia",
+    "title": "La Grazia",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/la-grazia/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446918+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_sirat-2025",
+    "title": "Sirāt",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/sirat-2025/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446914+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_pompei-below-the-clouds",
+    "title": "Pompei: Below the Clouds",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/pompei-below-the-clouds/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446909+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_my-undesirable-friends-part-i-last-air-in",
+    "title": "My Undesirable Friends: Part I - Last Air in Moscow",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/my-undesirable-friends-part-i-last-air-in/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446905+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_teenage-sex-and-death-at-camp-miasma",
+    "title": "Teenage Sex and Death at Camp Miasma",
+    "year": 2026,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/teenage-sex-and-death-at-camp-miasma/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446902+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_the-substance",
+    "title": "The Substance",
+    "year": 2024,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-substance/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446898+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_it-was-just-an-accident",
+    "title": "It Was Just an Accident",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/it-was-just-an-accident/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446894+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_no-other-choice-2025",
+    "title": "No Other Choice",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/no-other-choice-2025/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446891+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_the-secret-agent-2025",
+    "title": "The Secret Agent",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/the-secret-agent-2025/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446887+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_sentimental-value-2025",
+    "title": "Sentimental Value",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/sentimental-value-2025/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446883+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_my-fathers-shadow-2025",
+    "title": "My Father's Shadow",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/my-fathers-shadow-2025/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446879+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_sound-of-falling",
+    "title": "Sound of Falling",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/sound-of-falling/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446875+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_die-my-love",
+    "title": "Die My Love",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/die-my-love/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446864+00:00",
+    "score": 2.0
+  },
+  {
+    "id": "mubi_father-mother-sister-brother",
+    "title": "Father Mother Sister Brother",
+    "year": 2025,
+    "thumbnail": "",
+    "url": "https://letterboxd.com/film/father-mother-sister-brother/",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T06:00:29.446833+00:00",
+    "score": 2.0
+  },
+  {
     "id": "mubi_398054",
     "title": "Father Mother Sister Brother",
     "title_locale": "en-US",

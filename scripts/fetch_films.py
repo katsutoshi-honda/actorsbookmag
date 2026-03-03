@@ -53,7 +53,15 @@ BROWSER_HEADERS = {
     "Cache-Control": "max-age=0",
 }
 
-LETTERBOXD_MUBI_LIST = "https://letterboxd.com/mubi/list/mubi-releases/"
+LETTERBOXD_MUBI_LIST  = "https://letterboxd.com/mubi/list/mubi-releases/"
+LETTERBOXD_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
+}
 UNEXT_NEW_URL    = "https://video.unext.jp/list/new?content_type=movie"
 UNEXT_GENRE_URL  = "https://video.unext.jp/genre/movie"
 
@@ -162,7 +170,7 @@ def fetch_mubi_films() -> list[dict]:
             else f"{LETTERBOXD_MUBI_LIST}page/{page}/"
         )
         try:
-            resp = requests.get(url, headers=BROWSER_HEADERS, timeout=15)
+            resp = requests.get(url, headers=LETTERBOXD_HEADERS, timeout=15)
             if resp.status_code == 404:
                 break
             resp.raise_for_status()
@@ -192,75 +200,42 @@ def fetch_mubi_films() -> list[dict]:
 def _parse_letterboxd_page(soup: BeautifulSoup) -> list[dict]:
     """Letterboxdリストページから映画データを抽出する。
 
-    Letterboxdのリストページ構造（3段階フォールバック）:
-      1. <div data-film-slug> 属性から slug / title / year を取得
-      2. <li> 内の <img alt> からタイトル、<a href="/film/..."> からURLを取得
-      3. ページ内の <a href="/film/..."> を直接収集
+    実際のHTML構造（調査済み）:
+      <div class="react-component"
+           data-item-slug="film-slug"
+           data-item-name="Film Title (2025)"
+           data-item-link="/film/film-slug/"
+           data-film-id="123456">
     """
     films: list[dict] = []
     seen:  set[str]   = set()
 
-    # ── パターン1: li.poster-container > div[data-film-slug] ──────────────────
-    for li in soup.select("li.poster-container, li[data-target-link]"):
-        film_div = li.select_one("div[data-film-slug]")
-        img      = li.select_one("img[alt]") or li.select_one("img")
-        link     = li.select_one("a[href*='/film/']")
+    for div in soup.select("div[data-item-slug][data-item-name]"):
+        slug      = div.get("data-item-slug", "")
+        full_name = div.get("data-item-name", "")  # "Film Title (2025)" の形式
+        href      = div.get("data-item-link", f"/film/{slug}/")
 
-        if film_div:
-            slug     = film_div.get("data-film-slug", "")
-            title    = film_div.get("data-film-name") or (img.get("alt", "") if img else "")
-            year_str = film_div.get("data-film-year", "")
-        else:
-            slug     = ""
-            title    = img.get("alt", "") if img else ""
-            year_str = ""
-
-        if not title or title in seen:
-            continue
-        seen.add(title)
-
-        href      = link["href"] if link else (f"/film/{slug}/" if slug else "")
-        film_url  = _abs("https://letterboxd.com", href)
-        thumb     = _letterboxd_thumb(img)
-        year      = int(year_str) if year_str and year_str.isdigit() else None
-
-        films.append(_make_mubi_record(slug or abs(hash(title)), title, year, thumb, film_url))
-
-    if films:
-        return films
-
-    # ── パターン2: li > img[alt] + a[href*="/film/"] ─────────────────────────
-    for li in soup.find_all("li"):
-        img  = li.find("img", alt=True)
-        link = li.find("a", href=lambda h: h and "/film/" in h)
-        if not img or not link:
-            continue
-        title = img.get("alt", "")
-        if not title or title in seen:
-            continue
-        seen.add(title)
-        href     = link["href"]
-        slug     = href.strip("/").split("/")[-1]
-        film_url = _abs("https://letterboxd.com", href)
-        films.append(_make_mubi_record(slug or abs(hash(title)), title, None, _letterboxd_thumb(img), film_url))
-
-    if films:
-        return films
-
-    # ── パターン3: ページ内の /film/ リンクを直接収集（最終手段）─────────────
-    for link in soup.select("a[href*='/film/']"):
-        href  = link.get("href", "")
-        parts = href.strip("/").split("/")
-        # /film/slug/ の形式のみ対象（深いパスは除外）
-        if len(parts) != 2 or parts[0] != "film":
-            continue
-        slug = parts[1]
-        if slug in seen:
+        if not slug or slug in seen:
             continue
         seen.add(slug)
-        img   = link.find("img")
-        title = (img.get("alt", "") if img else "") or link.get_text(strip=True) or slug
-        films.append(_make_mubi_record(slug, title, None, _letterboxd_thumb(img), _abs("https://letterboxd.com", href)))
+
+        # タイトルと製作年を分離: "Film Title (2025)" → title="Film Title", year=2025
+        year  = None
+        title = full_name
+        if full_name.endswith(")") and "(" in full_name:
+            body, _, year_part = full_name.rpartition("(")
+            year_str = year_part.rstrip(")")
+            if year_str.isdigit():
+                title = body.strip()
+                year  = int(year_str)
+
+        films.append(_make_mubi_record(
+            slug,
+            title,
+            year,
+            "",  # サムネイルはLetterboxdでは空（プレースホルダーのみ）
+            _abs("https://letterboxd.com", href),
+        ))
 
     return films
 
