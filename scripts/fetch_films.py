@@ -53,7 +53,7 @@ BROWSER_HEADERS = {
     "Cache-Control": "max-age=0",
 }
 
-MUBI_SHOWING_URL = "https://mubi.com/en/jp/showing"
+LETTERBOXD_MUBI_LIST = "https://letterboxd.com/mubi/list/mubi-releases/"
 UNEXT_NEW_URL    = "https://video.unext.jp/list/new?content_type=movie"
 UNEXT_GENRE_URL  = "https://video.unext.jp/genre/movie"
 
@@ -147,184 +147,142 @@ def generate_comment(film: dict, client: anthropic.Anthropic) -> str:
     return resp.content[0].text.strip()
 
 
-# ─── MUBI ─────────────────────────────────────────────────────────────────────
+# ─── MUBI（Letterboxd経由）────────────────────────────────────────────────────
 
 def fetch_mubi_films() -> list[dict]:
-    """Scrape MUBI Now Showing from https://mubi.com/en/jp/showing."""
+    """Scrape MUBI releases from https://letterboxd.com/mubi/list/mubi-releases/
+    Letterboxd はサーバーサイドレンダリングなので全件取得できる（最大3ページ）。
+    """
     films: list[dict] = []
 
-    try:
-        resp = requests.get(MUBI_SHOWING_URL, headers=BROWSER_HEADERS, timeout=15)
-        resp.raise_for_status()
-    except requests.RequestException as e:
-        print(f"  [MUBI] Fetch error: {e}", file=sys.stderr)
-        return _fetch_mubi_api_fallback()
-
-    soup = BeautifulSoup(resp.text, "html.parser")
-
-    # 1. __NEXT_DATA__: extract every film-like object in the JSON tree
-    tag = soup.find("script", {"id": "__NEXT_DATA__"})
-    if tag:
+    for page in range(1, 4):
+        url = (
+            LETTERBOXD_MUBI_LIST
+            if page == 1
+            else f"{LETTERBOXD_MUBI_LIST}page/{page}/"
+        )
         try:
-            data = json.loads(tag.string or "{}")
+            resp = requests.get(url, headers=BROWSER_HEADERS, timeout=15)
+            if resp.status_code == 404:
+                break
+            resp.raise_for_status()
+        except requests.RequestException as e:
+            print(f"  [MUBI] Page {page} fetch error: {e}", file=sys.stderr)
+            break
 
-            # a) marqueeFilm (always present in SSR)
-            marquee = (
-                data.get("props", {})
-                    .get("pageProps", {})
-                    .get("marqueeFilm")
-            )
-            if marquee and isinstance(marquee, dict):
-                f = _parse_mubi_object(marquee)
-                if f:
-                    films.append(f)
+        soup       = BeautifulSoup(resp.text, "html.parser")
+        page_films = _parse_letterboxd_page(soup)
 
-            # b) Deep-search entire JSON for objects that look like MUBI films
-            found = _collect_mubi_film_objects(data)
-            seen_ids = {f["id"] for f in films}
-            for obj in found:
-                parsed = _parse_mubi_object(obj)
-                if parsed and parsed["id"] not in seen_ids:
-                    films.append(parsed)
-                    seen_ids.add(parsed["id"])
+        if not page_films:
+            print(f"  [MUBI] Page {page}: 0 films — stopping", file=sys.stderr)
+            break
 
-        except (json.JSONDecodeError, Exception) as e:
-            print(f"  [MUBI] __NEXT_DATA__ parse error: {e}", file=sys.stderr)
+        films.extend(page_films)
+        print(f"  [MUBI] Page {page}: {len(page_films)} films")
 
-    if films:
-        print(f"  [MUBI] {len(films)} film(s) from __NEXT_DATA__")
+        # 次ページリンクがなければ終了
+        if not soup.select_one("a.next"):
+            break
 
-    # 2. HTML card scraping (in case MUBI adds SSR film cards in future)
-    html_films = _scrape_mubi_html_cards(soup)
-    seen_ids = {f["id"] for f in films}
-    for f in html_films:
-        if f["id"] not in seen_ids:
-            films.append(f)
-            seen_ids.add(f["id"])
-
-    if not films:
-        print("  [MUBI] 0 films from page — trying API fallback...", file=sys.stderr)
-        films = _fetch_mubi_api_fallback()
+        time.sleep(1)
 
     return films
 
 
-def _collect_mubi_film_objects(obj, _depth: int = 0) -> list[dict]:
-    """Recursively collect dict objects that look like MUBI film records."""
-    results: list[dict] = []
-    if _depth > 12:
-        return results
-    if isinstance(obj, dict):
-        if (
-            obj.get("title")
-            and (obj.get("year") or obj.get("still_url") or obj.get("web_url"))
-        ):
-            results.append(obj)
-        for v in obj.values():
-            results.extend(_collect_mubi_film_objects(v, _depth + 1))
-    elif isinstance(obj, list):
-        for item in obj:
-            results.extend(_collect_mubi_film_objects(item, _depth + 1))
-    return results
+def _parse_letterboxd_page(soup: BeautifulSoup) -> list[dict]:
+    """Letterboxdリストページから映画データを抽出する。
+
+    Letterboxdのリストページ構造（3段階フォールバック）:
+      1. <div data-film-slug> 属性から slug / title / year を取得
+      2. <li> 内の <img alt> からタイトル、<a href="/film/..."> からURLを取得
+      3. ページ内の <a href="/film/..."> を直接収集
+    """
+    films: list[dict] = []
+    seen:  set[str]   = set()
+
+    # ── パターン1: li.poster-container > div[data-film-slug] ──────────────────
+    for li in soup.select("li.poster-container, li[data-target-link]"):
+        film_div = li.select_one("div[data-film-slug]")
+        img      = li.select_one("img[alt]") or li.select_one("img")
+        link     = li.select_one("a[href*='/film/']")
+
+        if film_div:
+            slug     = film_div.get("data-film-slug", "")
+            title    = film_div.get("data-film-name") or (img.get("alt", "") if img else "")
+            year_str = film_div.get("data-film-year", "")
+        else:
+            slug     = ""
+            title    = img.get("alt", "") if img else ""
+            year_str = ""
+
+        if not title or title in seen:
+            continue
+        seen.add(title)
+
+        href      = link["href"] if link else (f"/film/{slug}/" if slug else "")
+        film_url  = _abs("https://letterboxd.com", href)
+        thumb     = _letterboxd_thumb(img)
+        year      = int(year_str) if year_str and year_str.isdigit() else None
+
+        films.append(_make_mubi_record(slug or abs(hash(title)), title, year, thumb, film_url))
+
+    if films:
+        return films
+
+    # ── パターン2: li > img[alt] + a[href*="/film/"] ─────────────────────────
+    for li in soup.find_all("li"):
+        img  = li.find("img", alt=True)
+        link = li.find("a", href=lambda h: h and "/film/" in h)
+        if not img or not link:
+            continue
+        title = img.get("alt", "")
+        if not title or title in seen:
+            continue
+        seen.add(title)
+        href     = link["href"]
+        slug     = href.strip("/").split("/")[-1]
+        film_url = _abs("https://letterboxd.com", href)
+        films.append(_make_mubi_record(slug or abs(hash(title)), title, None, _letterboxd_thumb(img), film_url))
+
+    if films:
+        return films
+
+    # ── パターン3: ページ内の /film/ リンクを直接収集（最終手段）─────────────
+    for link in soup.select("a[href*='/film/']"):
+        href  = link.get("href", "")
+        parts = href.strip("/").split("/")
+        # /film/slug/ の形式のみ対象（深いパスは除外）
+        if len(parts) != 2 or parts[0] != "film":
+            continue
+        slug = parts[1]
+        if slug in seen:
+            continue
+        seen.add(slug)
+        img   = link.find("img")
+        title = (img.get("alt", "") if img else "") or link.get_text(strip=True) or slug
+        films.append(_make_mubi_record(slug, title, None, _letterboxd_thumb(img), _abs("https://letterboxd.com", href)))
+
+    return films
 
 
-def _parse_mubi_object(f: dict) -> dict | None:
-    """Normalise a MUBI film dict into our unified schema."""
-    title = f.get("title") or f.get("original_title", "")
-    if not title:
-        return None
-
-    film_id = f.get("id") or f.get("slug") or abs(hash(title))
-    slug    = f.get("slug") or f.get("film_slug", "")
-    web_url = (
-        f.get("web_url")
-        or f.get("canonical_url")
-        or (f"https://mubi.com/films/{slug}" if slug else MUBI_SHOWING_URL)
-    )
-
-    thumb = f.get("still_url", "")
-    if not thumb:
-        stills = f.get("stills") or f.get("still") or {}
-        if isinstance(stills, dict):
-            thumb = stills.get("standard") or stills.get("url") or stills.get("medium", "")
-        elif isinstance(stills, list) and stills:
-            thumb = (stills[0] or {}).get("url", "") if isinstance(stills[0], dict) else ""
-
-    directors = f.get("directors") or []
-    director  = directors[0].get("name", "") if directors and isinstance(directors[0], dict) else ""
-    countries = f.get("countries") or []
-    country   = countries[0].get("name", "") if countries and isinstance(countries[0], dict) else ""
-
+def _make_mubi_record(film_id, title: str, year, thumbnail: str, url: str) -> dict:
     return {
-        "id":           f"mubi_{film_id}",
-        "title":        title,
-        "title_locale": f.get("title_locale") or f.get("original_title", ""),
-        "year":         f.get("year"),
-        "director":     director,
-        "country":      country,
-        "duration":     f.get("duration"),
-        "synopsis":     f.get("short_synopsis") or f.get("synopsis", ""),
-        "thumbnail":    thumb,
-        "url":          web_url,
-        "source":       "MUBI",
-        "fetched_at":   datetime.now(timezone.utc).isoformat(),
+        "id":         f"mubi_{film_id}",
+        "title":      title,
+        "year":       year,
+        "thumbnail":  thumbnail,
+        "url":        url,
+        "source":     "MUBI",
+        "fetched_at": datetime.now(timezone.utc).isoformat(),
     }
 
 
-def _scrape_mubi_html_cards(soup: BeautifulSoup) -> list[dict]:
-    """Try to extract film cards directly from rendered MUBI HTML."""
-    films: list[dict] = []
-    for sel in ["[data-film-id]", "[class*='FilmCard']", "[class*='film-card']", "article[class*='film']"]:
-        cards = soup.select(sel)
-        if not cards:
-            continue
-        for card in cards:
-            title_el = card.select_one("h2, h3, [class*='title'], [class*='Title']")
-            img_el   = card.select_one("img[src], img[data-src]")
-            link_el  = card.select_one("a[href]")
-            if not title_el:
-                continue
-            href     = link_el["href"] if link_el else ""
-            full_url = _abs("https://mubi.com", href)
-            thumb    = (img_el.get("src") or img_el.get("data-src", "")) if img_el else ""
-            films.append({
-                "id":         f"mubi_{abs(hash(full_url))}",
-                "title":      title_el.get_text(strip=True),
-                "thumbnail":  thumb,
-                "url":        full_url,
-                "source":     "MUBI",
-                "fetched_at": datetime.now(timezone.utc).isoformat(),
-            })
-        if films:
-            break
-    return films
-
-
-def _fetch_mubi_api_fallback() -> list[dict]:
-    """Try MUBI's public API (no auth) as last resort."""
-    films: list[dict] = []
-    api_headers = {**BROWSER_HEADERS, "Accept": "application/json", "Client-Country": "JP", "Client-Version": "4.0.0"}
-    for url in [
-        "https://api.mubi.com/v3/films?filter[now_showing]=true&country_code=JP&per_page=30",
-        "https://api.mubi.com/v3/films?filter[new_arrivals]=true&country_code=JP&per_page=20",
-    ]:
-        try:
-            resp = requests.get(url, headers=api_headers, timeout=15)
-            if resp.status_code in (401, 403):
-                continue
-            resp.raise_for_status()
-            data      = resp.json()
-            film_list = data.get("films") or data.get("data") or []
-            if film_list:
-                for f in film_list:
-                    parsed = _parse_mubi_object(f)
-                    if parsed:
-                        films.append(parsed)
-                print(f"  [MUBI API] {len(films)} films from {url}")
-                return films
-        except Exception as e:
-            print(f"  [MUBI API] {url}: {e}", file=sys.stderr)
-    return films
+def _letterboxd_thumb(img) -> str:
+    """プレースホルダー画像を除外してサムネイルURLを返す。"""
+    if not img:
+        return ""
+    src = img.get("src") or img.get("data-src", "")
+    return "" if ("empty-poster" in src or not src) else src
 
 
 # ─── U-NEXT ───────────────────────────────────────────────────────────────────
@@ -487,7 +445,7 @@ def main() -> None:
     existing_by_id: dict[str, dict] = {f["id"]: f for f in existing if f.get("id")}
 
     # ── Scrape ────────────────────────────────────────────────────────────────
-    print(f"\nFetching MUBI now-showing from {MUBI_SHOWING_URL} ...")
+    print(f"\nFetching MUBI releases from {LETTERBOXD_MUBI_LIST} ...")
     mubi = fetch_mubi_films()
     print(f"  → {len(mubi)} films total from MUBI")
 
