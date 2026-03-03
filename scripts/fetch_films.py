@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Fetch new film listings from MUBI and U-NEXT daily.
-Auto-generates Japanese cinephile comments via Claude API.
+Auto-generates Japanese cinephile comments via Gemini API.
 
 Sources:
   MUBI   : https://mubi.com/en/jp/showing  (HTML scrape + API fallback)
@@ -10,8 +10,8 @@ Sources:
 Saves merged results to data/films.json.
 
 Usage:
-    pip install requests beautifulsoup4 lxml anthropic
-    ANTHROPIC_API_KEY=sk-... python scripts/fetch_films.py
+    pip install requests beautifulsoup4 lxml google-generativeai
+    GEMINI_API_KEY=AIza... python scripts/fetch_films.py
 """
 
 from __future__ import annotations
@@ -23,13 +23,13 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-import anthropic
+import google.generativeai as genai
 import requests
 from bs4 import BeautifulSoup
 
 OUTPUT_PATH = Path("data/films.json")
 MAX_FILMS   = 300
-CLAUDE_MODEL = "claude-haiku-4-5-20251001"  # Haiku for cost efficiency
+GEMINI_MODEL = "gemini-1.5-flash"  # Free tier available
 
 # ── Full browser headers to avoid bot detection ───────────────────────────────
 BROWSER_HEADERS = {
@@ -58,7 +58,7 @@ UNEXT_NEW_URL    = "https://video.unext.jp/list/new?content_type=movie"
 UNEXT_GENRE_URL  = "https://video.unext.jp/genre/movie"
 
 
-# ─── Claude: comment generation & scoring ─────────────────────────────────────
+# ─── Gemini: comment generation & scoring ─────────────────────────────────────
 
 def score_film(film: dict) -> float:
     """
@@ -107,8 +107,8 @@ def score_film(film: dict) -> float:
     return round(score, 1)
 
 
-def generate_comment(film: dict, client: anthropic.Anthropic) -> str:
-    """Generate a Japanese cinephile comment for a film using Claude API."""
+def generate_comment(film: dict, model: genai.GenerativeModel) -> str:
+    """Generate a Japanese cinephile comment for a film using Gemini API."""
     lines = []
     if film.get("title"):
         lines.append(f"タイトル: {film['title']}")
@@ -139,12 +139,8 @@ def generate_comment(film: dict, client: anthropic.Anthropic) -> str:
 
 コメント:"""
 
-    resp = client.messages.create(
-        model=CLAUDE_MODEL,
-        max_tokens=250,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    return resp.content[0].text.strip()
+    resp = model.generate_content(prompt)
+    return resp.text.strip()
 
 
 # ─── MUBI ─────────────────────────────────────────────────────────────────────
@@ -466,13 +462,15 @@ def _deep_find(obj, key: str, _depth: int = 0):
 def main() -> None:
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-    # ── Claude client ──────────────────────────────────────────────────────────
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    claude  = anthropic.Anthropic(api_key=api_key) if api_key else None
-    if claude:
-        print(f"Claude API ready (model: {CLAUDE_MODEL})")
+    # ── Gemini client ──────────────────────────────────────────────────────────
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if api_key:
+        genai.configure(api_key=api_key)
+        gemini_model = genai.GenerativeModel(GEMINI_MODEL)
+        print(f"Gemini API ready (model: {GEMINI_MODEL})")
     else:
-        print("Warning: ANTHROPIC_API_KEY not set — comment generation skipped", file=sys.stderr)
+        gemini_model = None
+        print("Warning: GEMINI_API_KEY not set — comment generation skipped", file=sys.stderr)
 
     # ── Load existing data (to preserve comments) ─────────────────────────────
     existing: list[dict] = []
@@ -521,19 +519,16 @@ def main() -> None:
     fresh.sort(key=lambda f: f.get("fetched_at", ""), reverse=True)
     fresh = fresh[:MAX_FILMS]
 
-    # ── Generate comments via Claude ──────────────────────────────────────────
-    if claude:
+    # ── Generate comments via Gemini ──────────────────────────────────────────
+    if gemini_model:
         needs_comment = [f for f in fresh if not f.get("comment")]
         already_done  = len(fresh) - len(needs_comment)
         print(f"\nComment generation: {len(needs_comment)} new, {already_done} already have comments (skipped)")
 
         for i, film in enumerate(needs_comment, 1):
             try:
-                film["comment"] = generate_comment(film, claude)
+                film["comment"] = generate_comment(film, gemini_model)
                 print(f"  [{i}/{len(needs_comment)}] {film['title']}")
-            except anthropic.APIError as e:
-                print(f"  [{i}/{len(needs_comment)}] {film['title']}: API error — {e}", file=sys.stderr)
-                film["comment"] = ""
             except Exception as e:
                 print(f"  [{i}/{len(needs_comment)}] {film['title']}: {e}", file=sys.stderr)
                 film["comment"] = ""
