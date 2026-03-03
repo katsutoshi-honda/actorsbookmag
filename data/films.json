@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "mubi_398054",
+    "title": "Father Mother Sister Brother",
+    "title_locale": "en-US",
+    "year": 2025,
+    "director": "Jim Jarmusch",
+    "country": "",
+    "duration": 110,
+    "synopsis": "A feature film in the form of a triptych. The three stories all concern the relationships between adult children, their somewhat distant parent (or parents), and each other.",
+    "thumbnail": "https://images.mubicdn.net/images/film/398054/cache-1112480-1770218943/image-w1280.jpg",
+    "url": "https://mubi.com/films/father-mother-sister-brother",
+    "source": "MUBI",
+    "fetched_at": "2026-03-03T02:27:40.316827+00:00"
+  }
+]
