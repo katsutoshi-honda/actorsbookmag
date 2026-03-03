@@ -23,7 +23,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install requests beautifulsoup4 lxml google-generativeai
+        run: pip install requests beautifulsoup4 lxml google-genai
 
       - name: Fetch films and generate comments
         env:

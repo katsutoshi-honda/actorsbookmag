@@ -10,7 +10,7 @@ Sources:
 Saves merged results to data/films.json.
 
 Usage:
-    pip install requests beautifulsoup4 lxml google-generativeai
+    pip install requests beautifulsoup4 lxml google-genai
     GEMINI_API_KEY=AIza... python scripts/fetch_films.py
 """
 
@@ -23,13 +23,13 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-import google.generativeai as genai
+from google import genai
 import requests
 from bs4 import BeautifulSoup
 
 OUTPUT_PATH = Path("data/films.json")
 MAX_FILMS   = 300
-GEMINI_MODEL = "gemini-1.5-flash"  # Free tier available
+GEMINI_MODEL = "gemini-2.0-flash-lite"  # Free tier available
 
 # ── Full browser headers to avoid bot detection ───────────────────────────────
 BROWSER_HEADERS = {
@@ -107,7 +107,7 @@ def score_film(film: dict) -> float:
     return round(score, 1)
 
 
-def generate_comment(film: dict, model: genai.GenerativeModel) -> str:
+def generate_comment(film: dict, client: genai.Client) -> str:
     """Generate a Japanese cinephile comment for a film using Gemini API."""
     lines = []
     if film.get("title"):
@@ -139,7 +139,7 @@ def generate_comment(film: dict, model: genai.GenerativeModel) -> str:
 
 コメント:"""
 
-    resp = model.generate_content(prompt)
+    resp = client.models.generate_content(model=GEMINI_MODEL, contents=prompt)
     return resp.text.strip()
 
 
@@ -465,8 +465,7 @@ def main() -> None:
     # ── Gemini client ──────────────────────────────────────────────────────────
     api_key = os.environ.get("GEMINI_API_KEY")
     if api_key:
-        genai.configure(api_key=api_key)
-        gemini_model = genai.GenerativeModel(GEMINI_MODEL)
+        gemini_model = genai.Client(api_key=api_key)
         print(f"Gemini API ready (model: {GEMINI_MODEL})")
     else:
         gemini_model = None
