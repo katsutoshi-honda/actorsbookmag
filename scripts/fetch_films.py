@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Fetch new film listings from MUBI and U-NEXT daily.
+"""Fetch new film listings from MUBI (via Letterboxd) and U-NEXT daily.
+
+Sources:
+  MUBI   : https://letterboxd.com/mubi/list/mubi-releases/
+  U-NEXT : https://video.unext.jp/genre/foreign-movie
 
 Saves merged results to data/films.json.
 
@@ -27,252 +31,228 @@ UA = (
     "AppleWebKit/537.36 (KHTML, like Gecko) "
     "Chrome/122.0.0.0 Safari/537.36"
 )
-COMMON_HEADERS = {"User-Agent": UA}
+COMMON_HEADERS = {
+    "User-Agent": UA,
+    "Accept-Language": "ja,en;q=0.9",
+}
+
+LETTERBOXD_LIST = "https://letterboxd.com/mubi/list/mubi-releases/"
+UNEXT_GENRE_URL = "https://video.unext.jp/genre/foreign-movie"
 
 
-# ─── MUBI ─────────────────────────────────────────────────────────────────────
+# ─── MUBI (via Letterboxd) ────────────────────────────────────────────────────
 
 def fetch_mubi_films() -> list[dict]:
-    """Fetch new-arrival films from MUBI Japan."""
+    """Scrape MUBI release list from Letterboxd (up to 3 pages)."""
     films: list[dict] = []
 
-    api_headers = {
-        **COMMON_HEADERS,
-        "Accept": "application/json",
-        "Client-Country": "JP",
-        "Client-Version": "4.0.0",
-        "Client-Device": "web",
-    }
-
-    filter_sets = [
-        {"filter[new_arrivals]": "true", "per_page": 20, "page": 1},
-        {"filter[new_releases]": "true", "per_page": 20, "page": 1},
-        {"filter[now_showing]": "true", "per_page": 20, "page": 1},
-    ]
-
-    for params in filter_sets:
+    for page in range(1, 4):
+        url = LETTERBOXD_LIST if page == 1 else f"{LETTERBOXD_LIST}page/{page}/"
         try:
-            resp = requests.get(
-                "https://api.mubi.com/v3/films",
-                headers=api_headers,
-                params=params,
-                timeout=15,
-            )
-            if resp.status_code in (401, 403):
-                print(f"  [MUBI] {resp.status_code} for {params}, skipping", file=sys.stderr)
-                continue
+            resp = requests.get(url, headers=COMMON_HEADERS, timeout=15)
+            if resp.status_code == 404:
+                break
             resp.raise_for_status()
-            data = resp.json()
-            film_list = data.get("films") or data.get("data") or []
-            if film_list:
-                for f in film_list:
-                    films.append(_parse_mubi_film(f))
-                print(f"  [MUBI] Got {len(films)} films via API params={params}")
-                return films
         except requests.RequestException as e:
-            print(f"  [MUBI] Request error ({params}): {e}", file=sys.stderr)
-        except (json.JSONDecodeError, KeyError) as e:
-            print(f"  [MUBI] Parse error ({params}): {e}", file=sys.stderr)
+            print(f"  [MUBI/Letterboxd] Page {page} fetch error: {e}", file=sys.stderr)
+            break
 
-    # Fallback: scrape MUBI website (Next.js embeds data in __NEXT_DATA__)
-    print("  [MUBI] Falling back to website scrape...")
-    films = _scrape_mubi_website()
+        soup = BeautifulSoup(resp.text, "html.parser")
+        page_films = _parse_letterboxd_page(soup)
+
+        if not page_films:
+            print(f"  [MUBI/Letterboxd] No films found on page {page}", file=sys.stderr)
+            break
+
+        films.extend(page_films)
+        print(f"  [MUBI/Letterboxd] Page {page}: {len(page_films)} films")
+
+        # Stop if there is no "next page" link
+        if not soup.select_one("a.next"):
+            break
+
+        time.sleep(1)
+
     return films
 
 
-def _parse_mubi_film(f: dict) -> dict:
-    directors = f.get("directors") or []
-    dir_name = directors[0].get("name", "") if directors else ""
-    countries = f.get("countries") or []
-    country = countries[0].get("name", "") if countries else ""
-    still = f.get("still") or {}
-    if isinstance(still, list):
-        still = still[0] if still else {}
-    thumb = still.get("url") or still.get("medium") or ""
-    slug = f.get("slug") or f.get("id", "")
-    return {
-        "id": f"mubi_{f.get('id', slug)}",
-        "title": f.get("title", ""),
-        "title_locale": f.get("title_locale") or f.get("original_title", ""),
-        "year": f.get("year"),
-        "director": dir_name,
-        "country": country,
-        "duration": f.get("duration"),
-        "synopsis": f.get("short_synopsis") or f.get("synopsis", ""),
-        "thumbnail": thumb,
-        "url": f"https://mubi.com/films/{slug}",
-        "source": "MUBI",
-        "fetched_at": datetime.now(timezone.utc).isoformat(),
-    }
-
-
-def _scrape_mubi_website() -> list[dict]:
+def _parse_letterboxd_page(soup: BeautifulSoup) -> list[dict]:
+    """Extract film records from a single Letterboxd list page."""
     films: list[dict] = []
-    try:
-        resp = requests.get(
-            "https://mubi.com/ja/films",
-            headers=COMMON_HEADERS,
-            timeout=15,
-        )
-        resp.raise_for_status()
-        soup = BeautifulSoup(resp.text, "html.parser")
 
-        # Next.js embeds page data in <script id="__NEXT_DATA__">
-        tag = soup.find("script", {"id": "__NEXT_DATA__"})
-        if tag:
-            data = json.loads(tag.string or "{}")
-            film_list = _deep_find(data, "films")
-            if isinstance(film_list, list):
-                for f in film_list[:20]:
-                    if isinstance(f, dict) and f.get("title"):
-                        films.append(_parse_mubi_film(f))
-                if films:
-                    print(f"  [MUBI scrape] Got {len(films)} films from __NEXT_DATA__")
-                    return films
+    # Primary: <li class="poster-container"> containing <div data-film-slug>
+    items = soup.select("li.poster-container")
 
-        # HTML card fallback
-        cards = soup.select("[data-filmid], [class*='FilmCell'], [class*='film-cell']")
-        for card in cards[:20]:
-            title_el = card.select_one("h2, h3, [class*='title']")
-            img_el = card.select_one("img")
-            link_el = card.select_one("a[href]")
-            if title_el:
-                href = link_el["href"] if link_el else ""
-                full_url = ("https://mubi.com" + href) if href.startswith("/") else href
+    # Fallback: any element that carries data-film-slug directly
+    if not items:
+        items = [el for el in soup.select("[data-film-slug]") if el.name in ("li", "div")]
+
+    for item in items:
+        film_div = item.select_one("div[data-film-slug]")
+        if not film_div and item.get("data-film-slug"):
+            film_div = item
+
+        if film_div:
+            slug = film_div.get("data-film-slug", "")
+            title = film_div.get("data-film-name", "")
+            year_str = film_div.get("data-film-year", "")
+
+            img = item.select_one("img.image") or item.select_one("img[src]")
+            thumb = _letterboxd_thumb(img)
+
+            link = item.select_one("a[href*='/film/']")
+            href = link["href"] if link else f"/film/{slug}/"
+            film_url = _abs("https://letterboxd.com", href)
+
+            if title or slug:
                 films.append({
-                    "id": f"mubi_{abs(hash(full_url))}",
-                    "title": title_el.get_text(strip=True),
-                    "thumbnail": (img_el.get("src") or img_el.get("data-src", "")) if img_el else "",
-                    "url": full_url,
+                    "id": f"mubi_{slug or abs(hash(title))}",
+                    "title": title,
+                    "year": int(year_str) if year_str and year_str.isdigit() else None,
+                    "thumbnail": thumb,
+                    "url": film_url,
                     "source": "MUBI",
                     "fetched_at": datetime.now(timezone.utc).isoformat(),
                 })
-        print(f"  [MUBI scrape] Got {len(films)} films from HTML cards")
-    except Exception as e:
-        print(f"  [MUBI scrape] Error: {e}", file=sys.stderr)
+        else:
+            # Last-resort fallback: read title from img alt attribute
+            img = item.select_one("img[alt]")
+            link = item.select_one("a[href]")
+            if img and img.get("alt"):
+                href = link["href"] if link else ""
+                film_url = _abs("https://letterboxd.com", href)
+                films.append({
+                    "id": f"mubi_{abs(hash(film_url or img['alt']))}",
+                    "title": img["alt"],
+                    "thumbnail": _letterboxd_thumb(img),
+                    "url": film_url,
+                    "source": "MUBI",
+                    "fetched_at": datetime.now(timezone.utc).isoformat(),
+                })
+
     return films
+
+
+def _letterboxd_thumb(img) -> str:
+    """Return image URL, skipping Letterboxd placeholder images."""
+    if not img:
+        return ""
+    src = img.get("src") or img.get("data-src", "")
+    return "" if "empty-poster" in src else src
 
 
 # ─── U-NEXT ───────────────────────────────────────────────────────────────────
 
 def fetch_unext_films() -> list[dict]:
-    """Fetch new-arrival films from U-NEXT."""
-    films = _fetch_unext_via_api()
-    if not films:
-        print("  [U-NEXT] API returned nothing, trying website scrape...")
-        films = _scrape_unext_website()
-    return films
-
-
-def _fetch_unext_via_api() -> list[dict]:
-    """Try U-NEXT internal API endpoints."""
-    films: list[dict] = []
-    headers = {
-        **COMMON_HEADERS,
-        "Accept": "application/json",
-        "Origin": "https://video.unext.jp",
-        "Referer": "https://video.unext.jp/",
-    }
-    # Candidate endpoints (U-NEXT internal REST API, observed from network traffic)
-    endpoints = [
-        "https://api.unext.jp/api/1/content/list?sort=new&content_type=movie&page_size=20&page_num=1",
-        "https://api.unext.jp/api/1/search/list?sort=newest&content_type=movie&page_size=20",
-        "https://api.unext.jp/api/2/content/new?content_type=movie&page_size=20",
-    ]
-    for url in endpoints:
-        try:
-            resp = requests.get(url, headers=headers, timeout=15)
-            if resp.status_code in (401, 403, 404):
-                continue
-            resp.raise_for_status()
-            data = resp.json()
-            items = (
-                data.get("result_list")
-                or data.get("items")
-                or data.get("contents")
-                or data.get("titleList")
-                or []
-            )
-            if items:
-                for item in items[:20]:
-                    films.append(_parse_unext_item(item))
-                print(f"  [U-NEXT API] Got {len(films)} films from {url}")
-                return films
-        except Exception as e:
-            print(f"  [U-NEXT API] {url}: {e}", file=sys.stderr)
-    return films
-
-
-def _scrape_unext_website() -> list[dict]:
-    """Scrape U-NEXT new arrivals page."""
+    """Scrape foreign movies from U-NEXT genre page."""
     films: list[dict] = []
     try:
         resp = requests.get(
-            "https://video.unext.jp/category/new",
-            headers=COMMON_HEADERS,
+            UNEXT_GENRE_URL,
+            headers={
+                **COMMON_HEADERS,
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            },
             timeout=15,
         )
         resp.raise_for_status()
-        soup = BeautifulSoup(resp.text, "html.parser")
+    except requests.RequestException as e:
+        print(f"  [U-NEXT] Fetch error: {e}", file=sys.stderr)
+        return films
 
-        # Next.js __NEXT_DATA__ approach
-        tag = soup.find("script", {"id": "__NEXT_DATA__"})
-        if tag:
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    # 1. Next.js SSR — __NEXT_DATA__ often embeds the full content list
+    tag = soup.find("script", {"id": "__NEXT_DATA__"})
+    if tag:
+        try:
             data = json.loads(tag.string or "{}")
             items = (
                 _deep_find(data, "titleList")
+                or _deep_find(data, "titleListDtos")
                 or _deep_find(data, "contentList")
                 or _deep_find(data, "items")
                 or []
             )
-            if isinstance(items, list):
-                for item in items[:20]:
+            if isinstance(items, list) and items:
+                for item in items[:40]:
                     if isinstance(item, dict):
                         films.append(_parse_unext_item(item))
-                if films:
-                    print(f"  [U-NEXT scrape] Got {len(films)} films from __NEXT_DATA__")
-                    return films
+                print(f"  [U-NEXT] {len(films)} films from __NEXT_DATA__")
+                return films
+        except (json.JSONDecodeError, Exception) as e:
+            print(f"  [U-NEXT] __NEXT_DATA__ parse error: {e}", file=sys.stderr)
 
-        # HTML card fallback
-        selectors = [
-            "[data-testid='title-card']",
-            ".c-title-card",
-            "[class*='titleCard']",
-            "[class*='TitleCard']",
-            "[class*='title-item']",
-        ]
-        for sel in selectors:
-            cards = soup.select(sel)
-            if not cards:
+    # 2. HTML card scraping (for partially SSR pages)
+    films = _scrape_unext_html(soup)
+    if films:
+        print(f"  [U-NEXT] {len(films)} films from HTML cards")
+    else:
+        print(
+            "  [U-NEXT] 0 films found — page may require JavaScript rendering.",
+            file=sys.stderr,
+        )
+    return films
+
+
+def _scrape_unext_html(soup: BeautifulSoup) -> list[dict]:
+    """Extract title cards from U-NEXT HTML (server-rendered fragment)."""
+    films: list[dict] = []
+    seen: set[str] = set()
+
+    # Try progressively broader selectors
+    selectors = [
+        "a[href*='/title/SID']",
+        "a[href*='/title/']",
+        "[class*='titleCard'] a",
+        "[class*='TitleCard'] a",
+        "[class*='title-card'] a",
+    ]
+    for sel in selectors:
+        for card in soup.select(sel):
+            href = card.get("href", "") if card.name == "a" else ""
+            if not href:
+                link = card.select_one("a[href*='/title/']")
+                href = link.get("href", "") if link else ""
+            if not href or href in seen:
                 continue
-            for card in cards[:20]:
-                title_el = card.select_one("h3, h2, [class*='title'], [class*='Title']")
-                img_el = card.select_one("img")
-                link_el = card.select_one("a[href]")
-                if title_el:
-                    href = link_el["href"] if link_el else ""
-                    full_url = ("https://video.unext.jp" + href) if href.startswith("/") else href
-                    films.append({
-                        "id": f"unext_{abs(hash(full_url))}",
-                        "title": title_el.get_text(strip=True),
-                        "thumbnail": (img_el.get("src") or img_el.get("data-src", "")) if img_el else "",
-                        "url": full_url,
-                        "source": "U-NEXT",
-                        "fetched_at": datetime.now(timezone.utc).isoformat(),
-                    })
-            if films:
-                break
-        print(f"  [U-NEXT scrape] Got {len(films)} films from HTML")
-    except Exception as e:
-        print(f"  [U-NEXT scrape] Error: {e}", file=sys.stderr)
+            seen.add(href)
+
+            full_url = _abs("https://video.unext.jp", href)
+            img = card.select_one("img") if card.name != "img" else card
+            title_el = card.select_one("p, span, h3, h2, [class*='title']")
+            title = (
+                title_el.get_text(strip=True)
+                if title_el
+                else (img.get("alt", "") if img else "")
+            )
+            if not title:
+                continue
+
+            films.append({
+                "id": f"unext_{abs(hash(href))}",
+                "title": title,
+                "thumbnail": (img.get("src") or img.get("data-src", "")) if img else "",
+                "url": full_url,
+                "source": "U-NEXT",
+                "fetched_at": datetime.now(timezone.utc).isoformat(),
+            })
+
+        if films:
+            break
+
     return films
 
 
 def _parse_unext_item(item: dict) -> dict:
+    """Normalize a U-NEXT data item (from __NEXT_DATA__ or API)."""
     title = item.get("title") or item.get("name") or item.get("display_name", "")
     code = item.get("title_code") or item.get("code") or item.get("id", "")
     thumb_raw = item.get("thumbnail_url") or item.get("image_url") or item.get("thumbnail", "")
-    thumb = thumb_raw if isinstance(thumb_raw, str) else (thumb_raw.get("url", "") if isinstance(thumb_raw, dict) else "")
+    thumb = (
+        thumb_raw if isinstance(thumb_raw, str)
+        else (thumb_raw.get("url", "") if isinstance(thumb_raw, dict) else "")
+    )
     return {
         "id": f"unext_{code}",
         "title": title,
@@ -280,7 +260,7 @@ def _parse_unext_item(item: dict) -> dict:
         "director": item.get("director", ""),
         "synopsis": item.get("synopsis") or item.get("comment", ""),
         "thumbnail": thumb,
-        "url": f"https://video.unext.jp/title/{code}" if code else "https://video.unext.jp/",
+        "url": f"https://video.unext.jp/title/{code}" if code else UNEXT_GENRE_URL,
         "source": "U-NEXT",
         "fetched_at": datetime.now(timezone.utc).isoformat(),
     }
@@ -288,8 +268,15 @@ def _parse_unext_item(item: dict) -> dict:
 
 # ─── Utilities ────────────────────────────────────────────────────────────────
 
+def _abs(base: str, href: str) -> str:
+    """Convert a relative href to an absolute URL."""
+    if not href:
+        return base
+    return (base + href) if href.startswith("/") else href
+
+
 def _deep_find(obj, key, _depth=0):
-    """Recursively search a nested dict/list for a key whose value is a non-empty list."""
+    """Recursively search nested dicts/lists for a key with a non-empty list value."""
     if _depth > 10:
         return None
     if isinstance(obj, dict):
@@ -319,17 +306,17 @@ def main() -> None:
         except json.JSONDecodeError:
             pass
 
-    print("Fetching from MUBI...")
+    print("Fetching MUBI releases from Letterboxd...")
     mubi = fetch_mubi_films()
-    print(f"  → {len(mubi)} films from MUBI")
+    print(f"  → {len(mubi)} films total from MUBI")
 
     time.sleep(2)
 
-    print("Fetching from U-NEXT...")
+    print("Fetching U-NEXT foreign movies...")
     unext = fetch_unext_films()
-    print(f"  → {len(unext)} films from U-NEXT")
+    print(f"  → {len(unext)} films total from U-NEXT")
 
-    # Merge: new results first, then existing (deduplicated by URL)
+    # Merge: fresh results first, then carry-over existing (dedup by URL)
     fresh = mubi + unext
     seen: set[str] = {f["url"] for f in fresh}
     for film in existing:
@@ -338,7 +325,6 @@ def main() -> None:
             fresh.append(film)
             seen.add(url)
 
-    # Sort newest-fetched first, cap at MAX_FILMS
     fresh.sort(key=lambda f: f.get("fetched_at", ""), reverse=True)
     fresh = fresh[:MAX_FILMS]
 
