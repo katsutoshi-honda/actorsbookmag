@@ -20,6 +20,7 @@
   --accent2: #ff3300;
   --accent3: #00aaff;
   --mubi-color: #E8F037;
+  --filmarks-color: #ff5a5f;
   --unext-color: #00c3e3;
 }
 
@@ -143,8 +144,9 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 }
 .filter-btn:hover { border-color: var(--white); color: var(--white); }
 .filter-btn.active { background: var(--white); color: var(--bg); border-color: var(--white); }
-.filter-btn.mubi.active { background: var(--mubi-color); color: #000; border-color: var(--mubi-color); }
-.filter-btn.unext.active { background: var(--unext-color); color: #000; border-color: var(--unext-color); }
+.filter-btn.mubi.active     { background: var(--mubi-color); color: #000; border-color: var(--mubi-color); }
+.filter-btn.filmarks.active { background: var(--filmarks-color); color: #fff; border-color: var(--filmarks-color); }
+.filter-btn.unext.active    { background: var(--unext-color); color: #000; border-color: var(--unext-color); }
 .filter-count {
   margin-left: auto;
   font-family: 'Space Mono', monospace;
@@ -202,8 +204,9 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   padding: 3px 8px;
   font-weight: 700;
 }
-.badge-mubi { background: var(--mubi-color); color: #000; }
-.badge-unext { background: var(--unext-color); color: #000; }
+.badge-mubi     { background: var(--mubi-color); color: #000; }
+.badge-filmarks { background: var(--filmarks-color); color: #fff; }
+.badge-unext    { background: var(--unext-color); color: #000; }
 
 .film-info {
   padding: 16px 16px 20px;
@@ -358,7 +361,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
     <div class="page-hero-title">NEW<br><em>ARRIVALS</em></div>
   </div>
   <div class="page-hero-meta">
-    <div>SOURCE — MUBI</div>
+    <div>SOURCE — MUBI &amp; FILMARKS</div>
     <div>更新: <strong id="last-updated">—</strong></div>
     <div>全 <strong id="total-count">—</strong> 作品</div>
   </div>
@@ -366,8 +369,10 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
 <!-- FILTER BAR -->
 <div class="filter-bar">
-  <span class="filter-label">SOURCE</span>
-  <button class="filter-btn mubi active" data-filter="MUBI">MUBI</button>
+  <span class="filter-label">FILTER</span>
+  <button class="filter-btn active" data-filter="all">ALL</button>
+  <button class="filter-btn mubi" data-filter="MUBI">MUBI</button>
+  <button class="filter-btn filmarks" data-filter="Filmarks">FILMARKS</button>
   <span class="filter-count" id="visible-count"></span>
 </div>
 
@@ -394,7 +399,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   const filterBtns = document.querySelectorAll('.filter-btn');
 
   let allFilms = [];
-  let currentFilter = 'MUBI';
+  let currentFilter = 'all';
 
   // ── Render ──────────────────────────────────────────────────────────────────
   function renderFilms(films) {
@@ -416,7 +421,9 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
       card.className = 'film-card';
 
       const source = film.source || 'MUBI';
-      const badgeClass = source === 'U-NEXT' ? 'badge-unext' : 'badge-mubi';
+      const badgeClass = source === 'Filmarks' ? 'badge-filmarks'
+                       : source === 'U-NEXT'   ? 'badge-unext'
+                       : 'badge-mubi';
 
       const thumbHtml = film.thumbnail
         ? `<img src="${escHtml(film.thumbnail)}" alt="${escHtml(film.title)}" loading="lazy">`
@@ -426,6 +433,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
         film.year ? `<span class="film-meta-item"><strong>${film.year}</strong></span>` : '',
         film.director ? `<span class="film-meta-item">DIR <strong>${escHtml(film.director)}</strong></span>` : '',
         film.country ? `<span class="film-meta-item">${escHtml(film.country)}</span>` : '',
+        film.filmarks_score ? `<span class="film-meta-item">★ ${film.filmarks_score}</span>` : '',
         film.duration ? `<span class="film-meta-item">${film.duration}<small>min</small></span>` : '',
       ].filter(Boolean).join('');
 
@@ -453,7 +461,9 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   }
 
   function applyFilter() {
-    const filtered = allFilms.filter(f => f.source === currentFilter);
+    const filtered = currentFilter === 'all'
+      ? allFilms
+      : allFilms.filter(f => f.source === currentFilter);
     renderFilms(filtered);
   }
 
