@@ -248,6 +248,15 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+.film-comment {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--offwhite);
+  line-height: 1.8;
+  font-style: italic;
+}
 .film-link {
   margin-top: auto;
   padding-top: 12px;
@@ -349,7 +358,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
     <div class="page-hero-title">NEW<br><em>ARRIVALS</em></div>
   </div>
   <div class="page-hero-meta">
-    <div>SOURCE — MUBI &amp; U-NEXT</div>
+    <div>SOURCE — MUBI</div>
     <div>更新: <strong id="last-updated">—</strong></div>
     <div>全 <strong id="total-count">—</strong> 作品</div>
   </div>
@@ -357,10 +366,8 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
 <!-- FILTER BAR -->
 <div class="filter-bar">
-  <span class="filter-label">FILTER</span>
-  <button class="filter-btn active" data-filter="all">ALL</button>
-  <button class="filter-btn mubi" data-filter="MUBI">MUBI</button>
-  <button class="filter-btn unext" data-filter="U-NEXT">U-NEXT</button>
+  <span class="filter-label">SOURCE</span>
+  <button class="filter-btn mubi active" data-filter="MUBI">MUBI</button>
   <span class="filter-count" id="visible-count"></span>
 </div>
 
@@ -387,7 +394,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   const filterBtns = document.querySelectorAll('.filter-btn');
 
   let allFilms = [];
-  let currentFilter = 'all';
+  let currentFilter = 'MUBI';
 
   // ── Render ──────────────────────────────────────────────────────────────────
   function renderFilms(films) {
@@ -434,6 +441,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
               ? `<div class="film-title-locale">${escHtml(film.title_locale)}</div>` : ''}
             ${metaItems ? `<div class="film-meta">${metaItems}</div>` : ''}
             ${film.synopsis ? `<p class="film-synopsis">${escHtml(film.synopsis)}</p>` : ''}
+            ${film.comment ? `<p class="film-comment">${escHtml(film.comment)}</p>` : ''}
             <div class="film-link">VIEW ON ${escHtml(source)}</div>
           </div>
         </a>`;
@@ -445,9 +453,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   }
 
   function applyFilter() {
-    const filtered = currentFilter === 'all'
-      ? allFilms
-      : allFilms.filter(f => f.source === currentFilter);
+    const filtered = allFilms.filter(f => f.source === currentFilter);
     renderFilms(filtered);
   }
 
