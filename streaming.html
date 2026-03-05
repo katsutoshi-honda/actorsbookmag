@@ -372,7 +372,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   <span class="filter-label">FILTER</span>
   <button class="filter-btn active" data-filter="all">ALL</button>
   <button class="filter-btn mubi" data-filter="MUBI">MUBI</button>
-  <button class="filter-btn filmarks" data-filter="Filmarks">FILMARKS</button>
+  <button class="filter-btn filmarks" data-filter="Filmarks" style="display:none">FILMARKS</button>
   <span class="filter-count" id="visible-count"></span>
 </div>
 
@@ -508,7 +508,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
       return res.json();
     })
     .then(data => {
-      allFilms = Array.isArray(data) ? data : [];
+      allFilms = (Array.isArray(data) ? data : []).filter(f => f.source !== 'Filmarks');
       totalCountEl.textContent = allFilms.length;
 
       if (allFilms.length === 0) {
