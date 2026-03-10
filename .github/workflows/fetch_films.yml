@@ -23,7 +23,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4 lxml anthropic
+          pip install requests beautifulsoup4 lxml anthropic playwright
+          playwright install chromium
+          playwright install-deps chromium
 
       - name: Fetch films
         env:
