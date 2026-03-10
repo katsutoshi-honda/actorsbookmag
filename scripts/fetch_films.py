@@ -29,30 +29,30 @@ import requests
 from bs4 import BeautifulSoup
 
 OUTPUT_PATH = Path("data/films.json")
-MAX_FILMS_PER_SOURCE = 10
+MAX_FILMS_PER_SOURCE = 5
 CLAUDE_MODEL = "claude-haiku-4-5-20251001"
 
+# MUBI: __NEXT_DATA__ scraping
 MUBI_URL = "https://mubi.com/en/jp/showing"
-UNEXT_URL = "https://video.unext.jp/browse/feature/JFETMAN0006"
-
 MUBI_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
 }
 
+# U-NEXT: HTML scraping
+UNEXT_URL = "https://video.unext.jp/browse/feature/JFETMAN0006"
 UNEXT_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
-    "Referer": "https://video.unext.jp/",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
 }
 
 FESTIVAL_KEYWORDS = [
     "cannes", "berlin", "venice", "sundance", "toronto", "rotterdam",
     "locarno", "カンヌ", "ベルリン", "ヴェネチア", "ヴェニス", "サンダンス",
     "トロント", "ロカルノ", "tiff", "東京国際映画祭", "国際映画祭",
-    "award", "prize", "受賞", "グランプリ", "パルムードール", "金熊賞",
+    "award", "prize", "受賞", "グランプリ", "パルム・ドール", "金熊賞",
     "銀熊賞", "golden lion", "palme d'or", "golden bear", "silver bear",
 ]
 
@@ -60,8 +60,8 @@ ARTHOUSE_DIRECTORS = [
     "濱口竜介", "是枝裕和", "黒沢清", "三宅唱", "西川美和", "河瀬直美",
     "塚本晋也", "深田晃司", "石井裕也", "大森立嗣",
     "ゴダール", "タルコフスキー", "ハネケ", "ケン・ローチ",
-    "アピチャッポン", "ウォン・カーウァイ", "ホウ・シャオシェン",
-    "ジャ・ジャンクー", "ポン・ジュノ", "パク・チャヌク",
+    "アビチャッポン", "ウォン・カーウァイ", "ホウーシャオシェン",
+    "ジャ・ジャンクー", "ポンージュノ", "パク・チャヌク",
     "kore-eda", "kurosawa", "hamaguchi", "miyake", "nishikawa",
 ]
 
@@ -85,7 +85,7 @@ COUNTRY_FLAGS = {
     "spain": "🇪🇸", "spanish": "🇪🇸", "スペイン": "🇪🇸",
     "brazil": "🇧🇷", "brazilian": "🇧🇷", "ブラジル": "🇧🇷",
     "thailand": "🇹🇭", "thai": "🇹🇭", "タイ": "🇹🇭",
-    "argentina": "🇦🇷", "アルゼンチン": "🇦🇷",
+    "argentina": "🆦🇷", "アルゼンチン": "🇦🇷",
     "mexico": "🇲🇽", "mexican": "🇲🇽", "メキシコ": "🇲🇽",
     "india": "🇮🇳", "indian": "🇮🇳", "インド": "🇮🇳",
     "russia": "🇷🇺", "russian": "🇷🇺", "ロシア": "🇷🇺",
@@ -171,7 +171,7 @@ def generate_comment(film: dict, client: anthropic.Anthropic) -> str:
 - 映画祭での受賞歴・上映歴に触れる（情報がある場合）
 - 監督の作家性・これまでの作品との関連に言及する
 - 文化的・社会的背景や今日的な意義を示す
-- 「この映画は〜」「〜という作品」などの平凡な書お出しを避ける
+- 「この映画は〜」「〜という作品」などの平凡な書き出しを避ける
 - コメントのみを出力（前置き・説明・見出し不要）
 
 {film_info}
@@ -249,15 +249,25 @@ def fetch_mubi_films() -> list[dict]:
         country = film_data.get("country") or ""
         synopsis = (film_data.get("excerpt") or film_data.get("synopsis") or "").strip()
         thumbnail = ""
-        still = film_data.get("still_url") or film_data.get("still") or {}
-        if isinstance(still, dict):
-            thumbnail = still.get("url") or still.get("retina") or still.get("standard") or ""
-        elif isinstance(still, str):
-            thumbnail = still
+        # Try string fields first
+        for img_field in ("still_url", "image_url", "poster_url", "backdrop_url"):
+            val = film_data.get(img_field)
+            if isinstance(val, str) and val.startswith("http"):
+                thumbnail = val
+                break
+        # Then try dict fields
         if not thumbnail:
-            poster = film_data.get("poster") or {}
-            if isinstance(poster, dict):
-                thumbnail = poster.get("url") or poster.get("medium") or ""
+            for img_field in ("still", "poster", "image", "backdrop", "cover"):
+                obj = film_data.get(img_field) or {}
+                if isinstance(obj, dict):
+                    thumbnail = (obj.get("url") or obj.get("retina") or
+                                 obj.get("standard") or obj.get("medium") or
+                                 obj.get("small") or "")
+                    if thumbnail:
+                        break
+                elif isinstance(obj, str) and obj.startswith("http"):
+                    thumbnail = obj
+                    break
 
         expires_at = item.get("available_until") or item.get("expires_at") or ""
 
@@ -289,16 +299,29 @@ def fetch_mubi_films() -> list[dict]:
 
 
 def fetch_unext_films() -> list[dict]:
-    """U-NEXTの新着映画をHTMLスクレイピング"""
-    print(f"  [U-NEXT] Fetching {UNEXT_URL}")
+    """U-NEXTの新着映画をPlaywrightでJSレンダリング後スクレイピング"""
     try:
-        resp = requests.get(UNEXT_URL, headers=UNEXT_HEADERS, timeout=20)
-        resp.raise_for_status()
-    except requests.RequestException as e:
-        print(f"  [U-NEXT] Error: {e}", file=sys.stderr)
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        print("  [U-NEXT] playwright not installed — skipping", file=sys.stderr)
         return []
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    print(f"  [U-NEXT] Fetching {UNEXT_URL} (headless browser)")
+    html = ""
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page(user_agent=UNEXT_HEADERS["User-Agent"])
+            page.goto(UNEXT_URL, wait_until="networkidle", timeout=30000)
+            # 少し待つ
+            page.wait_for_timeout(3000)
+            html = page.content()
+            browser.close()
+    except Exception as e:
+        print(f"  [U-NEXT] Playwright error: {e}", file=sys.stderr)
+        return []
+
+    soup = BeautifulSoup(html, "html.parser")
     films = []
     seen = set()
     now = _now()
@@ -327,6 +350,9 @@ def fetch_unext_films() -> list[dict]:
         thumbnail = ""
         if img:
             thumbnail = img.get("src") or img.get("data-src") or ""
+        # //metac.nxtv.jp 形式のURLをhttpsに
+        if thumbnail.startswith("//"):
+            thumbnail = "https:" + thumbnail
 
         try:
             fetched = datetime.fromisoformat(now.replace("Z", "+00:00"))
