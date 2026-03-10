@@ -1,43 +1,40 @@
-name: Fetch Films Daily
+name: Fetch Streaming Films
 
 on:
   schedule:
-    # 毎日 06:00 JST (= 21:00 UTC 前日) に実行
-    - cron: '0 21 * * *'
-  workflow_dispatch:  # 手動実行も可能
+    # 毎朝06:00 JST (UTC 21:00)
+    - cron: "0 21 * * *"
+  workflow_dispatch:
 
 jobs:
   fetch:
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install requests beautifulsoup4 lxml anthropic
+        run: |
+          pip install requests beautifulsoup4 lxml anthropic
 
-      - name: Fetch films and generate comments
+      - name: Fetch films
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: python scripts/fetch_films.py
+        run: |
+          python scripts/fetch_films.py
 
-      - name: Commit and push if changed
+      - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/films.json
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "chore: update films data $(date -u +%Y-%m-%d)"
-            git push
-          fi
+          git diff --staged --quiet || git commit -m "chore: update streaming films $(date +'%Y-%m-%d')"
+          git push
