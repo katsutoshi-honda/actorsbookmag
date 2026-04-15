@@ -1,4 +1,6 @@
 {
-  "banners": [],
-  "count": 0
+  "banners": [
+    "data/banners/mubi_akinola-davies-jr.jpg"
+  ],
+  "count": 1
 }
