@@ -1,4 +1,6 @@
 {
-  "banners": [],
-  "count": 0
+  "banners": [
+    "data/banners/mubi_frank-ripploh.jpg"
+  ],
+  "count": 1
 }
