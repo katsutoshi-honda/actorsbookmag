@@ -1,4 +1,7 @@
 {
-  "banners": [],
-  "count": 0
+  "banners": [
+    "data/banners/mubi_lisa-barros-d-sa.jpg",
+    "data/banners/mubi_glenn-leyburn.jpg"
+  ],
+  "count": 2
 }
