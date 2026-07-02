@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>actorsbookmag</title>
+<link rel="stylesheet" href="/news/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap"><div class="inner">
+  <a class="brand" href="/news/">ACTORSBOOK<span class="dot">.</span></a>
+  <nav>
+    <a href="/news/">Index</a>
+    <a href="/news/archive.html">Archive</a>
+  </nav>
+</div></div></header>
+
+<div id="hero"></div>
+<main class="reading"><div id="post"><p class="empty">読み込み中…</p></div></main>
+
+<footer class="site"><div class="wrap">ACTORSBOOK — 日本の自主・独立映画シーン</div></footer>
+
+<script>
+function esc(s){return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function fmtDate(iso){try{const d=new Date(iso);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;}catch(e){return "";}}
+const id=new URLSearchParams(location.search).get('id');
+fetch('/data/news.json').then(r=>r.json()).then(news=>{
+  const post=document.getElementById('post');
+  const a=news.find(x=>x.id===id);
+  if(!a){post.innerHTML='<p class="empty">記事が見つかりませんでした。 <a href="/news/">Indexへ</a></p>';return;}
+  document.title=a.headline+' — actorsbookmag';
+  if(a.thumbnail){document.getElementById('hero').innerHTML=`<div class="hero"><img src="${esc(a.thumbnail)}" alt=""></div>`;}
+  const tags=(a.hashtags||[]).map(esc).join('　');
+  const src=(a.source && a.source!=='actorsbookmag original' && a.source!=='manual')
+    ? `<div class="src">Source: ${esc(a.source)}${a.source_url?` — <a href="${esc(a.source_url)}" target="_blank" rel="noopener">元記事</a>`:''}</div>` : '';
+  post.innerHTML=`
+    <article class="post">
+      <div class="meta"><span class="cat">${esc(a.category||'映画')}</span><span>${fmtDate(a.published_at)}</span></div>
+      <h1>${esc(a.headline)}</h1>
+      ${a.dek?`<p class="dek">${esc(a.dek)}</p>`:''}
+      <div class="body">${esc(a.body)}</div>
+      ${tags?`<div class="tags">${tags}</div>`:''}
+      ${src}
+      <a class="back" href="/news/">← Index</a>
+    </article>`;
+}).catch(e=>{document.getElementById('post').innerHTML='<p class="empty">読み込みに失敗しました。</p>';});
+</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archive — actorsbookmag</title>
+<link rel="stylesheet" href="/news/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap"><div class="inner">
+  <a class="brand" href="/news/">ACTORSBOOK<span class="dot">.</span></a>
+  <nav>
+    <a href="/news/">Index</a>
+    <a href="/news/archive.html">Archive</a>
+  </nav>
+</div></div></header>
+
+<main class="wrap">
+  <section class="archive" id="list"><p class="empty">読み込み中…</p></section>
+</main>
+
+<footer class="site"><div class="wrap">ACTORSBOOK — 日本の自主・独立映画シーン</div></footer>
+
+<script>
+function esc(s){return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function fmtDate(iso){try{const d=new Date(iso);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;}catch(e){return "";}}
+fetch('/data/news.json').then(r=>r.json()).then(news=>{
+  const el=document.getElementById('list');
+  if(!news.length){el.innerHTML='<p class="empty">記事はまだありません。</p>';return;}
+  el.innerHTML=news.map(a=>`
+    <a class="arow" href="/news/article.html?id=${encodeURIComponent(a.id)}">
+      <span class="adate">${fmtDate(a.published_at)}</span>
+      <span class="acat">${esc(a.category||'映画')}</span>
+      <h3>${esc(a.headline)}</h3>
+    </a>`).join('');
+}).catch(e=>{document.getElementById('list').innerHTML='<p class="empty">読み込みに失敗しました。</p>';});
+</script>
+</body>
+</html>

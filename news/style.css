@@ -1,0 +1,75 @@
+/* actorsbookmag news — 白基調・余白たっぷり・ミニマル (032c風) */
+:root{
+  --bg:#ffffff; --fg:#0d0d0d; --muted:#9b9b9b; --line:#e9e9e9; --red:#ff0000;
+  --mono:"Helvetica Neue",Arial,"Hiragino Kaku Gothic ProN","Hiragino Sans",Meiryo,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--fg); font-family:var(--mono);
+  line-height:1.8; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+a{color:inherit; text-decoration:none}
+img{display:block; max-width:100%}
+
+.wrap{max-width:1180px; margin:0 auto; padding:0 48px}
+.reading{max-width:660px; margin:0 auto; padding:0 24px}
+@media(max-width:640px){ .wrap{padding:0 22px} }
+
+/* ── ヘッダー ── */
+header.site{padding:38px 0 26px}
+header.site .inner{display:flex; align-items:baseline}
+.brand{font-weight:800; font-size:19px; letter-spacing:-.01em}
+.brand .dot{color:var(--red)}
+nav{margin-left:auto; display:flex; gap:30px; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
+nav a:hover{color:var(--fg)}
+.hair{height:1px; background:var(--fg)}
+
+/* ── 共通メタ ── */
+.meta{display:flex; gap:16px; align-items:center; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+.meta .cat{color:var(--red)}
+
+/* ── トップ：記事リスト ── */
+.index{padding:70px 0 120px}
+.row{display:grid; grid-template-columns:120px 1fr; gap:34px; align-items:start;
+     padding:44px 0; border-top:1px solid var(--line)}
+.row:first-child{border-top:none; padding-top:0}
+.row .thumb{width:120px; aspect-ratio:4/5; object-fit:cover; background:#f2f2f2}
+.row h2{font-size:clamp(24px,3.4vw,38px); line-height:1.08; font-weight:800; letter-spacing:-.02em; margin:14px 0 0}
+.row .dek{color:#666; margin:16px 0 0; max-width:56ch; font-size:15px}
+@media(max-width:640px){
+  .row{grid-template-columns:1fr; gap:16px}
+  .row .thumb{width:150px}
+}
+
+/* ── アーカイブ：テキスト行 ── */
+.archive{padding:70px 0 120px}
+.archive .arow{display:grid; grid-template-columns:110px 120px 1fr; gap:22px; align-items:baseline;
+     padding:26px 0; border-top:1px solid var(--line)}
+.archive .arow:hover h3{color:var(--red)}
+.archive .adate,.archive .acat{font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
+.archive h3{margin:0; font-size:22px; font-weight:600; letter-spacing:-.01em; transition:color .15s}
+@media(max-width:640px){ .archive .arow{grid-template-columns:1fr; gap:6px} }
+
+/* ── 記事：フルブリードのヒーロー ── */
+.hero{width:100vw; margin-left:calc(50% - 50vw); background:#0a0a0a;
+      min-height:78vh; display:flex; align-items:center; justify-content:center}
+.hero img{width:auto; max-width:100%; max-height:92vh; object-fit:contain}
+
+article.post{padding:72px 0 140px}
+article.post .meta{justify-content:center; margin-bottom:26px}
+article.post h1{font-size:clamp(30px,5.2vw,58px); line-height:1.04; font-weight:800;
+     letter-spacing:-.025em; text-align:center; margin:0 auto 18px; max-width:20ch}
+article.post .dek{text-align:center; color:#555; font-size:19px; max-width:44ch; margin:0 auto 8px}
+article.post .body{font-size:18px; line-height:2.0; white-space:pre-wrap; margin-top:52px}
+article.post .tags{margin-top:44px; color:var(--muted); font-size:13px; letter-spacing:.06em}
+article.post .src{margin-top:16px; font-size:13px; color:var(--muted)}
+article.post .src a{color:var(--red)}
+.back{display:inline-block; margin-top:56px; font-size:12px; letter-spacing:.12em;
+      text-transform:uppercase; color:var(--muted)}
+.back:hover{color:var(--fg)}
+
+/* ── フッター ── */
+footer.site{border-top:1px solid var(--line); color:var(--muted); font-size:11px;
+     letter-spacing:.08em; padding:40px 0; margin-top:60px}
+.empty{padding:100px 0; color:var(--muted); text-align:center}
