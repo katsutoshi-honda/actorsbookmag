@@ -29,15 +29,32 @@ fetch('/data/news.json').then(r=>r.json()).then(news=>{
   const a=news.find(x=>x.id===id);
   if(!a){post.innerHTML='<p class="empty">記事が見つかりませんでした。 <a href="/news/">Indexへ</a></p>';return;}
   document.title=a.headline+' — actorsbookmag';
-  if(a.thumbnail){document.getElementById('hero').innerHTML=`<div class="hero"><img src="${esc(a.thumbnail)}" alt=""></div>`;}
+  const cat=esc(a.category||'映画'), date=fmtDate(a.published_at);
+  const hero=document.getElementById('hero');
+  let heroCarriesTitle=false;
+  if(a.background){
+    heroCarriesTitle=true;
+    hero.innerHTML=`<div class="hero--photo" style="background-image:url('${esc(a.background)}')">
+        <div class="scrim"></div>
+        <div class="cap">
+          <div class="kick"><span class="cat">${cat}</span>　${date}</div>
+          <h1 class="htitle">${esc(a.headline)}</h1>
+          ${a.dek?`<p class="hdek">${esc(a.dek)}</p>`:''}
+        </div>
+      </div>`;
+  } else if(a.thumbnail){
+    hero.innerHTML=`<div class="hero"><img src="${esc(a.thumbnail)}" alt=""></div>`;
+  }
   const tags=(a.hashtags||[]).map(esc).join('　');
   const src=(a.source && a.source!=='actorsbookmag original' && a.source!=='manual')
     ? `<div class="src">Source: ${esc(a.source)}${a.source_url?` — <a href="${esc(a.source_url)}" target="_blank" rel="noopener">元記事</a>`:''}</div>` : '';
+  const head=heroCarriesTitle ? '' : `
+      <div class="meta"><span class="cat">${cat}</span><span>${date}</span></div>
+      <h1>${esc(a.headline)}</h1>
+      ${a.dek?`<p class="dek">${esc(a.dek)}</p>`:''}`;
   post.innerHTML=`
     <article class="post">
-      <div class="meta"><span class="cat">${esc(a.category||'映画')}</span><span>${fmtDate(a.published_at)}</span></div>
-      <h1>${esc(a.headline)}</h1>
-      ${a.dek?`<p class="dek">${esc(a.dek)}</p>`:''}
+      ${head}
       <div class="body">${esc(a.body)}</div>
       ${tags?`<div class="tags">${tags}</div>`:''}
       ${src}

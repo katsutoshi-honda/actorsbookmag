@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Editor — actorsbookmag</title>
+<style>
+:root{--fg:#0d0d0d;--muted:#9b9b9b;--line:#e6e6e6;--red:#ff0000;--bg:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+ font-family:"Helvetica Neue",Arial,"Hiragino Kaku Gothic ProN","Hiragino Sans",Meiryo,sans-serif;line-height:1.7}
+header{display:flex;align-items:baseline;gap:16px;padding:20px 28px;border-bottom:1px solid var(--fg)}
+.brand{font-weight:800}.brand .dot{color:var(--red)}
+header .tag{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+header .right{margin-left:auto;display:flex;gap:12px;align-items:center;font-size:13px}
+.dotok{color:#1a9e4b;font-weight:700}.dotng{color:var(--red);font-weight:700}
+main{display:grid;grid-template-columns:300px 1fr;gap:0;min-height:calc(100vh - 62px)}
+aside{border-right:1px solid var(--line);padding:16px;overflow:auto}
+aside h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:6px 8px 12px}
+.item{display:block;width:100%;text-align:left;border:0;background:none;padding:12px 10px;border-radius:8px;
+ cursor:pointer;font:inherit;color:inherit;border-bottom:1px solid var(--line)}
+.item:hover{background:#f6f6f6}
+.item.sel{background:#111;color:#fff}
+.item small{display:block;color:var(--muted);font-size:11px;letter-spacing:.08em}
+.item.sel small{color:#bbb}
+.newbtn{width:100%;margin-bottom:12px;padding:10px;border:1px dashed #bbb;background:none;border-radius:8px;cursor:pointer;font:inherit}
+section.edit{padding:30px 40px;max-width:760px}
+label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:20px 0 6px}
+input[type=text],textarea,select{width:100%;padding:12px 14px;border:1px solid #ccc;border-radius:8px;
+ font:inherit;background:#fff;color:var(--fg)}
+textarea{min-height:220px;resize:vertical;line-height:1.9}
+input[type=text].big{font-size:22px;font-weight:800;letter-spacing:-.01em}
+.row2{display:flex;gap:16px}.row2>div{flex:1}
+.bgprev{margin-top:10px;width:180px;aspect-ratio:4/5;object-fit:cover;background:#f0f0f0;border:1px solid var(--line);display:block}
+.bar{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:16px 40px;display:flex;gap:16px;align-items:center;margin:30px -40px 0}
+button.save{background:#111;color:#fff;border:0;border-radius:8px;padding:12px 26px;font:inherit;font-weight:700;cursor:pointer}
+button.save:disabled{opacity:.4;cursor:default}
+a.view{font-size:13px;color:var(--muted)}
+.status{font-size:13px;color:var(--muted)}
+.status.ok{color:#1a9e4b}.status.err{color:var(--red)}
+.tokenbox{padding:40px;max-width:620px}
+.tokenbox input{margin-top:10px}
+.hint{font-size:13px;color:var(--muted);margin-top:8px}
+.empty{padding:60px 40px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">ACTORSBOOK<span class="dot">.</span></span>
+  <span class="tag">Editor</span>
+  <div class="right">
+    <span id="conn"></span>
+    <a class="view" href="/news/" target="_blank">サイトを見る ↗</a>
+    <button id="logout" class="view" style="border:0;background:none;cursor:pointer">接続を解除</button>
+  </div>
+</header>
+
+<div id="app"></div>
+
+<script>
+const OWNER="katsutoshi-honda", REPO="actorsbookmag", BRANCH="main";
+const CATS=["映画","本・書店","ストリート","ファッション"];
+const app=document.getElementById("app");
+let NEWS=[], sel=null, pendingFile=null;
+
+// ---- utils ----
+const esc=s=>(s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const token=()=>localStorage.getItem("gh_token")||"";
+function u8ToB64(u8){let s="";const c=0x8000;for(let i=0;i<u8.length;i+=c)s+=String.fromCharCode.apply(null,u8.subarray(i,i+c));return btoa(s);}
+const strToB64=str=>u8ToB64(new TextEncoder().encode(str));
+const b64ToStr=b=>new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\n/g,"")),c=>c.charCodeAt(0)));
+function ghHeaders(){return {"Authorization":"Bearer "+token(),"Accept":"application/vnd.github+json"};}
+async function ghGet(path){
+  const r=await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}`,{headers:ghHeaders(),cache:"no-store"});
+  if(r.status===404)return null;
+  if(!r.ok)throw new Error("読み込み失敗 ("+r.status+")");
+  return r.json();
+}
+async function ghPut(path,contentB64,message,sha){
+  const body={message,content:contentB64,branch:BRANCH};if(sha)body.sha=sha;
+  const r=await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`,
+    {method:"PUT",headers:ghHeaders(),body:JSON.stringify(body)});
+  if(!r.ok){let t="";try{t=(await r.json()).message||"";}catch(e){}throw new Error("保存失敗 ("+r.status+") "+t);}
+  return r.json();
+}
+function fmtDate(iso){try{const d=new Date(iso);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;}catch(e){return "";}}
+
+// ---- 認証ゲート ----
+function renderConn(){
+  document.getElementById("conn").innerHTML = token()
+    ? '<span class="dotok">● 接続済み</span>' : '<span class="dotng">● 未接続</span>';
+}
+function tokenGate(){
+  renderConn();
+  app.innerHTML=`<div class="tokenbox">
+    <h2>編集をはじめるには、GitHubトークンを一度だけ登録します</h2>
+    <p class="hint">保存(コミット)にトークンが必要です。トークンは<b>このブラウザ内だけ</b>に保存され、外部には送られません。</p>
+    <label>GitHub Personal Access Token（repo権限）</label>
+    <input id="tok" type="text" placeholder="ghp_...">
+    <p class="hint">※前に発行した <code>actorsbookmag-push</code> のトークンがそのまま使えます。</p>
+    <p style="margin-top:16px"><button class="save" id="savetok">接続する</button></p>
+  </div>`;
+  document.getElementById("savetok").onclick=()=>{
+    const v=document.getElementById("tok").value.trim();
+    if(!v.startsWith("ghp_")&&!v.startsWith("github_pat_")){alert("トークンの形式が違うようです（ghp_ で始まります）");return;}
+    localStorage.setItem("gh_token",v); boot();
+  };
+}
+
+// ---- 一覧 + 編集 ----
+function shell(){
+  app.innerHTML=`<main>
+    <aside>
+      <h2>記事</h2>
+      <button class="newbtn" id="new">＋ 新規記事</button>
+      <div id="list"></div>
+    </aside>
+    <section class="edit" id="editor"><div class="empty">左の一覧から記事を選んでください。</div></section>
+  </main>`;
+  document.getElementById("new").onclick=newArticle;
+  renderList();
+}
+function renderList(){
+  const el=document.getElementById("list");
+  el.innerHTML=NEWS.map((a,i)=>`<button class="item ${sel===i?'sel':''}" data-i="${i}">
+     ${esc(a.headline||'(無題)')}<small>${esc(a.category||'映画')}・${fmtDate(a.published_at)}</small></button>`).join("");
+  [...el.querySelectorAll(".item")].forEach(b=>b.onclick=()=>{sel=+b.dataset.i;pendingFile=null;renderList();renderEditor();});
+}
+function renderEditor(){
+  if(sel==null)return;
+  const a=NEWS[sel];
+  document.getElementById("editor").innerHTML=`
+    <label>見出し（タイトル）</label>
+    <input id="f_head" class="big" type="text" value="${esc(a.headline||'')}">
+    <div class="row2">
+      <div><label>カテゴリ</label>
+        <select id="f_cat">${CATS.map(c=>`<option ${a.category===c?'selected':''}>${c}</option>`).join("")}</select></div>
+      <div><label>リード（サブ見出し）</label>
+        <input id="f_dek" type="text" value="${esc(a.dek||'')}"></div>
+    </div>
+    <label>本文</label>
+    <textarea id="f_body">${esc(a.body||'')}</textarea>
+    <label>背景画像（ヒーローに使われます）</label>
+    <img class="bgprev" id="bgprev" src="${esc(a.background||a.thumbnail||'')}" alt="" onerror="this.style.visibility='hidden'">
+    <div class="row2" style="margin-top:10px">
+      <div><label>画像をアップロード</label><input id="f_file" type="file" accept="image/*"></div>
+      <div><label>または画像URL</label><input id="f_url" type="text" value="${esc((a.background||'').startsWith('http')?a.background:'')}" placeholder="https://..."></div>
+    </div>
+    <div class="bar">
+      <button class="save" id="save">保存して公開</button>
+      <a class="view" href="/news/article.html?id=${encodeURIComponent(a.id)}" target="_blank">この記事を見る ↗</a>
+      <span class="status" id="status"></span>
+    </div>`;
+  const fileEl=document.getElementById("f_file");
+  fileEl.onchange=()=>{pendingFile=fileEl.files[0]||null;
+    if(pendingFile){const u=URL.createObjectURL(pendingFile);const p=document.getElementById("bgprev");p.src=u;p.style.visibility="visible";}};
+  document.getElementById("save").onclick=save;
+}
+function newArticle(){
+  const id="post-"+Math.random().toString(36).slice(2,10)+"-"+Date.now();
+  NEWS.unshift({id,headline:"（新規記事）",dek:"",body:"",category:"映画",hashtags:[],
+    source:"actorsbookmag original",source_url:"",thumbnail:"",background:"",published_at:new Date().toISOString()});
+  sel=0;pendingFile=null;renderList();renderEditor();
+}
+
+async function save(){
+  const btn=document.getElementById("save"), st=document.getElementById("status");
+  const setStatus=(m,cls)=>{st.className="status "+(cls||"");st.textContent=m;};
+  btn.disabled=true; setStatus("保存中…");
+  try{
+    const a={...NEWS[sel]};
+    a.headline=document.getElementById("f_head").value.trim();
+    a.dek=document.getElementById("f_dek").value.trim();
+    a.body=document.getElementById("f_body").value;
+    a.category=document.getElementById("f_cat").value;
+    const url=document.getElementById("f_url").value.trim();
+
+    // 背景画像: ファイルが選ばれていればアップロード、なければURL欄を採用
+    if(pendingFile){
+      setStatus("画像をアップロード中…");
+      const buf=new Uint8Array(await pendingFile.arrayBuffer());
+      const ext=(pendingFile.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg";
+      const path=`images/news/bg/${a.id}-${Date.now()}.${ext}`;
+      await ghPut(path,u8ToB64(buf),"cms: upload bg for "+a.id);
+      a.background="/"+path;
+    } else if(url){ a.background=url; }
+
+    // news.json を最新取得 → 該当を差し替え → コミット
+    setStatus("記事を保存中…");
+    const cur=await ghGet("data/news.json");
+    let arr=cur?JSON.parse(b64ToStr(cur.content)):[];
+    const i=arr.findIndex(x=>x.id===a.id);
+    if(i>=0) arr[i]=a; else arr.unshift(a);
+    await ghPut("data/news.json",strToB64(JSON.stringify(arr,null,2)),"cms: edit "+a.id, cur?cur.sha:undefined);
+
+    NEWS[sel]=a; pendingFile=null; renderList();
+    setStatus("✓ 保存しました。1分ほどで公開に反映されます。","ok");
+  }catch(e){ setStatus("⚠ "+e.message,"err"); }
+  finally{ btn.disabled=false; }
+}
+
+// ---- 起動 ----
+async function boot(){
+  renderConn();
+  try{
+    // 一覧は公開JSONから読み込み（トークン不要）。保存時のみAPIを使う
+    const r=await fetch("/data/news.json",{cache:"no-store"});
+    NEWS=await r.json();
+  }catch(e){ NEWS=[]; }
+  shell();
+}
+document.getElementById("logout").onclick=()=>{localStorage.removeItem("gh_token");tokenGate();};
+if(token()) boot(); else tokenGate();
+</script>
+</body>
+</html>

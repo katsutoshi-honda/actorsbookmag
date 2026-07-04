@@ -255,6 +255,7 @@ def save_to_site(article: dict, source: dict, image_path: str | None) -> dict:
         "source": source.get("source", ""),
         "source_url": source.get("url", ""),
         "thumbnail": web_thumb,
+        "background": "",  # CMSで差し替え可能なヒーロー背景画像
         "published_at": ts,
     }
     news.insert(0, record)  # 新着順
