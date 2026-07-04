@@ -278,14 +278,32 @@ def _font(path: str, size: int, index: int = 0):
 
 
 def _wrap_jp(text: str, max_chars: int) -> list[str]:
+    """日本語は1文字ずつ折る。ただし英数字の連なり(STRANGER, 7/3 等)は
+    途中で分断せず1トークンとして扱う。"""
+    # トークン化: 英数記号の語 / 空白 / それ以外(CJK等)は1文字
+    tokens = re.findall(r"[A-Za-z0-9._/&+\-]+|\s+|[^A-Za-z0-9._/&+\-\s]", text)
     lines, cur = [], ""
-    for ch in text:
-        cur += ch
-        if len(cur) >= max_chars:
-            lines.append(cur)
+    for tok in tokens:
+        if tok.isspace():
+            if cur:
+                cur += tok
+            continue
+        # 長すぎる英単語だけは強制分割(1行に収まらない場合の保険)
+        if len(tok) > max_chars:
+            if cur:
+                lines.append(cur.rstrip())
+                cur = ""
+            while len(tok) > max_chars:
+                lines.append(tok[:max_chars])
+                tok = tok[max_chars:]
+            cur = tok
+            continue
+        if len(cur) + len(tok) > max_chars and cur:
+            lines.append(cur.rstrip())
             cur = ""
-    if cur:
-        lines.append(cur)
+        cur += tok
+    if cur.strip():
+        lines.append(cur.rstrip())
     return lines
 
 
