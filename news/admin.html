@@ -31,7 +31,7 @@ aside h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(
 .newbtn{width:100%;margin-bottom:12px;padding:10px;border:1px dashed #bbb;background:none;border-radius:8px;cursor:pointer;font:inherit}
 section.edit{padding:30px 40px;max-width:760px}
 label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:20px 0 6px}
-input[type=text],textarea,select{width:100%;padding:12px 14px;border:1px solid #ccc;border-radius:8px;
+input[type=text],input[type=password],textarea,select{width:100%;padding:12px 14px;border:1px solid #ccc;border-radius:8px;
  font:inherit;background:#fff;color:var(--fg)}
 textarea{min-height:220px;resize:vertical;line-height:1.9}
 input[type=text].big{font-size:22px;font-weight:800;letter-spacing:-.01em}
@@ -43,7 +43,7 @@ button.save:disabled{opacity:.4;cursor:default}
 a.view{font-size:13px;color:var(--muted)}
 .status{font-size:13px;color:var(--muted)}
 .status.ok{color:#1a9e4b}.status.err{color:var(--red)}
-.tokenbox{padding:40px;max-width:620px}
+.tokenbox{padding:40px;max-width:560px}
 .tokenbox input{margin-top:10px}
 .hint{font-size:13px;color:var(--muted);margin-top:8px}
 .empty{padding:60px 40px;color:var(--muted)}
@@ -56,60 +56,41 @@ a.view{font-size:13px;color:var(--muted)}
   <div class="right">
     <span id="conn"></span>
     <a class="view" href="/news/" target="_blank">サイトを見る ↗</a>
-    <button id="logout" class="view" style="border:0;background:none;cursor:pointer">接続を解除</button>
+    <button id="logout" class="view" style="border:0;background:none;cursor:pointer">ログアウト</button>
   </div>
 </header>
 
 <div id="app"></div>
 
 <script>
-const OWNER="katsutoshi-honda", REPO="actorsbookmag", BRANCH="main";
-const CATS=["映画","本・書店","ストリート","ファッション"];
 const app=document.getElementById("app");
 let NEWS=[], sel=null, pendingFile=null;
 
 // ---- utils ----
 const esc=s=>(s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const token=()=>localStorage.getItem("gh_token")||"";
+const pw=()=>sessionStorage.getItem("edit_pw")||localStorage.getItem("edit_pw")||"";
 function u8ToB64(u8){let s="";const c=0x8000;for(let i=0;i<u8.length;i+=c)s+=String.fromCharCode.apply(null,u8.subarray(i,i+c));return btoa(s);}
-const strToB64=str=>u8ToB64(new TextEncoder().encode(str));
-const b64ToStr=b=>new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\n/g,"")),c=>c.charCodeAt(0)));
-function ghHeaders(){return {"Authorization":"Bearer "+token(),"Accept":"application/vnd.github+json"};}
-async function ghGet(path){
-  const r=await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}`,{headers:ghHeaders(),cache:"no-store"});
-  if(r.status===404)return null;
-  if(!r.ok)throw new Error("読み込み失敗 ("+r.status+")");
-  return r.json();
-}
-async function ghPut(path,contentB64,message,sha){
-  const body={message,content:contentB64,branch:BRANCH};if(sha)body.sha=sha;
-  const r=await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`,
-    {method:"PUT",headers:ghHeaders(),body:JSON.stringify(body)});
-  if(!r.ok){let t="";try{t=(await r.json()).message||"";}catch(e){}throw new Error("保存失敗 ("+r.status+") "+t);}
-  return r.json();
-}
 function fmtDate(iso){try{const d=new Date(iso);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;}catch(e){return "";}}
 
-// ---- 認証ゲート ----
 function renderConn(){
-  document.getElementById("conn").innerHTML = token()
-    ? '<span class="dotok">● 接続済み</span>' : '<span class="dotng">● 未接続</span>';
+  document.getElementById("conn").innerHTML = pw()
+    ? '<span class="dotok">● ログイン中</span>' : '<span class="dotng">● 未ログイン</span>';
 }
-function tokenGate(){
+
+// ---- パスワードゲート ----
+function passwordGate(){
   renderConn();
   app.innerHTML=`<div class="tokenbox">
-    <h2>編集をはじめるには、GitHubトークンを一度だけ登録します</h2>
-    <p class="hint">保存(コミット)にトークンが必要です。トークンは<b>このブラウザ内だけ</b>に保存され、外部には送られません。</p>
-    <label>GitHub Personal Access Token（repo権限）</label>
-    <input id="tok" type="text" placeholder="ghp_...">
-    <p class="hint">※前に発行した <code>actorsbookmag-push</code> のトークンがそのまま使えます。</p>
-    <p style="margin-top:16px"><button class="save" id="savetok">接続する</button></p>
+    <h2>編集するにはパスワードを入力してください</h2>
+    <p class="hint">Vercelに設定した <b>EDIT_PASSWORD</b> を入力します。パスワードはこのブラウザ内だけに保存されます。</p>
+    <label>パスワード</label>
+    <input id="pw" type="password" placeholder="••••••••">
+    <p style="margin-top:16px"><button class="save" id="savepw">ログイン</button>
+      <span class="status" id="pwstatus" style="margin-left:12px"></span></p>
   </div>`;
-  document.getElementById("savetok").onclick=()=>{
-    const v=document.getElementById("tok").value.trim();
-    if(!v.startsWith("ghp_")&&!v.startsWith("github_pat_")){alert("トークンの形式が違うようです（ghp_ で始まります）");return;}
-    localStorage.setItem("gh_token",v); boot();
-  };
+  const go=()=>{const v=document.getElementById("pw").value;if(!v){return;}localStorage.setItem("edit_pw",v);boot();};
+  document.getElementById("savepw").onclick=go;
+  document.getElementById("pw").addEventListener("keydown",e=>{if(e.key==="Enter")go();});
 }
 
 // ---- 一覧 + 編集 ----
@@ -128,8 +109,8 @@ function shell(){
 function renderList(){
   const el=document.getElementById("list");
   el.innerHTML=NEWS.map((a,i)=>{
-    const pub=a.status!=='draft';
-    const badge=pub?'<span class="st st-pub">● 公開</span>':'<span class="st st-draft">○ 下書き</span>';
+    const isPub=a.status!=='draft';
+    const badge=isPub?'<span class="st st-pub">● 公開</span>':'<span class="st st-draft">○ 下書き</span>';
     return `<button class="item ${sel===i?'sel':''}" data-i="${i}">
      ${esc(a.headline||'(無題)')}<small>${badge}　${esc(a.category||'映画')}</small></button>`;}).join("");
   [...el.querySelectorAll(".item")].forEach(b=>b.onclick=()=>{sel=+b.dataset.i;pendingFile=null;renderList();renderEditor();});
@@ -137,13 +118,13 @@ function renderList(){
 function renderEditor(){
   if(sel==null)return;
   const a=NEWS[sel];
-  const pub=a.status!=='draft';
+  const isPub=a.status!=='draft';
   document.getElementById("editor").innerHTML=`
     <label>見出し（タイトル）</label>
     <input id="f_head" class="big" type="text" value="${esc(a.headline||'')}">
     <div class="row2">
       <div><label>カテゴリ</label>
-        <select id="f_cat">${CATS.map(c=>`<option ${a.category===c?'selected':''}>${c}</option>`).join("")}</select></div>
+        <select id="f_cat">${["映画","本・書店","ストリート","ファッション"].map(c=>`<option ${a.category===c?'selected':''}>${c}</option>`).join("")}</select></div>
       <div><label>リード（サブ見出し）</label>
         <input id="f_dek" type="text" value="${esc(a.dek||'')}"></div>
     </div>
@@ -156,7 +137,7 @@ function renderEditor(){
       <div><label>または画像URL</label><input id="f_url" type="text" value="${esc((a.background||'').startsWith('http')?a.background:'')}" placeholder="https://..."></div>
     </div>
     <div class="bar">
-      <label class="toggle"><input type="checkbox" id="f_pub" ${pub?'checked':''}><span>公開する</span></label>
+      <label class="toggle"><input type="checkbox" id="f_pub" ${isPub?'checked':''}><span>公開する</span></label>
       <button class="save" id="save">保存</button>
       <a class="view" href="/news/article.html?id=${encodeURIComponent(a.id)}" target="_blank">プレビュー ↗</a>
       <span class="status" id="status"></span>
@@ -176,6 +157,7 @@ function newArticle(){
 async function save(){
   const btn=document.getElementById("save"), st=document.getElementById("status");
   const setStatus=(m,cls)=>{st.className="status "+(cls||"");st.textContent=m;};
+  if(!pw()){passwordGate();return;}
   btn.disabled=true; setStatus("保存中…");
   try{
     const a={...NEWS[sel]};
@@ -186,24 +168,24 @@ async function save(){
     a.status=document.getElementById("f_pub").checked ? "published" : "draft";
     const url=document.getElementById("f_url").value.trim();
 
-    // 背景画像: ファイルが選ばれていればアップロード、なければURL欄を採用
+    let image=null;
     if(pendingFile){
-      setStatus("画像をアップロード中…");
+      setStatus("画像を読み込み中…");
       const buf=new Uint8Array(await pendingFile.arrayBuffer());
-      const ext=(pendingFile.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg";
-      const path=`images/news/bg/${a.id}-${Date.now()}.${ext}`;
-      await ghPut(path,u8ToB64(buf),"cms: upload bg for "+a.id);
-      a.background="/"+path;
+      const ext=(pendingFile.name.split(".").pop()||"jpg");
+      image={ext, dataB64:u8ToB64(buf)};
     } else if(url){ a.background=url; }
 
-    // news.json を最新取得 → 該当を差し替え → コミット
-    setStatus("記事を保存中…");
-    const cur=await ghGet("data/news.json");
-    let arr=cur?JSON.parse(b64ToStr(cur.content)):[];
-    const i=arr.findIndex(x=>x.id===a.id);
-    if(i>=0) arr[i]=a; else arr.unshift(a);
-    await ghPut("data/news.json",strToB64(JSON.stringify(arr,null,2)),"cms: edit "+a.id, cur?cur.sha:undefined);
-
+    setStatus("保存中…");
+    const resp=await fetch("/api/save",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({password:pw(), record:a, image})});
+    let data={}; try{data=await resp.json();}catch(e){}
+    if(!resp.ok){
+      if(resp.status===401){ setStatus("⚠ パスワードが違います。ログアウトして入れ直してください。","err"); }
+      else{ setStatus("⚠ "+(data.error||("失敗 "+resp.status)),"err"); }
+      btn.disabled=false; return;
+    }
+    if(data.background) a.background=data.background;
     NEWS[sel]=a; pendingFile=null; renderList();
     setStatus("✓ 保存しました。1分ほどで公開に反映されます。","ok");
   }catch(e){ setStatus("⚠ "+e.message,"err"); }
@@ -214,14 +196,13 @@ async function save(){
 async function boot(){
   renderConn();
   try{
-    // 一覧は公開JSONから読み込み（トークン不要）。保存時のみAPIを使う
     const r=await fetch("/data/news.json",{cache:"no-store"});
     NEWS=await r.json();
   }catch(e){ NEWS=[]; }
   shell();
 }
-document.getElementById("logout").onclick=()=>{localStorage.removeItem("gh_token");tokenGate();};
-if(token()) boot(); else tokenGate();
+document.getElementById("logout").onclick=()=>{localStorage.removeItem("edit_pw");sessionStorage.removeItem("edit_pw");passwordGate();};
+if(pw()) boot(); else passwordGate();
 </script>
 </body>
 </html>
