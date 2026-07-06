@@ -260,6 +260,7 @@ def save_to_site(article: dict, source: dict, image_path: str | None) -> dict:
         "source_url": source.get("url", ""),
         "thumbnail": web_thumb,
         "background": "",  # CMSで差し替え可能なヒーロー背景画像
+        "status": "draft",  # 既定は下書き=ストック。CMSで「公開」にすると出る
         "published_at": ts,
     }
     news.insert(0, record)  # 新着順

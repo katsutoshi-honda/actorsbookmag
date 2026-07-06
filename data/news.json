@@ -15,7 +15,8 @@
     "source": "actorsbookmag original",
     "source_url": "",
     "thumbnail": "/images/news/stranger-7-3-2ba28a43-1782978609.jpg",
-    "published_at": "2026-07-02T07:50:09.546468+00:00"
+    "published_at": "2026-07-02T07:50:09.546468+00:00",
+    "status": "published"
   },
   {
     "id": "post-58920b2c-1782977835",
@@ -33,7 +34,8 @@
     "source": "actorsbookmag original",
     "source_url": "",
     "thumbnail": "/images/news/post-58920b2c-1782977835.jpg",
-    "published_at": "2026-07-02T07:37:15.452193+00:00"
+    "published_at": "2026-07-02T07:37:15.452193+00:00",
+    "status": "published"
   },
   {
     "id": "28-e513751b-1782977258",
@@ -51,6 +53,7 @@
     "source": "actorsbookmag original",
     "source_url": "",
     "thumbnail": "/images/news/28-e513751b-1782977258.jpg",
-    "published_at": "2026-07-02T07:27:38.152976+00:00"
+    "published_at": "2026-07-02T07:27:38.152976+00:00",
+    "status": "published"
   }
 ]

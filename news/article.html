@@ -29,6 +29,12 @@ fetch('/data/news.json').then(r=>r.json()).then(news=>{
   const a=news.find(x=>x.id===id);
   if(!a){post.innerHTML='<p class="empty">記事が見つかりませんでした。 <a href="/news/">Indexへ</a></p>';return;}
   document.title=a.headline+' — actorsbookmag';
+  if(a.status==='draft'){
+    const b=document.createElement('div');
+    b.textContent='下書き（未公開）— このページはまだ一覧に出ていません';
+    b.style.cssText='background:#ffe8e8;color:#c00;text-align:center;padding:8px;font-size:13px;letter-spacing:.04em';
+    document.body.insertBefore(b, document.body.firstChild);
+  }
   const cat=esc(a.category||'映画'), date=fmtDate(a.published_at);
   const hero=document.getElementById('hero');
   let heroCarriesTitle=false;

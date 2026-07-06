@@ -24,6 +24,10 @@ aside h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(
 .item.sel{background:#111;color:#fff}
 .item small{display:block;color:var(--muted);font-size:11px;letter-spacing:.08em}
 .item.sel small{color:#bbb}
+.st{font-weight:700}.st-pub{color:#1a9e4b}.st-draft{color:#c98a00}
+.item.sel .st-pub{color:#7ee2a3}.item.sel .st-draft{color:#f0c86b}
+.toggle{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;user-select:none}
+.toggle input{width:18px;height:18px}
 .newbtn{width:100%;margin-bottom:12px;padding:10px;border:1px dashed #bbb;background:none;border-radius:8px;cursor:pointer;font:inherit}
 section.edit{padding:30px 40px;max-width:760px}
 label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:20px 0 6px}
@@ -123,13 +127,17 @@ function shell(){
 }
 function renderList(){
   const el=document.getElementById("list");
-  el.innerHTML=NEWS.map((a,i)=>`<button class="item ${sel===i?'sel':''}" data-i="${i}">
-     ${esc(a.headline||'(無題)')}<small>${esc(a.category||'映画')}・${fmtDate(a.published_at)}</small></button>`).join("");
+  el.innerHTML=NEWS.map((a,i)=>{
+    const pub=a.status!=='draft';
+    const badge=pub?'<span class="st st-pub">● 公開</span>':'<span class="st st-draft">○ 下書き</span>';
+    return `<button class="item ${sel===i?'sel':''}" data-i="${i}">
+     ${esc(a.headline||'(無題)')}<small>${badge}　${esc(a.category||'映画')}</small></button>`;}).join("");
   [...el.querySelectorAll(".item")].forEach(b=>b.onclick=()=>{sel=+b.dataset.i;pendingFile=null;renderList();renderEditor();});
 }
 function renderEditor(){
   if(sel==null)return;
   const a=NEWS[sel];
+  const pub=a.status!=='draft';
   document.getElementById("editor").innerHTML=`
     <label>見出し（タイトル）</label>
     <input id="f_head" class="big" type="text" value="${esc(a.headline||'')}">
@@ -148,8 +156,9 @@ function renderEditor(){
       <div><label>または画像URL</label><input id="f_url" type="text" value="${esc((a.background||'').startsWith('http')?a.background:'')}" placeholder="https://..."></div>
     </div>
     <div class="bar">
-      <button class="save" id="save">保存して公開</button>
-      <a class="view" href="/news/article.html?id=${encodeURIComponent(a.id)}" target="_blank">この記事を見る ↗</a>
+      <label class="toggle"><input type="checkbox" id="f_pub" ${pub?'checked':''}><span>公開する</span></label>
+      <button class="save" id="save">保存</button>
+      <a class="view" href="/news/article.html?id=${encodeURIComponent(a.id)}" target="_blank">プレビュー ↗</a>
       <span class="status" id="status"></span>
     </div>`;
   const fileEl=document.getElementById("f_file");
@@ -160,7 +169,7 @@ function renderEditor(){
 function newArticle(){
   const id="post-"+Math.random().toString(36).slice(2,10)+"-"+Date.now();
   NEWS.unshift({id,headline:"（新規記事）",dek:"",body:"",category:"映画",hashtags:[],
-    source:"actorsbookmag original",source_url:"",thumbnail:"",background:"",published_at:new Date().toISOString()});
+    source:"actorsbookmag original",source_url:"",thumbnail:"",background:"",status:"draft",published_at:new Date().toISOString()});
   sel=0;pendingFile=null;renderList();renderEditor();
 }
 
@@ -174,6 +183,7 @@ async function save(){
     a.dek=document.getElementById("f_dek").value.trim();
     a.body=document.getElementById("f_body").value;
     a.category=document.getElementById("f_cat").value;
+    a.status=document.getElementById("f_pub").checked ? "published" : "draft";
     const url=document.getElementById("f_url").value.trim();
 
     // 背景画像: ファイルが選ばれていればアップロード、なければURL欄を採用

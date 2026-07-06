@@ -24,7 +24,8 @@
 <script>
 function esc(s){return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function fmtDate(iso){try{const d=new Date(iso);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;}catch(e){return "";}}
-fetch('/data/news.json').then(r=>r.json()).then(news=>{
+fetch('/data/news.json').then(r=>r.json()).then(all=>{
+  const news=all.filter(a=>a.status!=='draft');  // 公開のみ
   const el=document.getElementById('list');
   if(!news.length){el.innerHTML='<p class="empty">記事はまだありません。</p>';return;}
   el.innerHTML=news.map(a=>`
