@@ -44,6 +44,14 @@ button.save:disabled{opacity:.4;cursor:default}
 .pub{background:#1a9e4b;color:#fff;border:0}
 .unpub{background:#fff;color:#c0392b;border:1px solid #e3b7b1}
 .pubbtn:disabled{opacity:.4;cursor:default}
+.sns{margin-top:26px;padding:20px;border:1px solid var(--line);border-radius:12px;background:#fafafa}
+.snshd{font-weight:800;font-size:15px;margin-bottom:4px}
+.snshd span{font-weight:400;font-size:12px;color:#999}
+.snsbtns{display:flex;gap:12px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.snsbtn{border:0;border-radius:8px;padding:11px 20px;font:inherit;font-weight:700;cursor:pointer;color:#fff}
+.snsbtn.x{background:#111}
+.snsbtn.ig{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)}
+.snsnote{font-size:11px;color:#999}
 a.view{font-size:13px;color:var(--muted)}
 .status{font-size:13px;color:var(--muted)}
 .status.ok{color:#1a9e4b}.status.err{color:var(--red)}
@@ -75,6 +83,24 @@ const esc=s=>(s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"
 const pw=()=>sessionStorage.getItem("edit_pw")||localStorage.getItem("edit_pw")||"";
 function u8ToB64(u8){let s="";const c=0x8000;for(let i=0;i<u8.length;i+=c)s+=String.fromCharCode.apply(null,u8.subarray(i,i+c));return btoa(s);}
 function fmtDate(iso){try{const d=new Date(iso);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;}catch(e){return "";}}
+
+const SITE="https://actorsbookmag.vercel.app";
+// X用テキストの自動生成（見出し+リード+リンク+ハッシュタグ3つ）
+function genX(a){
+  const url=SITE+"/news/article.html?id="+a.id;
+  const tags=(a.hashtags||[]).slice(0,3).join(" ");
+  let t=(a.headline||"");
+  if(a.dek) t+="\n\n"+a.dek;
+  t+="\n\n▶ "+url;
+  if(tags) t+="\n"+tags;
+  return t;
+}
+// Instagram用テキスト（キャプション長め・ハッシュタグ多め。リンクはプロフィール誘導）
+function genIG(a){
+  const base=(a.hashtags||[]).map(t=>t).join(" ");
+  const extra="#映画 #インディペンデント映画 #ミニシアター #cinema #film";
+  return [a.headline||"", a.dek||"", "▶ 記事はプロフィールのリンクから", (base+" "+extra).trim()].filter(Boolean).join("\n\n");
+}
 
 function renderConn(){
   document.getElementById("conn").innerHTML = pw()
@@ -140,6 +166,20 @@ function renderEditor(){
       <div><label>画像をアップロード</label><input id="f_file" type="file" accept="image/*"></div>
       <div><label>または画像URL</label><input id="f_url" type="text" value="${esc((a.background||'').startsWith('http')?a.background:'')}" placeholder="https://..."></div>
     </div>
+
+    <div class="sns">
+      <div class="snshd">SNS投稿テキスト<span>（自動生成・そのまま手直しOK）</span></div>
+      <label>X（旧Twitter）</label>
+      <textarea id="f_xtext" style="min-height:100px">${esc(a.x_text!=null?a.x_text:genX(a))}</textarea>
+      <label>Instagram <span style="text-transform:none;letter-spacing:0;color:#999">— サムネイル画像と一緒に投稿されます</span></label>
+      <textarea id="f_igtext" style="min-height:120px">${esc(a.ig_text!=null?a.ig_text:genIG(a))}</textarea>
+      <div class="snsbtns">
+        <button class="snsbtn x" id="postx">Xに投稿</button>
+        <button class="snsbtn ig" id="postig">Instagramに投稿</button>
+        <span class="snsnote">Xは投稿画面が開きます／Instagramはキー設定後にフル自動</span>
+      </div>
+    </div>
+
     <div class="bar">
       <button class="save" id="save">保存</button>
       ${isPub
@@ -153,6 +193,8 @@ function renderEditor(){
     if(pendingFile){const u=URL.createObjectURL(pendingFile);const p=document.getElementById("bgprev");p.src=u;p.style.visibility="visible";}};
   document.getElementById("save").onclick=()=>save();               // 状態は変えず保存
   document.getElementById("pubtoggle").onclick=()=>save(isPub?"draft":"published"); // 公開/非公開の切替
+  document.getElementById("postx").onclick=()=>postSNS("x");
+  document.getElementById("postig").onclick=()=>postSNS("instagram");
 }
 function newArticle(){
   const id="post-"+Math.random().toString(36).slice(2,10)+"-"+Date.now();
@@ -172,6 +214,8 @@ async function save(statusOverride){
     a.dek=document.getElementById("f_dek").value.trim();
     a.body=document.getElementById("f_body").value;
     a.category=document.getElementById("f_cat").value;
+    const _xt=document.getElementById("f_xtext"); if(_xt) a.x_text=_xt.value;
+    const _igt=document.getElementById("f_igtext"); if(_igt) a.ig_text=_igt.value;
     if(statusOverride) a.status=statusOverride;   // ボタンで明示切替。無ければ現状維持
     const url=document.getElementById("f_url").value.trim();
 
@@ -199,6 +243,20 @@ async function save(statusOverride){
       : statusOverride==="draft"   ? "✓ 非公開にしました。1分ほどで反映されます。"
       : "✓ 保存しました。1分ほどで反映されます。", "ok");
   }catch(e){ setStatus("⚠ "+e.message,"err"); if(btn) btn.disabled=false; }
+}
+
+// SNS投稿ボタン
+function postSNS(target){
+  const xt=(document.getElementById("f_xtext")||{}).value||"";
+  const igt=(document.getElementById("f_igtext")||{}).value||"";
+  if(target==="x"){
+    // Xは投稿インテントで即・投稿画面へ（キー不要）。※画像添付はAPI連携後に対応
+    window.open("https://x.com/intent/post?text="+encodeURIComponent(xt), "_blank", "noopener");
+  }else{
+    // InstagramはAPI/アプリが必須。今はキャプションをコピーして手動投稿を案内
+    if(navigator.clipboard) navigator.clipboard.writeText(igt);
+    alert("Instagramのキャプションをコピーしました。\n\nサムネイル画像を保存 → Instagramアプリで画像を選び、キャプションを貼り付けて投稿してください。\n（画像つきの自動投稿は、Instagram APIキー設定後に有効化します）");
+  }
 }
 
 // ---- 起動 ----
