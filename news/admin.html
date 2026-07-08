@@ -40,6 +40,10 @@ input[type=text].big{font-size:22px;font-weight:800;letter-spacing:-.01em}
 .bar{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:16px 40px;display:flex;gap:16px;align-items:center;margin:30px -40px 0}
 button.save{background:#111;color:#fff;border:0;border-radius:8px;padding:12px 26px;font:inherit;font-weight:700;cursor:pointer}
 button.save:disabled{opacity:.4;cursor:default}
+.pubbtn{border-radius:8px;padding:12px 22px;font:inherit;font-weight:700;cursor:pointer}
+.pub{background:#1a9e4b;color:#fff;border:0}
+.unpub{background:#fff;color:#c0392b;border:1px solid #e3b7b1}
+.pubbtn:disabled{opacity:.4;cursor:default}
 a.view{font-size:13px;color:var(--muted)}
 .status{font-size:13px;color:var(--muted)}
 .status.ok{color:#1a9e4b}.status.err{color:var(--red)}
@@ -137,15 +141,18 @@ function renderEditor(){
       <div><label>または画像URL</label><input id="f_url" type="text" value="${esc((a.background||'').startsWith('http')?a.background:'')}" placeholder="https://..."></div>
     </div>
     <div class="bar">
-      <label class="toggle"><input type="checkbox" id="f_pub" ${isPub?'checked':''}><span>公開する</span></label>
       <button class="save" id="save">保存</button>
+      ${isPub
+        ? '<button class="pubbtn unpub" id="pubtoggle">非公開にする</button>'
+        : '<button class="pubbtn pub" id="pubtoggle">公開する</button>'}
       <a class="view" href="/news/article.html?id=${encodeURIComponent(a.id)}" target="_blank">プレビュー ↗</a>
       <span class="status" id="status"></span>
     </div>`;
   const fileEl=document.getElementById("f_file");
   fileEl.onchange=()=>{pendingFile=fileEl.files[0]||null;
     if(pendingFile){const u=URL.createObjectURL(pendingFile);const p=document.getElementById("bgprev");p.src=u;p.style.visibility="visible";}};
-  document.getElementById("save").onclick=save;
+  document.getElementById("save").onclick=()=>save();               // 状態は変えず保存
+  document.getElementById("pubtoggle").onclick=()=>save(isPub?"draft":"published"); // 公開/非公開の切替
 }
 function newArticle(){
   const id="post-"+Math.random().toString(36).slice(2,10)+"-"+Date.now();
@@ -154,18 +161,18 @@ function newArticle(){
   sel=0;pendingFile=null;renderList();renderEditor();
 }
 
-async function save(){
-  const btn=document.getElementById("save"), st=document.getElementById("status");
-  const setStatus=(m,cls)=>{st.className="status "+(cls||"");st.textContent=m;};
+async function save(statusOverride){
+  const setStatus=(m,cls)=>{const e=document.getElementById("status");if(e){e.className="status "+(cls||"");e.textContent=m;}};
   if(!pw()){passwordGate();return;}
-  btn.disabled=true; setStatus("保存中…");
+  const btn=document.getElementById("save"); if(btn) btn.disabled=true;
+  setStatus("保存中…");
   try{
     const a={...NEWS[sel]};
     a.headline=document.getElementById("f_head").value.trim();
     a.dek=document.getElementById("f_dek").value.trim();
     a.body=document.getElementById("f_body").value;
     a.category=document.getElementById("f_cat").value;
-    a.status=document.getElementById("f_pub").checked ? "published" : "draft";
+    if(statusOverride) a.status=statusOverride;   // ボタンで明示切替。無ければ現状維持
     const url=document.getElementById("f_url").value.trim();
 
     let image=null;
@@ -183,13 +190,15 @@ async function save(){
     if(!resp.ok){
       if(resp.status===401){ setStatus("⚠ パスワードが違います。ログアウトして入れ直してください。","err"); }
       else{ setStatus("⚠ "+(data.error||("失敗 "+resp.status)),"err"); }
-      btn.disabled=false; return;
+      if(btn) btn.disabled=false; return;
     }
     if(data.background) a.background=data.background;
-    NEWS[sel]=a; pendingFile=null; renderList();
-    setStatus("✓ 保存しました。1分ほどで公開に反映されます。","ok");
-  }catch(e){ setStatus("⚠ "+e.message,"err"); }
-  finally{ btn.disabled=false; }
+    NEWS[sel]=a; pendingFile=null; renderList(); renderEditor();  // 再描画でボタンが公開⇄非公開に切替わる
+    setStatus(
+      statusOverride==="published" ? "✓ 公開しました。1分ほどで反映されます。"
+      : statusOverride==="draft"   ? "✓ 非公開にしました。1分ほどで反映されます。"
+      : "✓ 保存しました。1分ほどで反映されます。", "ok");
+  }catch(e){ setStatus("⚠ "+e.message,"err"); if(btn) btn.disabled=false; }
 }
 
 // ---- 起動 ----
