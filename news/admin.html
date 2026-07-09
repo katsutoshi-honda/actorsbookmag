@@ -84,7 +84,51 @@ a.view{font-size:13px;color:var(--muted)}
 
 <script>
 const app=document.getElementById("app");
-let NEWS=[], sel=null, pendingFile=null;
+let NEWS=[], sel=null, pendingFile=null, pendingURL=null;
+
+// ---- Canvasでニュースサムネを"その場で"合成（画像+黒スモーク+見出し）----
+function _coverDraw(ctx,im,W,H){
+  const ir=im.width/im.height, dr=W/H; let w,h,x,y;
+  if(ir>dr){h=H;w=H*ir;x=(W-w)/2;y=0;} else {w=W;h=W/ir;x=0;y=(H-h)/2;}
+  ctx.drawImage(im,x,y,w,h);
+}
+function _wrapCanvas(ctx,text,maxW){
+  const lines=[]; let cur="";
+  for(const ch of (text||"")){ const t=cur+ch; if(ctx.measureText(t).width>maxW && cur){lines.push(cur);cur=ch;} else cur=t; }
+  if(cur)lines.push(cur); return lines.slice(0,5);
+}
+function currentThumbSrc(){
+  if(pendingURL) return pendingURL;
+  const url=(document.getElementById("f_url")||{}).value||"";
+  if(url) return url;
+  return (NEWS[sel]||{}).background||"";
+}
+function drawThumb(){
+  const c=document.getElementById("bgprev"); if(!c||!c.getContext) return;
+  const ctx=c.getContext("2d"); const W=1080,H=1350;
+  const head=(document.getElementById("f_head")||{}).value||"";
+  const dek=(document.getElementById("f_dek")||{}).value||"";
+  const cat=(document.getElementById("f_cat")||{}).value||"映画";
+  const overlay=()=>{
+    ctx.fillStyle="rgba(0,0,0,0.30)"; ctx.fillRect(0,0,W,H);
+    const g=ctx.createLinearGradient(0,H*0.40,0,H); g.addColorStop(0,"rgba(0,0,0,0)"); g.addColorStop(1,"rgba(0,0,0,0.9)"); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    ctx.textBaseline="top";
+    ctx.fillStyle="#fff"; ctx.font="800 40px 'Helvetica Neue',Arial,sans-serif"; ctx.fillText("ACTORSBOOK",64,60);
+    ctx.fillStyle="#ff3c3c"; ctx.font="700 26px 'Hiragino Kaku Gothic ProN','Hiragino Sans',sans-serif"; ctx.fillText(cat,64,108);
+    ctx.fillStyle="#fff"; ctx.font="800 82px 'Hiragino Kaku Gothic ProN','Hiragino Sans',sans-serif";
+    const lines=_wrapCanvas(ctx,head,W-128); const lh=100; let y=H-150-lh*lines.length;
+    lines.forEach(l=>{ctx.fillText(l,64,y);y+=lh;});
+    if(dek){ctx.fillStyle="#cfcfcf"; ctx.font="400 30px 'Hiragino Kaku Gothic ProN','Hiragino Sans',sans-serif"; ctx.fillText(dek.slice(0,26),64,y+12);}
+    ctx.fillStyle="#ff3c3c"; ctx.fillRect(0,H-14,W,14);
+  };
+  ctx.clearRect(0,0,W,H); ctx.fillStyle="#0a0a0a"; ctx.fillRect(0,0,W,H);
+  const src=currentThumbSrc();
+  if(src){
+    const im=new Image(); im.crossOrigin="anonymous";
+    im.onload=()=>{ctx.fillStyle="#0a0a0a";ctx.fillRect(0,0,W,H);_coverDraw(ctx,im,W,H);overlay();};
+    im.onerror=overlay; im.src=src;
+  } else overlay();
+}
 
 // ---- utils ----
 const esc=s=>(s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -170,11 +214,15 @@ function renderEditor(){
     <textarea id="f_body">${esc(a.body||'')}</textarea>
     <label>Xの引用（ツイートURLを改行区切りで貼る）<span style="text-transform:none;letter-spacing:0;color:#999"> — 記事末に本物のツイートが埋め込まれます</span></label>
     <textarea id="f_embeds" style="min-height:64px" placeholder="https://x.com/.../status/...">${esc((a.embeds||[]).join("\n"))}</textarea>
-    <label>背景画像（ヒーローに使われます）</label>
-    <img class="bgprev" id="bgprev" src="${esc(a.background||a.thumbnail||'')}" alt="" onerror="this.style.visibility='hidden'">
-    <div class="row2" style="margin-top:10px">
-      <div><label>画像をアップロード</label><input id="f_file" type="file" accept="image/*"></div>
-      <div><label>または画像URL</label><input id="f_url" type="text" value="${esc((a.background||'').startsWith('http')?a.background:'')}" placeholder="https://..."></div>
+    <label>サムネイル画像 <span style="text-transform:none;letter-spacing:0;color:#999">— 登録すると右にニュースサムネが即生成されます</span></label>
+    <div style="display:flex;gap:20px;align-items:flex-start">
+      <canvas class="bgprev" id="bgprev" width="1080" height="1350"></canvas>
+      <div style="flex:1">
+        <label>画像をアップロード</label><input id="f_file" type="file" accept="image/*">
+        <label style="margin-top:14px">または画像URL</label>
+        <input id="f_url" type="text" value="${esc((a.background||'').startsWith('http')?a.background:'')}" placeholder="https://...">
+        <p class="anote" style="margin-top:12px">見出しを変えると合成も即更新。保存でこのサムネが記事に使われます。</p>
+      </div>
     </div>
 
     <div class="sns">
@@ -207,7 +255,14 @@ function renderEditor(){
     </div>`;
   const fileEl=document.getElementById("f_file");
   fileEl.onchange=()=>{pendingFile=fileEl.files[0]||null;
-    if(pendingFile){const u=URL.createObjectURL(pendingFile);const p=document.getElementById("bgprev");p.src=u;p.style.visibility="visible";}};
+    if(pendingURL){URL.revokeObjectURL(pendingURL);pendingURL=null;}
+    if(pendingFile){pendingURL=URL.createObjectURL(pendingFile);}
+    drawThumb();};
+  const uh=document.getElementById("f_url"); if(uh) uh.oninput=()=>drawThumb();
+  const hh=document.getElementById("f_head"); if(hh) hh.oninput=()=>drawThumb();
+  const dh=document.getElementById("f_dek"); if(dh) dh.oninput=()=>drawThumb();
+  const ch=document.getElementById("f_cat"); if(ch) ch.onchange=()=>drawThumb();
+  drawThumb();  // 初期表示
   document.getElementById("save").onclick=()=>save();               // 状態は変えず保存
   document.getElementById("pubtoggle").onclick=()=>save(isPub?"draft":"published"); // 公開/非公開の切替
   document.getElementById("postx").onclick=()=>postSNS("x");
@@ -245,9 +300,14 @@ async function save(statusOverride){
       image={ext, dataB64:u8ToB64(buf)};
     } else if(url){ a.background=url; }
 
+    // その場合成したニュースサムネ(Canvas)をJPEGで書き出し→thumbnailとして保存
+    let thumb=null;
+    const cv=document.getElementById("bgprev");
+    if(cv&&cv.getContext){ try{ thumb=cv.toDataURL("image/jpeg",0.9).split(",")[1]; }catch(e){} }
+
     setStatus("保存中…");
     const resp=await fetch("/api/save",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({password:pw(), record:a, image})});
+      body:JSON.stringify({password:pw(), record:a, image, thumb})});
     let data={}; try{data=await resp.json();}catch(e){}
     if(!resp.ok){
       if(resp.status===401){ setStatus("⚠ パスワードが違います。ログアウトして入れ直してください。","err"); }

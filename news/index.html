@@ -31,9 +31,9 @@ fetch('/data/news.json').then(r=>r.json()).then(all=>{
   if(!news.length){el.innerHTML='<p class="empty">記事はまだありません。</p>';return;}
   el.innerHTML=news.map(a=>`
     <a class="row" href="/news/article.html?id=${encodeURIComponent(a.id)}">
-      ${a.background
-        ? `<span class="thumb photo" style="background-image:url('${esc(a.background)}')"><span class="tsmoke"></span></span>`
-        : (a.thumbnail?`<img class="thumb" src="${esc(a.thumbnail)}" alt="">`:'<span class="thumb"></span>')}
+      ${a.thumbnail
+        ? `<img class="thumb" src="${esc(a.thumbnail)}" alt="">`
+        : (a.background?`<span class="thumb photo" style="background-image:url('${esc(a.background)}')"><span class="tsmoke"></span></span>`:'<span class="thumb"></span>')}
       <div>
         <div class="meta"><span class="cat">${esc(a.category||'映画')}</span><span>${fmtDate(a.published_at)}</span></div>
         <h2>${esc(a.headline)}</h2>

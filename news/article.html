@@ -39,7 +39,9 @@ fetch('/data/news.json').then(r=>r.json()).then(news=>{
   const cat=esc(a.category||'映画'), date=fmtDate(a.published_at);
   const hero=document.getElementById('hero');
   let heroCarriesTitle=false;
-  if(a.background){
+  if(a.thumbnail){
+    hero.innerHTML=`<div class="hero"><img src="${esc(a.thumbnail)}" alt=""></div>`;
+  } else if(a.background){
     heroCarriesTitle=true;
     hero.innerHTML=`<div class="hero--photo" style="background-image:url('${esc(a.background)}')">
         <div class="scrim"></div>
@@ -49,8 +51,6 @@ fetch('/data/news.json').then(r=>r.json()).then(news=>{
           ${a.dek?`<p class="hdek">${esc(a.dek)}</p>`:''}
         </div>
       </div>`;
-  } else if(a.thumbnail){
-    hero.innerHTML=`<div class="hero"><img src="${esc(a.thumbnail)}" alt=""></div>`;
   }
   const tags=(a.hashtags||[]).map(esc).join('　');
   const src=(a.source && a.source!=='actorsbookmag original' && a.source!=='manual')

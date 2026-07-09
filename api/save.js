@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: "POSTのみ対応しています" });
   }
 
-  const { password, record, image } = req.body || {};
+  const { password, record, image, thumb } = req.body || {};
 
   // 1) パスワード照合
   if (!process.env.EDIT_PASSWORD || password !== process.env.EDIT_PASSWORD) {
@@ -58,6 +58,21 @@ module.exports = async (req, res) => {
         return res.status(502).json({ error: "画像保存に失敗: " + t.slice(0, 200) });
       }
       record.background = "/" + path;
+    }
+
+    // 2.5) その場合成したニュースサムネ(Canvas)をthumbnailとして保存
+    if (thumb) {
+      const tpath = `images/news/${record.id}.jpg`;
+      let tsha;
+      const tcur = await api(`${tpath}?ref=${BRANCH}`);
+      if (tcur.ok) tsha = (await tcur.json()).sha;
+      const tr = await api(tpath, {
+        method: "PUT",
+        body: JSON.stringify({
+          message: `cms: thumbnail ${record.id}`, content: thumb, branch: BRANCH, sha: tsha,
+        }),
+      });
+      if (tr.ok) record.thumbnail = "/" + tpath;
     }
 
     // 3) 最新の news.json を取得(sha) → 該当recordを差し替え(なければ先頭に追加)
