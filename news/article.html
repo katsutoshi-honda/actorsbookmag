@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>actorsbookmag</title>
 <link rel="stylesheet" href="/news/style.css">
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </head>
 <body>
 <header class="site"><div class="wrap"><div class="inner">
@@ -58,14 +59,22 @@ fetch('/data/news.json').then(r=>r.json()).then(news=>{
       <div class="meta"><span class="cat">${cat}</span><span>${date}</span></div>
       <h1>${esc(a.headline)}</h1>
       ${a.dek?`<p class="dek">${esc(a.dek)}</p>`:''}`;
+  const embeds=(a.embeds||[]).filter(u=>/(x|twitter)\.com/.test(u));
+  const embedHtml=embeds.length
+    ? `<div class="embeds"><div class="ehd">Xでの反応</div>${embeds.map(u=>`<blockquote class="twitter-tweet"><a href="${esc(u)}"></a></blockquote>`).join("")}</div>`
+    : '';
   post.innerHTML=`
     <article class="post">
       ${head}
       <div class="body">${esc(a.body)}</div>
+      ${embedHtml}
       ${tags?`<div class="tags">${tags}</div>`:''}
       ${src}
       <a class="back" href="/news/">← Index</a>
     </article>`;
+  // 埋め込みツイートを描画（widgets.js読込後）
+  if(embeds.length){ if(window.twttr&&twttr.widgets){twttr.widgets.load();}
+    else{const t=setInterval(()=>{if(window.twttr&&twttr.widgets){twttr.widgets.load();clearInterval(t);}},300);setTimeout(()=>clearInterval(t),6000);} }
 }).catch(e=>{document.getElementById('post').innerHTML='<p class="empty">読み込みに失敗しました。</p>';});
 </script>
 </body>

@@ -17,7 +17,10 @@
     "thumbnail": "/images/news/youtube-c2029518-1783562356.jpg",
     "background": "",
     "status": "draft",
-    "published_at": "2026-07-09T01:59:16.220463+00:00"
+    "published_at": "2026-07-09T01:59:16.220463+00:00",
+    "embeds": [
+      "https://x.com/denfaminicogame/status/2072549939021001031"
+    ]
   },
   {
     "id": "post-581f3a79-1783305264",

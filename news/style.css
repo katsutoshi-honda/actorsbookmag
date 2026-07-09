@@ -77,6 +77,8 @@ article.post h1{font-size:clamp(30px,5.2vw,58px); line-height:1.04; font-weight:
      letter-spacing:-.025em; text-align:center; margin:0 auto 18px; max-width:20ch}
 article.post .dek{text-align:center; color:#555; font-size:19px; max-width:44ch; margin:0 auto 8px}
 article.post .body{font-size:18px; line-height:2.0; white-space:pre-wrap; margin-top:52px}
+article.post .embeds{margin-top:44px}
+article.post .embeds .ehd{font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:14px}
 article.post .tags{margin-top:44px; color:var(--muted); font-size:13px; letter-spacing:.06em}
 article.post .src{margin-top:16px; font-size:13px; color:var(--muted)}
 article.post .src a{color:var(--red)}

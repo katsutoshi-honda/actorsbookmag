@@ -168,6 +168,8 @@ function renderEditor(){
     </div>
     <label>本文</label>
     <textarea id="f_body">${esc(a.body||'')}</textarea>
+    <label>Xの引用（ツイートURLを改行区切りで貼る）<span style="text-transform:none;letter-spacing:0;color:#999"> — 記事末に本物のツイートが埋め込まれます</span></label>
+    <textarea id="f_embeds" style="min-height:64px" placeholder="https://x.com/.../status/...">${esc((a.embeds||[]).join("\n"))}</textarea>
     <label>背景画像（ヒーローに使われます）</label>
     <img class="bgprev" id="bgprev" src="${esc(a.background||a.thumbnail||'')}" alt="" onerror="this.style.visibility='hidden'">
     <div class="row2" style="margin-top:10px">
@@ -231,6 +233,7 @@ async function save(statusOverride){
     a.category=document.getElementById("f_cat").value;
     const _xt=document.getElementById("f_xtext"); if(_xt) a.x_text=_xt.value;
     const _igt=document.getElementById("f_igtext"); if(_igt) a.ig_text=_igt.value;
+    const _emb=document.getElementById("f_embeds"); if(_emb) a.embeds=_emb.value.split("\n").map(s=>s.trim()).filter(Boolean);
     if(statusOverride) a.status=statusOverride;   // ボタンで明示切替。無ければ現状維持
     const url=document.getElementById("f_url").value.trim();
 
