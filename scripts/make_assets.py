@@ -31,10 +31,15 @@ _font = pipeline._font
 _wrap = pipeline._wrap_jp
 
 
-def _find_font(candidates, fallback):
+def _find_font(candidates, fallback, globs=()):
     for p in candidates:
         if Path(p).exists():
             return p
+    import glob
+    for pat in globs:  # Linux等でファイル名が違っても拾えるよう総当たり
+        hits = sorted(glob.glob(pat, recursive=True))
+        if hits:
+            return hits[0]
     return fallback
 
 
@@ -43,11 +48,14 @@ JP = _find_font([
     "/System/Library/Fonts/Hiragino Sans GB.ttc",               # macOS
     "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",      # Linux (fonts-noto-cjk)
     "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
-], pipeline.JP_FONT)
+], pipeline.JP_FONT, globs=[
+    "/usr/share/fonts/**/*CJK*.ttc", "/usr/share/fonts/**/*CJK*.otf",
+    "/usr/share/fonts/**/NotoSansJP*.*", "/usr/share/fonts/**/*apanese*.*",
+])
 LAT = _find_font([
     "/System/Library/Fonts/Supplemental/Arial Black.ttf",       # macOS
     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",     # Linux
-], pipeline.LATIN_FONT)
+], pipeline.LATIN_FONT, globs=["/usr/share/fonts/**/DejaVuSans-Bold.ttf"])
 # ヒラギノは太字がindex 1、それ以外(Noto等)はindex 0
 JP_BOLD_IDX = 1 if "Hiragino" in JP else 0
 
