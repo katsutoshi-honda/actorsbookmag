@@ -35,6 +35,8 @@ nav a:hover{color:var(--fg)}
      padding:44px 0; border-top:1px solid var(--line)}
 .row:first-child{border-top:none; padding-top:0}
 .row .thumb{width:120px; aspect-ratio:4/5; object-fit:cover; background:#f2f2f2}
+.row .thumb.photo{position:relative; display:block; background-size:cover; background-position:center}
+.row .thumb.photo .tsmoke{position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.62))}
 .row h2{font-size:clamp(24px,3.4vw,38px); line-height:1.08; font-weight:800; letter-spacing:-.02em; margin:14px 0 0}
 .row .dek{color:#666; margin:16px 0 0; max-width:56ch; font-size:15px}
 @media(max-width:640px){
@@ -60,7 +62,7 @@ nav a:hover{color:var(--fg)}
 .hero--photo{width:100vw; margin-left:calc(50% - 50vw); position:relative;
      min-height:82vh; background:#0a0a0a center/cover no-repeat; display:flex; align-items:flex-end}
 .hero--photo .scrim{position:absolute; inset:0;
-     background:linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,.75) 100%)}
+     background:linear-gradient(180deg, rgba(0,0,0,.30) 0%, rgba(0,0,0,.12) 40%, rgba(0,0,0,.85) 100%)}
 .hero--photo .cap{position:relative; z-index:1; max-width:1180px; width:100%;
      margin:0 auto; padding:0 48px 56px; color:#fff}
 .hero--photo .kick{font-size:12px; letter-spacing:.14em; text-transform:uppercase;
