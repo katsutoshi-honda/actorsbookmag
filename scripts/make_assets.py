@@ -29,8 +29,27 @@ NEWS_JSON = ROOT / "data" / "news.json"
 RED = (255, 60, 60)
 _font = pipeline._font
 _wrap = pipeline._wrap_jp
-JP = pipeline.JP_FONT
-LAT = pipeline.LATIN_FONT
+
+
+def _find_font(candidates, fallback):
+    for p in candidates:
+        if Path(p).exists():
+            return p
+    return fallback
+
+
+# macOS(ローカル)とLinux(GitHub Actions)の両方でフォントを解決
+JP = _find_font([
+    "/System/Library/Fonts/Hiragino Sans GB.ttc",               # macOS
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",      # Linux (fonts-noto-cjk)
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+], pipeline.JP_FONT)
+LAT = _find_font([
+    "/System/Library/Fonts/Supplemental/Arial Black.ttf",       # macOS
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",     # Linux
+], pipeline.LATIN_FONT)
+# ヒラギノは太字がindex 1、それ以外(Noto等)はindex 0
+JP_BOLD_IDX = 1 if "Hiragino" in JP else 0
 
 
 def _base(W, H, dark):
@@ -42,7 +61,7 @@ def _header(d, W, dark, cat, num=None, total=None):
     fg = (255, 255, 255) if dark else (17, 17, 17)
     m = int(W * 0.066)
     d.text((m, int(W * 0.06)), "ACTORSBOOK", font=_font(LAT, 30), fill=fg)
-    d.text((m, int(W * 0.06) + 40), cat, font=_font(JP, 22, index=1), fill=RED)
+    d.text((m, int(W * 0.06) + 40), cat, font=_font(JP, 22, index=JP_BOLD_IDX), fill=RED)
     if num:
         d.text((W - m - 96, int(W * 0.06)), f"{num:02d}/{total:02d}",
                font=_font(LAT, 24), fill=(150, 150, 150))
@@ -60,7 +79,7 @@ def build_slides(rec, size):
     # 表紙（黒・見出し下寄せ）
     img, d = _base(W, H, True)
     _header(d, W, True, cat)
-    hf = _font(JP, int(W * 0.076), index=1)
+    hf = _font(JP, int(W * 0.076), index=JP_BOLD_IDX)
     lines = _wrap(rec["headline"], 9)[:5]
     lh = int(W * 0.09)
     y = H - int(H * 0.11) - lh * len(lines)
@@ -76,7 +95,7 @@ def build_slides(rec, size):
     for i, p in enumerate(paras):
         img, d = _base(W, H, False)
         _header(d, W, False, cat, i + 2, total)
-        tf = _font(JP, int(W * 0.044), index=1)
+        tf = _font(JP, int(W * 0.044), index=JP_BOLD_IDX)
         tl = _wrap(p, 17)[:16]
         tlh = int(W * 0.070)
         y = (H - tlh * len(tl)) // 2 - 20
@@ -124,28 +143,47 @@ def make_video(slide_paths, out_path, per=2.8, size=(1080, 1920)):
     return out_path
 
 
+def generate_for(rec, seconds):
+    """1記事分のIGカルーセル+動画を social/<id>/ に生成し、news.json用のパスを返す。"""
+    pub = ROOT / "social" / rec["id"]        # 公開・コミット対象（サイトから配信）
+    tmp = ROOT / "output" / "_vid" / rec["id"]  # 動画の作業用スライド（gitignore）
+    ig = save_slides(build_slides(rec, (1080, 1350)), pub / "ig")
+    vslides = save_slides(build_slides(rec, (1080, 1920)), tmp)
+    make_video(vslides, pub / "tiktok.mp4", per=seconds)
+    return {
+        "carousel": [f"/social/{rec['id']}/ig/{p.name}" for p in ig],
+        "video": f"/social/{rec['id']}/tiktok.mp4",
+    }
+
+
 def main():
     ap = argparse.ArgumentParser(description="SNSアセット生成(カルーセル+動画)")
-    ap.add_argument("--id", required=True, help="対象記事のid")
+    ap.add_argument("--id", help="対象記事のid")
+    ap.add_argument("--all-published", action="store_true",
+                    help="公開済みで未生成の記事を一括生成")
     ap.add_argument("--seconds", type=float, default=2.8, help="動画の1枚あたり秒数")
     args = ap.parse_args()
 
     news = json.loads(NEWS_JSON.read_text(encoding="utf-8"))
-    rec = next((r for r in news if r["id"] == args.id or r["id"].startswith(args.id)), None)
-    if not rec:
-        raise SystemExit(f"記事が見つかりません: {args.id}")
+    if args.all_published:
+        targets = [r for r in news if r.get("status") == "published" and not r.get("assets_ready")]
+    elif args.id:
+        targets = [r for r in news if r["id"] == args.id or r["id"].startswith(args.id)]
+    else:
+        raise SystemExit("--id か --all-published を指定してください。")
+    if not targets:
+        print("対象なし（公開済み・未生成の記事がありません）。")
+        return
 
-    base = ROOT / "output" / "carousel" / rec["id"]
-    print(f"対象: {rec['headline']}")
+    for rec in targets:
+        print(f"生成: {rec['headline'][:30]}")
+        assets = generate_for(rec, args.seconds)
+        rec["assets"] = assets
+        rec["assets_ready"] = True
+        print(f"  → カルーセル{len(assets['carousel'])}枚 + 動画 social/{rec['id']}/")
 
-    # ① IGカルーセル (1080x1350)
-    ig = save_slides(build_slides(rec, (1080, 1350)), base / "ig")
-    print(f"① IGカルーセル: {len(ig)}枚 → {base/'ig'}")
-
-    # ② TikTok/Reels 動画 (縦9:16のスライドを生成→MP4)
-    vslides = save_slides(build_slides(rec, (1080, 1920)), base / "vid")
-    mp4 = make_video(vslides, base / "tiktok.mp4", per=args.seconds)
-    print(f"② 縦型動画: {mp4}  ({len(vslides)}枚 × {args.seconds}s)")
+    NEWS_JSON.write_text(json.dumps(news, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"完了: {len(targets)}件。news.jsonに assets を記録。")
 
 
 if __name__ == "__main__":

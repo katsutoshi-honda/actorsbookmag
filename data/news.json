@@ -18,7 +18,19 @@
     "background": "",
     "status": "published",
     "published_at": "2026-07-06T02:34:24.597324+00:00",
-    "posted_x": true
+    "posted_x": true,
+    "assets": {
+      "carousel": [
+        "/social/post-581f3a79-1783305264/ig/01.jpg",
+        "/social/post-581f3a79-1783305264/ig/02.jpg",
+        "/social/post-581f3a79-1783305264/ig/03.jpg",
+        "/social/post-581f3a79-1783305264/ig/04.jpg",
+        "/social/post-581f3a79-1783305264/ig/05.jpg",
+        "/social/post-581f3a79-1783305264/ig/06.jpg"
+      ],
+      "video": "/social/post-581f3a79-1783305264/tiktok.mp4"
+    },
+    "assets_ready": true
   },
   {
     "id": "happyend-10-b580c215-1783305255",
@@ -78,7 +90,19 @@
     "thumbnail": "/images/news/stranger-7-3-2ba28a43-1782978609.jpg",
     "published_at": "2026-07-02T07:50:09.546468+00:00",
     "status": "published",
-    "posted_x": true
+    "posted_x": true,
+    "assets": {
+      "carousel": [
+        "/social/stranger-7-3-2ba28a43-1782978609/ig/01.jpg",
+        "/social/stranger-7-3-2ba28a43-1782978609/ig/02.jpg",
+        "/social/stranger-7-3-2ba28a43-1782978609/ig/03.jpg",
+        "/social/stranger-7-3-2ba28a43-1782978609/ig/04.jpg",
+        "/social/stranger-7-3-2ba28a43-1782978609/ig/05.jpg",
+        "/social/stranger-7-3-2ba28a43-1782978609/ig/06.jpg"
+      ],
+      "video": "/social/stranger-7-3-2ba28a43-1782978609/tiktok.mp4"
+    },
+    "assets_ready": true
   },
   {
     "id": "post-58920b2c-1782977835",
@@ -98,7 +122,20 @@
     "thumbnail": "/images/news/post-58920b2c-1782977835.jpg",
     "published_at": "2026-07-02T07:37:15.452193+00:00",
     "status": "published",
-    "posted_x": true
+    "posted_x": true,
+    "assets": {
+      "carousel": [
+        "/social/post-58920b2c-1782977835/ig/01.jpg",
+        "/social/post-58920b2c-1782977835/ig/02.jpg",
+        "/social/post-58920b2c-1782977835/ig/03.jpg",
+        "/social/post-58920b2c-1782977835/ig/04.jpg",
+        "/social/post-58920b2c-1782977835/ig/05.jpg",
+        "/social/post-58920b2c-1782977835/ig/06.jpg",
+        "/social/post-58920b2c-1782977835/ig/07.jpg"
+      ],
+      "video": "/social/post-58920b2c-1782977835/tiktok.mp4"
+    },
+    "assets_ready": true
   },
   {
     "id": "28-e513751b-1782977258",

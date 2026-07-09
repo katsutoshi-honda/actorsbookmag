@@ -52,6 +52,14 @@ button.save:disabled{opacity:.4;cursor:default}
 .snsbtn.x{background:#111}
 .snsbtn.ig{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)}
 .snsnote{font-size:11px;color:#999}
+.assets{margin-top:18px;padding-top:16px;border-top:1px dashed var(--line)}
+.ahd{font-size:13px;font-weight:700;color:#333;margin-bottom:8px}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap}
+.thumbs a{position:relative;display:block}
+.thumbs img{width:66px;aspect-ratio:4/5;object-fit:cover;border:1px solid var(--line);border-radius:4px;background:#eee}
+.thumbs span{position:absolute;top:2px;left:2px;background:rgba(0,0,0,.7);color:#fff;font-size:10px;padding:1px 5px;border-radius:3px}
+.dlbtn{display:inline-block;background:#111;color:#fff;padding:9px 18px;border-radius:8px;font-weight:700;font-size:13px}
+.anote{margin-top:16px;font-size:12px;color:#999}
 a.view{font-size:13px;color:var(--muted)}
 .status{font-size:13px;color:var(--muted)}
 .status.ok{color:#1a9e4b}.status.err{color:var(--red)}
@@ -176,8 +184,15 @@ function renderEditor(){
       <div class="snsbtns">
         <button class="snsbtn x" id="postx">Xに投稿</button>
         <button class="snsbtn ig" id="postig">Instagramに投稿</button>
-        <span class="snsnote">Xは投稿画面が開きます／Instagramはキー設定後にフル自動</span>
+        <span class="snsnote">Xは投稿画面が開きます</span>
       </div>
+      ${a.assets ? `
+      <div class="assets">
+        <div class="ahd">📸 Instagramカルーセル（${a.assets.carousel.length}枚）— 画像を保存して投稿</div>
+        <div class="thumbs">${a.assets.carousel.map((u,i)=>`<a href="${esc(u)}" download target="_blank" title="${i+1}枚目"><img src="${esc(u)}" alt=""><span>${i+1}</span></a>`).join("")}</div>
+        <div class="ahd" style="margin-top:14px">🎬 TikTok / Reels 動画（縦型）</div>
+        <a class="dlbtn" href="${esc(a.assets.video)}" download target="_blank">▽ 動画をダウンロード</a>
+      </div>` : `<div class="anote">※ カルーセル画像・動画は「公開」後に自動生成され、ここに並びます</div>`}
     </div>
 
     <div class="bar">
