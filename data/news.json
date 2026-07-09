@@ -89,7 +89,7 @@
     "source_url": "",
     "thumbnail": "/images/news/stranger-7-3-2ba28a43-1782978609.jpg",
     "published_at": "2026-07-02T07:50:09.546468+00:00",
-    "status": "published",
+    "status": "draft",
     "posted_x": true,
     "assets": {
       "carousel": [
@@ -102,7 +102,9 @@
       ],
       "video": "/social/stranger-7-3-2ba28a43-1782978609/tiktok.mp4"
     },
-    "assets_ready": true
+    "assets_ready": true,
+    "x_text": "金子由里奈の新作短編『外と』、7/3からSTRANGERで公開\n\n『眠る虫』の金子由里奈による19分の新作。二本立てで上映。\n\n▶ https://actorsbookmag.vercel.app/news/article.html?id=stranger-7-3-2ba28a43-1782978609\n#金子由里奈 #外と #STRANGER",
+    "ig_text": "金子由里奈の新作短編『外と』、7/3からSTRANGERで公開\n\n『眠る虫』の金子由里奈による19分の新作。二本立てで上映。\n\n▶ 記事はプロフィールのリンクから\n\n#金子由里奈 #外と #STRANGER #ミニシアター #インディペンデント映画 #映画 #インディペンデント映画 #ミニシアター #cinema #film"
   },
   {
     "id": "post-58920b2c-1782977835",
