@@ -65,6 +65,39 @@ def _base(W, H, dark):
     return img, ImageDraw.Draw(img)
 
 
+def _load_bg(rec):
+    """記事の背景画像(登録画像)を読み込む。無ければNone。"""
+    v = rec.get("background") or ""
+    try:
+        if v.startswith("/"):
+            p = ROOT / v.lstrip("/")
+            if p.exists():
+                return Image.open(p).convert("RGB")
+        elif v.startswith("http"):
+            import io
+            import requests
+            r = requests.get(v, timeout=20); r.raise_for_status()
+            return Image.open(io.BytesIO(r.content)).convert("RGB")
+    except Exception:
+        return None
+    return None
+
+
+def _cover_base(rec, W, H):
+    """表紙の下地を返す。背景画像があれば『画像＋黒スモーク』、無ければ黒。"""
+    bg = _load_bg(rec)
+    if bg is None:
+        return _base(W, H, True)
+    img = pipeline._cover(bg, W, H)                       # object-fit: cover
+    veil = Image.new("RGB", (W, H), (0, 0, 0))
+    img = Image.blend(img, veil, 0.30)                    # 全体を薄く暗く(黒スモーク)
+    grad = Image.new("L", (1, H), 0)                      # 下ほど濃く(見出し可読性)
+    for y in range(H):
+        grad.putpixel((0, y), int(235 * max(0.0, (y - H * 0.42) / (H * 0.58))))
+    img = Image.composite(Image.new("RGB", (W, H), (0, 0, 0)), img, grad.resize((W, H)))
+    return img, ImageDraw.Draw(img)
+
+
 def _header(d, W, dark, cat, num=None, total=None):
     fg = (255, 255, 255) if dark else (17, 17, 17)
     m = int(W * 0.066)
@@ -84,8 +117,8 @@ def build_slides(rec, size):
     total = 1 + len(paras) + 1
     slides = []
 
-    # 表紙（黒・見出し下寄せ）
-    img, d = _base(W, H, True)
+    # 表紙（背景画像があれば画像+黒スモーク、無ければ黒。見出し下寄せ）
+    img, d = _cover_base(rec, W, H)
     _header(d, W, True, cat)
     hf = _font(JP, int(W * 0.076), index=JP_BOLD_IDX)
     lines = _wrap(rec["headline"], 9)[:5]

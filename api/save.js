@@ -24,6 +24,9 @@ module.exports = async (req, res) => {
   if (!record || !record.id) {
     return res.status(400).json({ error: "recordが不正です" });
   }
+  // 保存のたびにSNS素材を作り直す（見出し/本文/背景の変更を反映）。
+  // 公開記事なら push を検知してGitHub Actionsが再生成する。
+  record.assets_ready = false;
 
   const api = (path, opts = {}) =>
     fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`, {
