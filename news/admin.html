@@ -103,31 +103,51 @@ function currentThumbSrc(){
   if(url) return url;
   return (NEWS[sel]||{}).background||"";
 }
+// カテゴリ由来の巨大ゴースト・ワードマーク（黒背景時の"透かし"。Pillow版(make_assets.py)と一致）
+const GHOST={"映画":["CINE","PHILE"],"本・書店":["BIBLIO","PHILE"],"ストリート":["STREET"],"ファッション":["MODE"]};
+function _pillCanvas(ctx,x,y,text,fontPx){
+  ctx.textBaseline="top";
+  ctx.font="700 "+fontPx+"px 'Hiragino Kaku Gothic ProN','Hiragino Sans',sans-serif";
+  const padx=20,pady=10, tw=ctx.measureText(text).width, w=tw+padx*2, h=fontPx+pady*2;
+  ctx.fillStyle="#ff3c3c";
+  if(ctx.roundRect){ctx.beginPath();ctx.roundRect(x,y,w,h,h/2);ctx.fill();} else {ctx.fillRect(x,y,w,h);}
+  ctx.fillStyle="#fff"; ctx.fillText(text,x+padx,y+pady);
+  return x+w;
+}
+function _ghostCanvas(ctx,cat){
+  const words=(GHOST[cat]||["CINE","PHILE"]).slice(0,2);
+  ctx.fillStyle="#1a1a1a"; ctx.textBaseline="top";
+  ctx.font="900 189px 'Helvetica Neue',Arial,sans-serif";
+  let y=230; words.forEach(w=>{ctx.fillText(w,65,y); y+=162;});
+}
 function drawThumb(){
   const c=document.getElementById("bgprev"); if(!c||!c.getContext) return;
   const ctx=c.getContext("2d"); const W=1080,H=1350;
   const head=(document.getElementById("f_head")||{}).value||"";
   const dek=(document.getElementById("f_dek")||{}).value||"";
   const cat=(document.getElementById("f_cat")||{}).value||"映画";
-  const overlay=()=>{
-    ctx.fillStyle="rgba(0,0,0,0.30)"; ctx.fillRect(0,0,W,H);
-    const g=ctx.createLinearGradient(0,H*0.40,0,H); g.addColorStop(0,"rgba(0,0,0,0)"); g.addColorStop(1,"rgba(0,0,0,0.9)"); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  const overlay=(hasPhoto)=>{
+    if(hasPhoto){
+      ctx.fillStyle="rgba(0,0,0,0.30)"; ctx.fillRect(0,0,W,H);
+      const g=ctx.createLinearGradient(0,H*0.42,0,H); g.addColorStop(0,"rgba(0,0,0,0)"); g.addColorStop(1,"rgba(0,0,0,0.92)"); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    } else { _ghostCanvas(ctx,cat); }
     ctx.textBaseline="top";
-    ctx.fillStyle="#fff"; ctx.font="800 40px 'Helvetica Neue',Arial,sans-serif"; ctx.fillText("ACTORSBOOK",64,60);
-    ctx.fillStyle="#ff3c3c"; ctx.font="700 26px 'Hiragino Kaku Gothic ProN','Hiragino Sans',sans-serif"; ctx.fillText(cat,64,108);
-    ctx.fillStyle="#fff"; ctx.font="800 82px 'Hiragino Kaku Gothic ProN','Hiragino Sans',sans-serif";
-    const lines=_wrapCanvas(ctx,head,W-128); const lh=100; let y=H-150-lh*lines.length;
-    lines.forEach(l=>{ctx.fillText(l,64,y);y+=lh;});
-    if(dek){ctx.fillStyle="#cfcfcf"; ctx.font="400 30px 'Hiragino Kaku Gothic ProN','Hiragino Sans',sans-serif"; ctx.fillText(dek.slice(0,26),64,y+12);}
+    ctx.fillStyle="#fff"; ctx.font="900 44px 'Helvetica Neue',Arial,sans-serif"; ctx.fillText("ACTORSBOOK",71,56);
+    _pillCanvas(ctx,71,120,cat,25);
+    ctx.fillStyle="#fff"; ctx.font="800 80px 'Hiragino Kaku Gothic ProN','Hiragino Sans',sans-serif";
+    const lines=_wrapCanvas(ctx,head,W-142); const lh=95;
+    let y=H-Math.round(H*0.085)-lh*lines.length-(dek?54:0);
+    lines.forEach(l=>{ctx.fillText(l,71,y);y+=lh;});
+    if(dek){ctx.fillStyle="#c6c6c6"; ctx.font="400 31px 'Hiragino Kaku Gothic ProN','Hiragino Sans',sans-serif"; ctx.fillText(dek.slice(0,30),71,y+12);}
     ctx.fillStyle="#ff3c3c"; ctx.fillRect(0,H-14,W,14);
   };
   ctx.clearRect(0,0,W,H); ctx.fillStyle="#0a0a0a"; ctx.fillRect(0,0,W,H);
   const src=currentThumbSrc();
   if(src){
     const im=new Image(); im.crossOrigin="anonymous";
-    im.onload=()=>{ctx.fillStyle="#0a0a0a";ctx.fillRect(0,0,W,H);_coverDraw(ctx,im,W,H);overlay();};
-    im.onerror=overlay; im.src=src;
-  } else overlay();
+    im.onload=()=>{ctx.fillStyle="#0a0a0a";ctx.fillRect(0,0,W,H);_coverDraw(ctx,im,W,H);overlay(true);};
+    im.onerror=()=>overlay(false); im.src=src;
+  } else overlay(false);
 }
 
 // ---- utils ----
@@ -249,7 +269,7 @@ function renderEditor(){
       <button class="save" id="save">保存</button>
       ${isPub
         ? '<button class="pubbtn unpub" id="pubtoggle">非公開にする</button>'
-        : '<button class="pubbtn pub" id="pubtoggle">公開する</button>'}
+        : '<button class="pubbtn pub" id="pubtoggle">公開する（＋X投稿画面）</button>'}
       <a class="view" href="/news/article.html?id=${encodeURIComponent(a.id)}" target="_blank">プレビュー ↗</a>
       <span class="status" id="status"></span>
     </div>`;
@@ -264,7 +284,7 @@ function renderEditor(){
   const ch=document.getElementById("f_cat"); if(ch) ch.onchange=()=>drawThumb();
   drawThumb();  // 初期表示
   document.getElementById("save").onclick=()=>save();               // 状態は変えず保存
-  document.getElementById("pubtoggle").onclick=()=>save(isPub?"draft":"published"); // 公開/非公開の切替
+  document.getElementById("pubtoggle").onclick=publishToggle;       // 公開/非公開の切替（公開時はXにも投稿）
   document.getElementById("postx").onclick=()=>postSNS("x");
   document.getElementById("postig").onclick=()=>postSNS("instagram");
 }
@@ -312,7 +332,7 @@ async function save(statusOverride){
     if(!resp.ok){
       if(resp.status===401){ setStatus("⚠ パスワードが違います。ログアウトして入れ直してください。","err"); }
       else{ setStatus("⚠ "+(data.error||("失敗 "+resp.status)),"err"); }
-      if(btn) btn.disabled=false; return;
+      if(btn) btn.disabled=false; return false;
     }
     if(data.background) a.background=data.background;
     NEWS[sel]=a; pendingFile=null; renderList(); renderEditor();  // 再描画でボタンが公開⇄非公開に切替わる
@@ -320,7 +340,20 @@ async function save(statusOverride){
       statusOverride==="published" ? "✓ 公開しました。1分ほどで反映されます。"
       : statusOverride==="draft"   ? "✓ 非公開にしました。1分ほどで反映されます。"
       : "✓ 保存しました。1分ほどで反映されます。", "ok");
-  }catch(e){ setStatus("⚠ "+e.message,"err"); if(btn) btn.disabled=false; }
+    return true;
+  }catch(e){ setStatus("⚠ "+e.message,"err"); if(btn) btn.disabled=false; return false; }
+}
+
+// 公開/非公開の切替。「公開する」時は保存成功後に自動でXの投稿画面を開く（キー不要・凍結リスクなし）
+async function publishToggle(){
+  const isPub=NEWS[sel] && NEWS[sel].status!=='draft';
+  if(isPub){ save("draft"); return; }              // 非公開化ではSNS投稿しない
+  // ポップアップブロック回避：クリック直後にタブを確保 → 保存成功後にX投稿画面へ飛ばす
+  const xt=(document.getElementById("f_xtext")||{}).value||"";
+  const win=xt ? window.open("about:blank","_blank") : null;
+  const ok=await save("published");
+  if(ok && win){ win.location.href="https://x.com/intent/post?text="+encodeURIComponent(xt); }
+  else if(win){ win.close(); }
 }
 
 // SNS投稿ボタン

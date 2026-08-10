@@ -108,6 +108,82 @@ def _header(d, W, dark, cat, num=None, total=None):
                font=_font(LAT, 24), fill=(150, 150, 150))
 
 
+# カテゴリ由来の巨大ゴースト・ワードマーク（背景の"透かし"。カテゴリごとに絵柄が変わる）
+GHOST = {
+    "映画": ["CINE", "PHILE"],
+    "本・書店": ["BIBLIO", "PHILE"],
+    "ストリート": ["STREET"],
+    "ファッション": ["MODE"],
+}
+
+
+def _pill(d, x, y, text, font, fill=RED, tcol=(255, 255, 255), padx=20, pady=10):
+    """角丸の"ピル"バッジを描き、右端X座標を返す。"""
+    l, t, r, b = d.textbbox((0, 0), text, font=font)
+    tw, th = r - l, b - t
+    x1, y1 = x + tw + padx * 2, y + th + pady * 2
+    d.rounded_rectangle([x, y, x1, y1], radius=(y1 - y) // 2, fill=fill)
+    d.text((x + padx - l, y + pady - t), text, font=font, fill=tcol)
+    return x1
+
+
+def _draw_ghost(d, cat, W, H):
+    """黒背景のとき、カテゴリ由来の巨大ワードマークを極薄で敷く。"""
+    words = GHOST.get(cat, ["CINE", "PHILE"])[:2]
+    gf = _font(LAT, int(W * 0.175))
+    gh = int(W * 0.150)
+    m = int(W * 0.060)
+    y = int(H * 0.170)
+    for w in words:
+        d.text((m, y), w, font=gf, fill=(26, 26, 26))
+        y += gh
+
+
+def build_cover(rec, W, H, swipe=False):
+    """表紙(=サイトのサムネと共通)。写真があれば写真+黒スモーク、無ければ黒+ゴースト。"""
+    bg = _load_bg(rec)
+    has_photo = bg is not None
+    cat = rec.get("category", "映画")
+    if has_photo:
+        img, d = _cover_base(rec, W, H)
+    else:
+        img, d = _base(W, H, True)
+        _draw_ghost(d, cat, W, H)
+    m = int(W * 0.066)
+    # マストヘッド ＋ カテゴリのピル
+    d.text((m, int(W * 0.052)), "ACTORSBOOK", font=_font(LAT, int(W * 0.041)),
+           fill=(255, 255, 255))
+    _pill(d, m, int(W * 0.052) + int(W * 0.041) + 20, cat,
+          _font(JP, int(W * 0.023), index=JP_BOLD_IDX))
+    # 見出し（下寄せ・特大）
+    hf = _font(JP, int(W * 0.074), index=JP_BOLD_IDX)
+    lines = _wrap(rec.get("headline", ""), 10)[:5]
+    lh = int(W * 0.088)
+    dek = (rec.get("dek") or "").strip()
+    y = H - int(H * 0.085) - lh * len(lines) - (int(W * 0.050) if dek else 0)
+    for ln in lines:
+        d.text((m, y), ln, font=hf, fill=(255, 255, 255)); y += lh
+    if dek:
+        df = _font(JP, int(W * 0.029))
+        dl = _wrap(dek, 30)[:1]
+        d.text((m, y + 12), (dl[0] if dl else dek), font=df, fill=(198, 198, 198))
+    if swipe:
+        d.text((W - int(W * 0.25), H - int(H * 0.075)), "SWIPE →",
+               font=_font(LAT, 30), fill=(255, 255, 255))
+    d.rectangle([0, H - 14, W, H], fill=RED)
+    return img, d
+
+
+def write_thumb(rec):
+    """サイト用サムネ(1080x1350)を images/news/<id>.jpg に生成し、パスを返す。"""
+    W, H = 1080, 1350
+    img, _ = build_cover(rec, W, H, swipe=False)
+    out = ROOT / "images" / "news" / f"{rec['id']}.jpg"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    img.save(out, "JPEG", quality=90)
+    return f"/images/news/{rec['id']}.jpg"
+
+
 def build_slides(rec, size):
     """記事から全スライド画像を生成して返す（表紙→本文→アウトロ）。"""
     W, H = size
@@ -117,19 +193,8 @@ def build_slides(rec, size):
     total = 1 + len(paras) + 1
     slides = []
 
-    # 表紙（背景画像があれば画像+黒スモーク、無ければ黒。見出し下寄せ）
-    img, d = _cover_base(rec, W, H)
-    _header(d, W, True, cat)
-    hf = _font(JP, int(W * 0.076), index=JP_BOLD_IDX)
-    lines = _wrap(rec["headline"], 9)[:5]
-    lh = int(W * 0.09)
-    y = H - int(H * 0.11) - lh * len(lines)
-    for ln in lines:
-        d.text((m, y), ln, font=hf, fill=(255, 255, 255)); y += lh
-    if rec.get("dek"):
-        d.text((m, y + 14), rec["dek"], font=_font(JP, 30), fill=(200, 200, 200))
-    d.text((W - int(W * 0.25), H - int(H * 0.07)), "SWIPE →", font=_font(LAT, 30), fill=(255, 255, 255))
-    d.rectangle([0, H - 14, W, H], fill=RED)
+    # 表紙（サイトのサムネと共通テンプレ：カテゴリ・ゴースト＋下寄せ見出し。IGはSWIPE表示）
+    img, _d = build_cover(rec, W, H, swipe=True)
     slides.append(img)
 
     # 本文（白・大きく読める）
@@ -203,9 +268,28 @@ def main():
     ap.add_argument("--all-published", action="store_true",
                     help="公開済みで未生成の記事を一括生成")
     ap.add_argument("--seconds", type=float, default=2.8, help="動画の1枚あたり秒数")
+    ap.add_argument("--thumbs", action="store_true",
+                    help="サイト用サムネ(1080x1350)を再生成（--id か 全記事）")
     args = ap.parse_args()
 
     news = json.loads(NEWS_JSON.read_text(encoding="utf-8"))
+
+    # サイト用サムネの一括再生成（テンプレ改良を既存記事へ反映）
+    if args.thumbs:
+        pool = news if not args.id else [r for r in news
+                                         if r["id"] == args.id or r["id"].startswith(args.id)]
+        changed = False
+        for rec in pool:
+            path = write_thumb(rec)
+            # 既にthumbnailを持つ記事のみパス更新（下書きに新フィールドを足してnews.jsonを汚さない）
+            if rec.get("thumbnail") and rec.get("thumbnail") != path:
+                rec["thumbnail"] = path; changed = True
+            print(f"サムネ生成: {rec['headline'][:26]} → {path}")
+        if changed:
+            NEWS_JSON.write_text(json.dumps(news, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"完了: {len(pool)}件のサムネを再生成。")
+        return
+
     if args.all_published:
         targets = [r for r in news if r.get("status") == "published" and not r.get("assets_ready")]
     elif args.id:
