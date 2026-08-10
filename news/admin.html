@@ -269,7 +269,7 @@ function renderEditor(){
       <button class="save" id="save">保存</button>
       ${isPub
         ? '<button class="pubbtn unpub" id="pubtoggle">非公開にする</button>'
-        : '<button class="pubbtn pub" id="pubtoggle">公開する（＋X投稿画面）</button>'}
+        : '<button class="pubbtn pub" id="pubtoggle">公開する</button>'}
       <a class="view" href="/news/article.html?id=${encodeURIComponent(a.id)}" target="_blank">プレビュー ↗</a>
       <span class="status" id="status"></span>
     </div>`;
@@ -284,7 +284,7 @@ function renderEditor(){
   const ch=document.getElementById("f_cat"); if(ch) ch.onchange=()=>drawThumb();
   drawThumb();  // 初期表示
   document.getElementById("save").onclick=()=>save();               // 状態は変えず保存
-  document.getElementById("pubtoggle").onclick=publishToggle;       // 公開/非公開の切替（公開時はXにも投稿）
+  document.getElementById("pubtoggle").onclick=()=>save(isPub?"draft":"published"); // 公開/非公開の切替
   document.getElementById("postx").onclick=()=>postSNS("x");
   document.getElementById("postig").onclick=()=>postSNS("instagram");
 }
@@ -344,17 +344,6 @@ async function save(statusOverride){
   }catch(e){ setStatus("⚠ "+e.message,"err"); if(btn) btn.disabled=false; return false; }
 }
 
-// 公開/非公開の切替。「公開する」時は保存成功後に自動でXの投稿画面を開く（キー不要・凍結リスクなし）
-async function publishToggle(){
-  const isPub=NEWS[sel] && NEWS[sel].status!=='draft';
-  if(isPub){ save("draft"); return; }              // 非公開化ではSNS投稿しない
-  // ポップアップブロック回避：クリック直後にタブを確保 → 保存成功後にX投稿画面へ飛ばす
-  const xt=(document.getElementById("f_xtext")||{}).value||"";
-  const win=xt ? window.open("about:blank","_blank") : null;
-  const ok=await save("published");
-  if(ok && win){ win.location.href="https://x.com/intent/post?text="+encodeURIComponent(xt); }
-  else if(win){ win.close(); }
-}
 
 // SNS投稿ボタン
 function postSNS(target){
