@@ -17,7 +17,19 @@
     "thumbnail": "/images/news/post-76411232-1786335872.jpg",
     "background": "/images/news/bg/post-76411232-1786335872.webp",
     "status": "published",
-    "published_at": "2026-08-10T04:24:32.503643+00:00"
+    "published_at": "2026-08-10T04:24:32.503643+00:00",
+    "assets": {
+      "carousel": [
+        "/social/post-76411232-1786335872/ig/01.jpg",
+        "/social/post-76411232-1786335872/ig/02.jpg",
+        "/social/post-76411232-1786335872/ig/03.jpg",
+        "/social/post-76411232-1786335872/ig/04.jpg",
+        "/social/post-76411232-1786335872/ig/05.jpg",
+        "/social/post-76411232-1786335872/ig/06.jpg"
+      ],
+      "video": "/social/post-76411232-1786335872/tiktok.mp4"
+    },
+    "assets_ready": true
   },
   {
     "id": "youtube-c2029518-1783562356",
