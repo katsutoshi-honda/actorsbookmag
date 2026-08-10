@@ -1,94 +1,126 @@
-/* actorsbookmag news — 白基調・余白たっぷり・ミニマル (032c風) */
+/* actorsbookmag news — 黒基調・極太タイポ・大判写真・グリッド（Hypebeast系エディトリアル） */
 :root{
-  --bg:#ffffff; --fg:#0d0d0d; --muted:#9b9b9b; --line:#e9e9e9; --red:#ff0000;
-  --mono:"Helvetica Neue",Arial,"Hiragino Kaku Gothic ProN","Hiragino Sans",Meiryo,system-ui,sans-serif;
+  --bg:#0a0a0a; --fg:#ffffff; --muted:#7c7c7c; --line:#232323; --red:#ff2a00;
+  --sans:"Helvetica Neue","Arial","Hiragino Kaku Gothic ProN","Hiragino Sans",Meiryo,system-ui,sans-serif;
+  --maxw:1400px; --pad:56px;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
 body{
-  background:var(--bg); color:var(--fg); font-family:var(--mono);
-  line-height:1.8; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  background:var(--bg); color:var(--fg); font-family:var(--sans);
+  line-height:1.6; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
 }
 a{color:inherit; text-decoration:none}
 img{display:block; max-width:100%}
+::selection{background:var(--red); color:#fff}
 
-.wrap{max-width:1180px; margin:0 auto; padding:0 48px}
-.reading{max-width:660px; margin:0 auto; padding:0 24px}
-@media(max-width:640px){ .wrap{padding:0 22px} }
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 var(--pad)}
+.reading{max-width:680px; margin:0 auto; padding:0 24px}
+@media(max-width:900px){ :root{--pad:32px} }
+@media(max-width:640px){ :root{--pad:20px} }
 
-/* ── ヘッダー ── */
-header.site{padding:38px 0 26px}
-header.site .inner{display:flex; align-items:baseline}
-.brand{font-weight:800; font-size:19px; letter-spacing:-.01em}
+/* ── ヘッダー（スティッキー） ── */
+header.site{position:sticky; top:0; z-index:50;
+  background:rgba(10,10,10,.82); backdrop-filter:saturate(140%) blur(12px);
+  border-bottom:1px solid var(--line)}
+header.site .inner{display:flex; align-items:center; padding:18px 0}
+.brand{font-weight:900; font-size:22px; letter-spacing:-.03em; text-transform:uppercase}
 .brand .dot{color:var(--red)}
-nav{margin-left:auto; display:flex; gap:30px; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
+nav{margin-left:auto; display:flex; gap:26px; font-size:11px; font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--muted)}
+nav a{position:relative; padding:2px 0}
 nav a:hover{color:var(--fg)}
-.hair{height:1px; background:var(--fg)}
+nav a::after{content:""; position:absolute; left:0; right:100%; bottom:-2px; height:2px;
+  background:var(--red); transition:right .25s ease}
+nav a:hover::after{right:0}
 
-/* ── 共通メタ ── */
-.meta{display:flex; gap:16px; align-items:center; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+/* ── 共通メタ（キッカー） ── */
+.meta{display:flex; gap:14px; align-items:center; font-size:11px; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--muted)}
 .meta .cat{color:var(--red)}
 
-/* ── トップ：記事リスト ── */
-.index{padding:70px 0 120px}
-.row{display:grid; grid-template-columns:120px 1fr; gap:34px; align-items:start;
-     padding:44px 0; border-top:1px solid var(--line)}
-.row:first-child{border-top:none; padding-top:0}
-.row .thumb{width:120px; aspect-ratio:4/5; object-fit:cover; background:#f2f2f2}
+/* ── トップ：ポスターを主役にしたグリッド ── */
+/* サムネ画像(img.thumb)はブランド/カテゴリ/見出し/リードを焼き込んだ完成ポスター(4:5)。
+   よって画像を大きく見せ、生テキストの見出し/リードは重複するので隠す(小さな日付だけ残す)。
+   生写真(span.thumb.photo)や画像なしの記事は、下に生見出しを表示してフォールバックする。 */
+.index{display:grid; grid-template-columns:repeat(3,1fr); gap:46px 36px;
+  padding:60px 0 130px}
+@media(max-width:1040px){ .index{grid-template-columns:repeat(2,1fr); gap:42px 28px} }
+@media(max-width:560px){ .index{grid-template-columns:1fr; gap:40px} }
+
+.row{display:flex; flex-direction:column; min-width:0}
+.row .thumb{width:100%; aspect-ratio:4/5; object-fit:cover; background:#141414;
+  transition:transform .5s cubic-bezier(.2,.7,.2,1), filter .4s}
 .row .thumb.photo{position:relative; display:block; background-size:cover; background-position:center}
-.row .thumb.photo .tsmoke{position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.62))}
-.row h2{font-size:clamp(24px,3.4vw,38px); line-height:1.08; font-weight:800; letter-spacing:-.02em; margin:14px 0 0}
-.row .dek{color:#666; margin:16px 0 0; max-width:56ch; font-size:15px}
+.row .thumb.photo .tsmoke{position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(0,0,0,0) 38%, rgba(0,0,0,.6))}
+.row{overflow:hidden}
+.row .thumb{border-radius:2px}
+.row:hover .thumb{transform:scale(1.035)}
+.row .meta{margin:16px 0 0}
+.row h2{font-size:clamp(19px,1.5vw,23px); line-height:1.16; font-weight:800;
+  letter-spacing:-.02em; margin:11px 0 0; text-wrap:balance}
+.row:hover h2{color:#cfcfcf}
+.row .dek{color:var(--muted); margin:9px 0 0; font-size:14px; line-height:1.55;
+  max-width:42ch; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+
+/* 合成ポスター(img.thumb)を持つカード：見出し/リードは画像内にあるので隠し、日付だけ残す（IGフィード風） */
+.row:has(img.thumb) h2, .row:has(img.thumb) .dek{display:none}
+.row:has(img.thumb) .meta{margin-top:13px; font-size:11px}
+
+/* ── アーカイブ：極太テキスト行 ── */
+.archive{padding:56px 0 130px}
+.archive .arow{display:grid; grid-template-columns:132px 128px 1fr; gap:26px; align-items:baseline;
+  padding:28px 0; border-top:1px solid var(--line)}
+.archive .arow:first-child{border-top:none}
+.archive .adate,.archive .acat{font-size:11px; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted)}
+.archive .acat{color:var(--red)}
+.archive h3{margin:0; font-size:clamp(20px,2.4vw,30px); font-weight:800; letter-spacing:-.02em;
+  line-height:1.1; transition:color .15s}
+.archive .arow:hover h3{color:var(--muted)}
 @media(max-width:640px){
-  .row{grid-template-columns:1fr; gap:16px}
-  .row .thumb{width:150px}
+  .archive .arow{grid-template-columns:1fr; gap:6px; padding:22px 0}
+  .archive h3{order:-1}
 }
 
-/* ── アーカイブ：テキスト行 ── */
-.archive{padding:70px 0 120px}
-.archive .arow{display:grid; grid-template-columns:110px 120px 1fr; gap:22px; align-items:baseline;
-     padding:26px 0; border-top:1px solid var(--line)}
-.archive .arow:hover h3{color:var(--red)}
-.archive .adate,.archive .acat{font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
-.archive h3{margin:0; font-size:22px; font-weight:600; letter-spacing:-.01em; transition:color .15s}
-@media(max-width:640px){ .archive .arow{grid-template-columns:1fr; gap:6px} }
-
 /* ── 記事：フルブリードのヒーロー ── */
-.hero{width:100vw; margin-left:calc(50% - 50vw); background:#0a0a0a;
-      min-height:78vh; display:flex; align-items:center; justify-content:center}
-.hero img{width:auto; max-width:100%; max-height:92vh; object-fit:contain}
+.hero{width:100vw; margin-left:calc(50% - 50vw); background:#000;
+  min-height:72vh; display:flex; align-items:center; justify-content:center; overflow:hidden}
+.hero img{width:auto; max-width:100%; max-height:88vh; object-fit:contain}
 
-/* 背景画像を引っ張ってきて見出しをライブ合成するヒーロー */
 .hero--photo{width:100vw; margin-left:calc(50% - 50vw); position:relative;
-     min-height:82vh; background:#0a0a0a center/cover no-repeat; display:flex; align-items:flex-end}
+  min-height:86vh; background:#000 center/cover no-repeat; display:flex; align-items:flex-end}
 .hero--photo .scrim{position:absolute; inset:0;
-     background:linear-gradient(180deg, rgba(0,0,0,.30) 0%, rgba(0,0,0,.12) 40%, rgba(0,0,0,.85) 100%)}
-.hero--photo .cap{position:relative; z-index:1; max-width:1180px; width:100%;
-     margin:0 auto; padding:0 48px 56px; color:#fff}
-.hero--photo .kick{font-size:12px; letter-spacing:.14em; text-transform:uppercase;
-     font-weight:800; color:#fff; margin-bottom:14px}
-.hero--photo .kick .cat{color:#ff3c3c}
-.hero--photo .htitle{font-size:clamp(32px,5.4vw,64px); line-height:1.05; font-weight:800;
-     letter-spacing:-.025em; margin:0; max-width:20ch; text-shadow:0 2px 24px rgba(0,0,0,.5)}
-.hero--photo .hdek{margin:16px 0 0; font-size:18px; color:#e8e8e8; max-width:46ch}
-@media(max-width:640px){ .hero--photo .cap{padding:0 22px 40px} }
+  background:linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,.05) 38%, rgba(0,0,0,.92) 100%)}
+.hero--photo .cap{position:relative; z-index:1; max-width:var(--maxw); width:100%;
+  margin:0 auto; padding:0 var(--pad) 64px; color:#fff}
+.hero--photo .kick{font-size:12px; letter-spacing:.16em; text-transform:uppercase;
+  font-weight:800; color:#fff; margin-bottom:16px}
+.hero--photo .kick .cat{color:var(--red)}
+.hero--photo .htitle{font-size:clamp(36px,6.4vw,86px); line-height:.98; font-weight:900;
+  letter-spacing:-.035em; margin:0; max-width:18ch; text-shadow:0 2px 40px rgba(0,0,0,.6)}
+.hero--photo .hdek{margin:20px 0 0; font-size:18px; line-height:1.55; color:#d6d6d6; max-width:48ch}
 
-article.post{padding:72px 0 140px}
-article.post .meta{justify-content:center; margin-bottom:26px}
-article.post h1{font-size:clamp(30px,5.2vw,58px); line-height:1.04; font-weight:800;
-     letter-spacing:-.025em; text-align:center; margin:0 auto 18px; max-width:20ch}
-article.post .dek{text-align:center; color:#555; font-size:19px; max-width:44ch; margin:0 auto 8px}
-article.post .body{font-size:18px; line-height:2.0; white-space:pre-wrap; margin-top:52px}
-article.post .embeds{margin-top:44px}
-article.post .embeds .ehd{font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:14px}
-article.post .tags{margin-top:44px; color:var(--muted); font-size:13px; letter-spacing:.06em}
+article.post{padding:76px 0 150px}
+article.post .meta{justify-content:center; margin-bottom:24px}
+article.post h1{font-size:clamp(32px,5.4vw,62px); line-height:1.02; font-weight:900;
+  letter-spacing:-.03em; text-align:center; margin:0 auto 20px; max-width:19ch; text-wrap:balance}
+article.post .dek{text-align:center; color:var(--muted); font-size:19px; line-height:1.5;
+  max-width:46ch; margin:0 auto}
+article.post .body{font-size:18px; line-height:1.95; white-space:pre-wrap; margin-top:56px; color:#e6e6e6}
+article.post .body::first-letter{}
+article.post .embeds{margin-top:52px}
+article.post .embeds .ehd{font-size:12px; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:16px}
+article.post .tags{margin-top:48px; color:var(--muted); font-size:13px; letter-spacing:.05em}
 article.post .src{margin-top:16px; font-size:13px; color:var(--muted)}
 article.post .src a{color:var(--red)}
-.back{display:inline-block; margin-top:56px; font-size:12px; letter-spacing:.12em;
-      text-transform:uppercase; color:var(--muted)}
+.back{display:inline-block; margin-top:60px; font-size:11px; font-weight:700; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--muted)}
 .back:hover{color:var(--fg)}
 
 /* ── フッター ── */
 footer.site{border-top:1px solid var(--line); color:var(--muted); font-size:11px;
-     letter-spacing:.08em; padding:40px 0; margin-top:60px}
-.empty{padding:100px 0; color:var(--muted); text-align:center}
+  font-weight:700; letter-spacing:.14em; text-transform:uppercase; padding:44px 0; margin-top:20px}
+.empty{padding:120px 0; color:var(--muted); text-align:center; letter-spacing:.04em}
