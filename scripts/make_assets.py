@@ -184,11 +184,69 @@ def write_thumb(rec):
     return f"/images/news/{rec['id']}.jpg"
 
 
+def _load_img(path):
+    """任意パス(サイトルート基準 /... または http...)の画像を読み込む。無ければNone。"""
+    if not path:
+        return None
+    try:
+        if str(path).startswith("/"):
+            p = ROOT / str(path).lstrip("/")
+            if p.exists():
+                return Image.open(p).convert("RGB")
+        elif str(path).startswith("http"):
+            import io
+            import requests
+            r = requests.get(path, timeout=20); r.raise_for_status()
+            return Image.open(io.BytesIO(r.content)).convert("RGB")
+    except Exception:
+        return None
+    return None
+
+
+def _body_slide(rec, para, idx, total, W, H):
+    """本文スライド1枚。slide_images[idx]があれば『写真＋黒グラデ＋白文字』、無ければ従来の白地。"""
+    cat = rec.get("category", "映画")
+    m = int(W * 0.066)
+    slides = rec.get("slide_images") or []
+    bg = _load_img(slides[idx]) if idx < len(slides) else None
+
+    if bg is not None:
+        img = pipeline._cover(bg, W, H)
+        img = Image.blend(img, Image.new("RGB", (W, H), (0, 0, 0)), 0.45)  # 全体を暗く
+        grad = Image.new("L", (1, H), 0)                                    # 下ほど濃く(可読性)
+        for y in range(H):
+            grad.putpixel((0, y), int(255 * max(0.0, (y - H * 0.30) / (H * 0.70))))
+        img = Image.composite(Image.new("RGB", (W, H), (0, 0, 0)), img, grad.resize((W, H)))
+        d = ImageDraw.Draw(img)
+        d.text((m, int(W * 0.052)), "ACTORSBOOK", font=_font(LAT, int(W * 0.036)), fill=(255, 255, 255))
+        _pill(d, m, int(W * 0.052) + int(W * 0.036) + 18, cat,
+              _font(JP, int(W * 0.021), index=JP_BOLD_IDX))
+        tf = _font(JP, int(W * 0.050), index=JP_BOLD_IDX)
+        lines = _wrap(para, 15)[:9]
+        lh = int(W * 0.076)
+        y = H - int(H * 0.075) - lh * len(lines)
+        for ln in lines:
+            d.text((m, y), ln, font=tf, fill=(255, 255, 255)); y += lh
+        d.rectangle([0, H - 14, W, H], fill=RED)
+        return img
+
+    # 画像なし＝従来の白地スライド
+    img, d = _base(W, H, False)
+    _header(d, W, False, cat, idx + 2, total)
+    tf = _font(JP, int(W * 0.044), index=JP_BOLD_IDX)
+    tl = _wrap(para, 17)[:16]
+    tlh = int(W * 0.070)
+    y = (H - tlh * len(tl)) // 2 - 20
+    for ln in tl:
+        d.text((int(W * 0.074), y), ln, font=tf, fill=(17, 17, 17)); y += tlh
+    d.rectangle([0, H - 14, W, H], fill=RED)
+    return img
+
+
 def build_slides(rec, size):
     """記事から全スライド画像を生成して返す（表紙→本文→アウトロ）。"""
     W, H = size
     m = int(W * 0.066)
-    cat = rec.get("category", "映画")
     paras = [p.strip() for p in (rec.get("body", "")).split("\n\n") if p.strip()]
     total = 1 + len(paras) + 1
     slides = []
@@ -197,18 +255,9 @@ def build_slides(rec, size):
     img, _d = build_cover(rec, W, H, swipe=True)
     slides.append(img)
 
-    # 本文（白・大きく読める）
+    # 本文（slide_imagesがあれば写真合成、無ければ白地）
     for i, p in enumerate(paras):
-        img, d = _base(W, H, False)
-        _header(d, W, False, cat, i + 2, total)
-        tf = _font(JP, int(W * 0.044), index=JP_BOLD_IDX)
-        tl = _wrap(p, 17)[:16]
-        tlh = int(W * 0.070)
-        y = (H - tlh * len(tl)) // 2 - 20
-        for ln in tl:
-            d.text((int(W * 0.074), y), ln, font=tf, fill=(17, 17, 17)); y += tlh
-        d.rectangle([0, H - 14, W, H], fill=RED)
-        slides.append(img)
+        slides.append(_body_slide(rec, p, i, total, W, H))
 
     # アウトロ（黒・ブランド）
     img, d = _base(W, H, True)

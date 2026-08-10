@@ -67,6 +67,17 @@ a.view{font-size:13px;color:var(--muted)}
 .tokenbox input{margin-top:10px}
 .hint{font-size:13px;color:var(--muted);margin-top:8px}
 .empty{padding:60px 40px;color:var(--muted)}
+.slidelist{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.slot{display:flex;gap:14px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px}
+.sthumb{width:64px;aspect-ratio:4/5;flex:none;border-radius:6px;overflow:hidden;background:#0a0a0a;display:flex;align-items:center;justify-content:center}
+.sthumb img{width:100%;height:100%;object-fit:cover}
+.sph{color:#888;font-size:11px}
+.sinfo{flex:1;min-width:0}
+.snum{font-size:11px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.stext{font-size:13px;color:#333;margin:2px 0 8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.sact{display:flex;gap:8px;align-items:center}
+.sbtn{display:inline-block;background:#111;color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
+.sclear{background:none;border:1px solid #ddd;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;color:#c0392b}
 </style>
 </head>
 <body>
@@ -84,7 +95,7 @@ a.view{font-size:13px;color:var(--muted)}
 
 <script>
 const app=document.getElementById("app");
-let NEWS=[], sel=null, pendingFile=null, pendingURL=null;
+let NEWS=[], sel=null, pendingFile=null, pendingURL=null, pendingSlides={};
 
 // ---- Canvasでニュースサムネを"その場で"合成（画像+黒スモーク+見出し）----
 function _coverDraw(ctx,im,W,H){
@@ -215,8 +226,41 @@ function renderList(){
     const badge=isPub?'<span class="st st-pub">● 公開</span>':'<span class="st st-draft">○ 下書き</span>';
     return `<button class="item ${sel===i?'sel':''}" data-i="${i}">
      ${esc(a.headline||'(無題)')}<small>${badge}　${esc(a.category||'映画')}</small></button>`;}).join("");
-  [...el.querySelectorAll(".item")].forEach(b=>b.onclick=()=>{sel=+b.dataset.i;pendingFile=null;renderList();renderEditor();});
+  [...el.querySelectorAll(".item")].forEach(b=>b.onclick=()=>{sel=+b.dataset.i;pendingFile=null;pendingSlides={};renderList();renderEditor();});
 }
+// 本文段落ごとのスライド画像UI。pendingSlides[i]=新規アップロード, NEWS[sel].slide_images[i]=保存済みパス
+function renderSlides(){
+  const wrap=document.getElementById("slideList"); if(!wrap) return;
+  const body=(document.getElementById("f_body")||{}).value||"";
+  const paras=body.split(/\n\n+/).map(s=>s.trim()).filter(Boolean);
+  const cur=(NEWS[sel]&&NEWS[sel].slide_images)||[];
+  if(!paras.length){ wrap.innerHTML='<p class="anote">本文を入力すると、段落ごとのスライドがここに並びます。</p>'; return; }
+  wrap.innerHTML=paras.map((p,i)=>{
+    const has=pendingSlides[i]?pendingSlides[i].url:(cur[i]||"");
+    return `<div class="slot">
+      <div class="sthumb">${has?`<img src="${esc(has)}" alt="">`:'<span class="sph">白地</span>'}</div>
+      <div class="sinfo">
+        <div class="snum">スライド ${i+2}</div>
+        <div class="stext">${esc(p.slice(0,44))}${p.length>44?'…':''}</div>
+        <div class="sact">
+          <label class="sbtn">画像を選ぶ<input type="file" accept="image/*" class="sfile" data-i="${i}" hidden></label>
+          ${has?`<button type="button" class="sclear" data-i="${i}">クリア</button>`:''}
+        </div>
+      </div>
+    </div>`;}).join("");
+  wrap.querySelectorAll(".sfile").forEach(inp=>inp.onchange=()=>{
+    const i=+inp.dataset.i, f=inp.files[0]; if(!f) return;
+    if(pendingSlides[i]&&pendingSlides[i].url) URL.revokeObjectURL(pendingSlides[i].url);
+    pendingSlides[i]={file:f,url:URL.createObjectURL(f)}; renderSlides();
+  });
+  wrap.querySelectorAll(".sclear").forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i;
+    if(pendingSlides[i]){ if(pendingSlides[i].url)URL.revokeObjectURL(pendingSlides[i].url); delete pendingSlides[i]; }
+    if(NEWS[sel].slide_images && NEWS[sel].slide_images[i]) NEWS[sel].slide_images[i]="";
+    renderSlides();
+  });
+}
+
 function renderEditor(){
   if(sel==null)return;
   const a=NEWS[sel];
@@ -244,6 +288,9 @@ function renderEditor(){
         <p class="anote" style="margin-top:12px">見出しを変えると合成も即更新。保存でこのサムネが記事に使われます。</p>
       </div>
     </div>
+
+    <label>カルーセルのスライド画像 <span style="text-transform:none;letter-spacing:0;color:#999">— 各本文スライドに写真を敷けます（無ければ白地。公開時に合成）</span></label>
+    <div id="slideList" class="slidelist"></div>
 
     <div class="sns">
       <div class="snshd">SNS投稿テキスト<span>（自動生成・そのまま手直しOK）</span></div>
@@ -283,6 +330,8 @@ function renderEditor(){
   const dh=document.getElementById("f_dek"); if(dh) dh.oninput=()=>drawThumb();
   const ch=document.getElementById("f_cat"); if(ch) ch.onchange=()=>drawThumb();
   drawThumb();  // 初期表示
+  const bh=document.getElementById("f_body"); if(bh) bh.oninput=()=>renderSlides();
+  renderSlides();  // スライド画像一覧の初期表示
   document.getElementById("save").onclick=()=>save();               // 状態は変えず保存
   document.getElementById("pubtoggle").onclick=()=>save(isPub?"draft":"published"); // 公開/非公開の切替
   document.getElementById("postx").onclick=()=>postSNS("x");
@@ -292,7 +341,7 @@ function newArticle(){
   const id="post-"+Math.random().toString(36).slice(2,10)+"-"+Date.now();
   NEWS.unshift({id,headline:"（新規記事）",dek:"",body:"",category:"映画",hashtags:[],
     source:"actorsbookmag original",source_url:"",thumbnail:"",background:"",status:"draft",published_at:new Date().toISOString()});
-  sel=0;pendingFile=null;renderList();renderEditor();
+  sel=0;pendingFile=null;pendingSlides={};renderList();renderEditor();
 }
 
 async function save(statusOverride){
@@ -325,9 +374,18 @@ async function save(statusOverride){
     const cv=document.getElementById("bgprev");
     if(cv&&cv.getContext){ try{ thumb=cv.toDataURL("image/jpeg",0.9).split(",")[1]; }catch(e){} }
 
+    // カルーセルのスライド画像（新規アップロード分をまとめる／既存の割り当ては維持）
+    a.slide_images=(NEWS[sel].slide_images||[]).slice();
+    const slidesPayload=[];
+    for(const k of Object.keys(pendingSlides)){
+      const i=+k, f=pendingSlides[i]&&pendingSlides[i].file; if(!f) continue;
+      const b=new Uint8Array(await f.arrayBuffer());
+      slidesPayload.push({idx:i, ext:(f.name.split('.').pop()||'jpg'), dataB64:u8ToB64(b)});
+    }
+
     setStatus("保存中…");
     const resp=await fetch("/api/save",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({password:pw(), record:a, image, thumb})});
+      body:JSON.stringify({password:pw(), record:a, image, thumb, slides:slidesPayload})});
     let data={}; try{data=await resp.json();}catch(e){}
     if(!resp.ok){
       if(resp.status===401){ setStatus("⚠ パスワードが違います。ログアウトして入れ直してください。","err"); }
@@ -335,7 +393,10 @@ async function save(statusOverride){
       if(btn) btn.disabled=false; return false;
     }
     if(data.background) a.background=data.background;
-    NEWS[sel]=a; pendingFile=null; renderList(); renderEditor();  // 再描画でボタンが公開⇄非公開に切替わる
+    if(data.slide_images) a.slide_images=data.slide_images;
+    NEWS[sel]=a; pendingFile=null;
+    Object.values(pendingSlides).forEach(s=>{if(s&&s.url)URL.revokeObjectURL(s.url);}); pendingSlides={};
+    renderList(); renderEditor();  // 再描画でボタンが公開⇄非公開に切替わる
     setStatus(
       statusOverride==="published" ? "✓ 公開しました。1分ほどで反映されます。"
       : statusOverride==="draft"   ? "✓ 非公開にしました。1分ほどで反映されます。"

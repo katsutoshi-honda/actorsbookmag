@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: "POSTのみ対応しています" });
   }
 
-  const { password, record, image, thumb } = req.body || {};
+  const { password, record, image, thumb, slides } = req.body || {};
 
   // 1) パスワード照合
   if (!process.env.EDIT_PASSWORD || password !== process.env.EDIT_PASSWORD) {
@@ -75,6 +75,26 @@ module.exports = async (req, res) => {
       if (tr.ok) record.thumbnail = "/" + tpath;
     }
 
+    // 2.7) カルーセルのスライド画像（本文各スライドの背景）をコミットして record.slide_images[idx] を更新
+    if (Array.isArray(slides) && slides.length) {
+      record.slide_images = Array.isArray(record.slide_images) ? record.slide_images.slice() : [];
+      for (const s of slides) {
+        if (!s || s.dataB64 == null || typeof s.idx !== "number") continue;
+        const sext = String(s.ext || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+        const sp = `images/news/slides/${record.id}-${s.idx}-${Date.now()}.${sext}`;
+        const sr = await api(sp, {
+          method: "PUT",
+          body: JSON.stringify({
+            message: `cms: slide ${s.idx} for ${record.id}`, content: s.dataB64, branch: BRANCH,
+          }),
+        });
+        if (sr.ok) {
+          while (record.slide_images.length <= s.idx) record.slide_images.push("");
+          record.slide_images[s.idx] = "/" + sp;
+        }
+      }
+    }
+
     // 3) 最新の news.json を取得(sha) → 該当recordを差し替え(なければ先頭に追加)
     const cur = await api(`data/news.json?ref=${BRANCH}`);
     let arr = [];
@@ -104,7 +124,11 @@ module.exports = async (req, res) => {
       return res.status(502).json({ error: "保存に失敗: " + t.slice(0, 200) });
     }
 
-    return res.status(200).json({ ok: true, background: record.background || "" });
+    return res.status(200).json({
+      ok: true,
+      background: record.background || "",
+      slide_images: record.slide_images || [],
+    });
   } catch (e) {
     return res.status(500).json({ error: String(e && e.message ? e.message : e) });
   }
