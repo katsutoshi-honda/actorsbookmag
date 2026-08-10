@@ -75,6 +75,7 @@ a.view{font-size:13px;color:var(--muted)}
 .sinfo{flex:1;min-width:0}
 .snum{font-size:11px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
 .stext{font-size:13px;color:#333;margin:2px 0 8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.stextedit{width:100%;border:1px solid #ddd;border-radius:6px;padding:8px 10px;font:inherit;font-size:13px;line-height:1.55;resize:vertical;margin:3px 0 8px;background:#fff;color:var(--fg);min-height:44px}
 .sact{display:flex;gap:8px;align-items:center}
 .sbtn{display:inline-block;background:#111;color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
 .sclear{background:none;border:1px solid #ddd;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;color:#c0392b}
@@ -235,19 +236,26 @@ function renderSlides(){
   const paras=body.split(/\n\n+/).map(s=>s.trim()).filter(Boolean);
   const cur=(NEWS[sel]&&NEWS[sel].slide_images)||[];
   if(!paras.length){ wrap.innerHTML='<p class="anote">本文を入力すると、段落ごとのスライドがここに並びます。</p>'; return; }
+  const texts=(NEWS[sel]&&NEWS[sel].slide_texts)||[];
   wrap.innerHTML=paras.map((p,i)=>{
     const has=pendingSlides[i]?pendingSlides[i].url:(cur[i]||"");
+    const ov=texts[i]||"";
+    const ph=`本文から自動：${p.slice(0,36)}${p.length>36?'…':''}`;
     return `<div class="slot">
       <div class="sthumb">${has?`<img src="${esc(has)}" alt="">`:'<span class="sph">白地</span>'}</div>
       <div class="sinfo">
         <div class="snum">スライド ${i+2}</div>
-        <div class="stext">${esc(p.slice(0,44))}${p.length>44?'…':''}</div>
+        <textarea class="stextedit" data-i="${i}" rows="2" placeholder="${esc(ph)}">${esc(ov)}</textarea>
         <div class="sact">
           <label class="sbtn">画像を選ぶ<input type="file" accept="image/*" class="sfile" data-i="${i}" hidden></label>
           ${has?`<button type="button" class="sclear" data-i="${i}">クリア</button>`:''}
         </div>
       </div>
     </div>`;}).join("");
+  wrap.querySelectorAll(".stextedit").forEach(t=>t.oninput=()=>{
+    const i=+t.dataset.i; const arr=(NEWS[sel].slide_texts=NEWS[sel].slide_texts||[]);
+    while(arr.length<=i) arr.push(""); arr[i]=t.value;
+  });
   wrap.querySelectorAll(".sfile").forEach(inp=>inp.onchange=()=>{
     const i=+inp.dataset.i, f=inp.files[0]; if(!f) return;
     if(pendingSlides[i]&&pendingSlides[i].url) URL.revokeObjectURL(pendingSlides[i].url);
@@ -289,7 +297,7 @@ function renderEditor(){
       </div>
     </div>
 
-    <label>カルーセルのスライド画像 <span style="text-transform:none;letter-spacing:0;color:#999">— 各本文スライドに写真を敷けます（無ければ白地。公開時に合成）</span></label>
+    <label>カルーセルのスライド <span style="text-transform:none;letter-spacing:0;color:#999">— 各スライドに写真＋テキスト。テキストは空欄なら本文から自動／書けば上書き。公開時に合成</span></label>
     <div id="slideList" class="slidelist"></div>
 
     <div class="sns">
@@ -374,6 +382,12 @@ async function save(statusOverride){
     const cv=document.getElementById("bgprev");
     if(cv&&cv.getContext){ try{ thumb=cv.toDataURL("image/jpeg",0.9).split(",")[1]; }catch(e){} }
 
+    // カルーセルのスライド本文（空欄=本文から自動。テキストはJSONに保存されるだけ）
+    const stArr=(NEWS[sel].slide_texts||[]).slice();
+    document.querySelectorAll('#slideList .stextedit').forEach(t=>{
+      const i=+t.dataset.i; while(stArr.length<=i) stArr.push(""); stArr[i]=t.value.trim();
+    });
+    a.slide_texts=stArr;
     // カルーセルのスライド画像（新規アップロード分をまとめる／既存の割り当ては維持）
     a.slide_images=(NEWS[sel].slide_images||[]).slice();
     const slidesPayload=[];

@@ -255,9 +255,11 @@ def build_slides(rec, size):
     img, _d = build_cover(rec, W, H, swipe=True)
     slides.append(img)
 
-    # 本文（slide_imagesがあれば写真合成、無ければ白地）
+    # 本文（slide_texts[i]があれば上書き、無ければ本文段落。画像はslide_imagesで合成）
+    stexts = rec.get("slide_texts") or []
     for i, p in enumerate(paras):
-        slides.append(_body_slide(rec, p, i, total, W, H))
+        t = stexts[i].strip() if (i < len(stexts) and isinstance(stexts[i], str) and stexts[i].strip()) else p
+        slides.append(_body_slide(rec, t, i, total, W, H))
 
     # アウトロ（黒・ブランド）
     img, d = _base(W, H, True)
