@@ -76,6 +76,14 @@ a.view{font-size:13px;color:var(--muted)}
 .snum{font-size:11px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
 .stext{font-size:13px;color:#333;margin:2px 0 8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .stextedit{width:100%;border:1px solid #ddd;border-radius:6px;padding:8px 10px;font:inherit;font-size:13px;line-height:1.55;resize:vertical;margin:3px 0 8px;background:#fff;color:var(--fg);min-height:44px}
+.thumbs a{cursor:zoom-in}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.86);display:none;align-items:center;justify-content:center;z-index:1000}
+.lightbox .lbinner{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:92vw;max-height:92vh}
+.lightbox img{max-width:90vw;max-height:80vh;object-fit:contain;border-radius:6px;box-shadow:0 10px 60px rgba(0,0,0,.6)}
+.lightbox .lbbar{display:flex;gap:12px;align-items:center}
+.lightbox .lbdl{background:#fff;color:#111;padding:9px 16px;border-radius:8px;font-weight:700;font-size:13px;text-decoration:none}
+.lightbox .lbclose{background:none;border:1px solid #666;color:#fff;padding:9px 16px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer}
+.lightbox .lbnav{background:rgba(255,255,255,.15);border:0;color:#fff;font-size:22px;width:44px;height:44px;border-radius:50%;cursor:pointer}
 .sact{display:flex;gap:8px;align-items:center}
 .sbtn{display:inline-block;background:#111;color:#fff;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer}
 .sclear{background:none;border:1px solid #ddd;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;color:#c0392b}
@@ -269,6 +277,36 @@ function renderSlides(){
   });
 }
 
+// カルーセル画像のライトボックス（クリックで拡大プレビュー＋前後送り＋ダウンロード）
+let lbList=[], lbIdx=0;
+function showLightbox(){
+  let lb=document.getElementById("lightbox");
+  if(!lb){ lb=document.createElement("div"); lb.id="lightbox"; lb.className="lightbox";
+    document.body.appendChild(lb);
+    lb.addEventListener("click",e=>{ if(e.target===lb) lb.style.display="none"; }); }
+  const u=lbList[lbIdx]||"", many=lbList.length>1;
+  lb.innerHTML=`
+    ${many?'<button class="lbnav" data-d="-1">‹</button>':''}
+    <div class="lbinner">
+      <img src="${esc(u)}" alt="">
+      <div class="lbbar">
+        <span style="color:#aaa;font-size:12px">${lbIdx+1} / ${lbList.length}</span>
+        <a class="lbdl" href="${esc(u)}" download>⬇ ダウンロード</a>
+        <button class="lbclose">閉じる ✕</button>
+      </div>
+    </div>
+    ${many?'<button class="lbnav" data-d="1">›</button>':''}`;
+  lb.style.display="flex";
+  lb.querySelector(".lbclose").onclick=()=>lb.style.display="none";
+  lb.querySelectorAll(".lbnav").forEach(b=>b.onclick=()=>{ lbIdx=(lbIdx+ +b.dataset.d + lbList.length)%lbList.length; showLightbox(); });
+}
+document.addEventListener("keydown",e=>{
+  const lb=document.getElementById("lightbox"); if(!lb||lb.style.display!=="flex") return;
+  if(e.key==="Escape") lb.style.display="none";
+  else if(e.key==="ArrowLeft" && lbList.length>1){ lbIdx=(lbIdx-1+lbList.length)%lbList.length; showLightbox(); }
+  else if(e.key==="ArrowRight" && lbList.length>1){ lbIdx=(lbIdx+1)%lbList.length; showLightbox(); }
+});
+
 function renderEditor(){
   if(sel==null)return;
   const a=NEWS[sel];
@@ -314,7 +352,7 @@ function renderEditor(){
       ${a.assets ? `
       <div class="assets">
         <div class="ahd">📸 Instagramカルーセル（${a.assets.carousel.length}枚）— 画像を保存して投稿</div>
-        <div class="thumbs">${a.assets.carousel.map((u,i)=>`<a href="${esc(u)}" download target="_blank" title="${i+1}枚目"><img src="${esc(u)}" alt=""><span>${i+1}</span></a>`).join("")}</div>
+        <div class="thumbs">${a.assets.carousel.map((u,i)=>`<a href="${esc(u)}" class="thumbimg" data-idx="${i}" title="${i+1}枚目（クリックで拡大）"><img src="${esc(u)}" alt=""><span>${i+1}</span></a>`).join("")}</div>
         <div class="ahd" style="margin-top:14px">🎬 TikTok / Reels 動画（縦型）</div>
         <a class="dlbtn" href="${esc(a.assets.video)}" download target="_blank">▽ 動画をダウンロード</a>
       </div>` : `<div class="anote">※ カルーセル画像・動画は「公開」後に自動生成され、ここに並びます</div>`}
@@ -344,6 +382,9 @@ function renderEditor(){
   document.getElementById("pubtoggle").onclick=()=>save(isPub?"draft":"published"); // 公開/非公開の切替
   document.getElementById("postx").onclick=()=>postSNS("x");
   document.getElementById("postig").onclick=()=>postSNS("instagram");
+  // カルーセルのサムネ→クリックで拡大プレビュー
+  const carousel=(a.assets&&a.assets.carousel)||[];
+  document.querySelectorAll(".thumbimg").forEach(el=>el.onclick=(e)=>{e.preventDefault(); lbList=carousel; lbIdx=+el.dataset.idx; showLightbox();});
 }
 function newArticle(){
   const id="post-"+Math.random().toString(36).slice(2,10)+"-"+Date.now();
