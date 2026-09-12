@@ -1,6 +1,7 @@
 {
   "banners": [
-    "data/banners/mubi_pete-ohs.jpg"
+    "data/banners/mubi_orian-barki.jpg",
+    "data/banners/mubi_meriem-bennani.jpg"
   ],
-  "count": 1
+  "count": 2
 }
